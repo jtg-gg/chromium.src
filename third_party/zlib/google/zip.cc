@@ -148,13 +148,8 @@ bool ExcludeHiddenFilesFilter(const base::FilePath& file_path) {
 }  // namespace
 
 namespace zip {
-
-bool Unzip(const base::FilePath& src_file, const base::FilePath& dest_dir) {
-  ZipReader reader;
-  if (!reader.Open(src_file)) {
-    DLOG(WARNING) << "Failed to open " << src_file.value();
-    return false;
-  }
+  
+bool Unzip(ZipReader& reader, const base::FilePath& dest_dir) {
   while (reader.HasMore()) {
     if (!reader.OpenCurrentEntryInZip()) {
       DLOG(WARNING) << "Failed to open the current file in zip";
@@ -162,12 +157,12 @@ bool Unzip(const base::FilePath& src_file, const base::FilePath& dest_dir) {
     }
     if (reader.current_entry_info()->is_unsafe()) {
       DLOG(WARNING) << "Found an unsafe file in zip "
-                    << reader.current_entry_info()->file_path().value();
+      << reader.current_entry_info()->file_path().value();
       return false;
     }
     if (!reader.ExtractCurrentEntryIntoDirectory(dest_dir)) {
       DLOG(WARNING) << "Failed to extract "
-                    << reader.current_entry_info()->file_path().value();
+      << reader.current_entry_info()->file_path().value();
       return false;
     }
     if (!reader.AdvanceToNextEntry()) {
@@ -177,6 +172,25 @@ bool Unzip(const base::FilePath& src_file, const base::FilePath& dest_dir) {
   }
   return true;
 }
+
+bool Unzip(const base::FilePath& src_file, const base::FilePath& dest_dir) {
+  ZipReader reader;
+  if (!reader.Open(src_file)) {
+    DLOG(WARNING) << "Failed to open " << src_file.value();
+    return false;
+  }
+  return Unzip(reader, dest_dir);
+}
+
+bool Unzip(const std::string& string, const base::FilePath& dest_dir) {
+  ZipReader reader;
+  if (!reader.OpenFromString(string)) {
+    DLOG(WARNING) << "Failed to open zip from string";
+    return false;
+  }
+  return Unzip(reader, dest_dir);
+}
+
 
 bool ZipWithFilterCallback(const base::FilePath& src_dir,
                            const base::FilePath& dest_file,

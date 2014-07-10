@@ -38,6 +38,9 @@ const char kAuditAllHandles[]               = "enable-handle-auditing-all";
 // is terminated.
 const char kAuditHandles[]                  = "enable-handle-auditing";
 
+// directory for bitmap font glyphs
+const char kBitmapFontDir[]                 = "bitmap-font-dir";
+
 // Blacklist the GPU for accelerated compositing.
 const char kBlacklistAcceleratedCompositing[] =
     "blacklist-accelerated-compositing";

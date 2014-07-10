@@ -1015,6 +1015,7 @@ void RenderProcessHostImpl::PropagateBrowserCommandLineToRenderer(
     switches::kAudioBufferSize,
     switches::kAuditAllHandles,
     switches::kAuditHandles,
+    switches::kBitmapFontDir,
     switches::kBlinkPlatformLogChannels,
     switches::kBlockCrossSiteDocuments,
     switches::kDefaultTileWidth,

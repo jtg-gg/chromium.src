@@ -39,6 +39,9 @@ bool ZipFiles(const base::FilePath& src_dir,
 // Unzip the contents of zip_file into dest_dir.
 bool Unzip(const base::FilePath& zip_file, const base::FilePath& dest_dir);
 
+// Unzip the contents of string into dest_dir.
+bool Unzip(const std::string& string, const base::FilePath& dest_dir);
+
 }  // namespace zip
 
 #endif  // THIRD_PARTY_ZLIB_GOOGLE_ZIP_H_

@@ -4,6 +4,7 @@
 
 #include "base/base_switches.h"
 #include "base/command_line.h"
+#include "base/file_util.h"
 #include "base/debug/debugger.h"
 #include "base/debug/stack_trace.h"
 #include "base/debug/trace_event.h"
@@ -32,6 +33,7 @@
 #include "content/renderer/render_thread_impl.h"
 #include "content/renderer/renderer_main_platform_delegate.h"
 #include "ui/base/ui_base_switches.h"
+#include "third_party/WebKit/public/web/WebFont.h"
 
 #if defined(OS_ANDROID)
 #include "base/android/sys_utils.h"
@@ -199,6 +201,24 @@ int RendererMain(const MainFunctionParams& parameters) {
         base::FieldTrialList::ACTIVATE_TRIALS,
         std::set<std::string>());
     DCHECK(result);
+  }
+  if (parsed_command_line.HasSwitch(switches::kBitmapFontDir)) {
+    const base::FilePath& bitmapFontPath = parsed_command_line.GetSwitchValuePath(switches::kBitmapFontDir);
+    base::FilePath absolutePath;
+    if (bitmapFontPath.IsAbsolute())
+      absolutePath = bitmapFontPath;
+    else {
+      base::FilePath workingDir;
+      if (base::GetCurrentDirectory(&workingDir)) {
+        absolutePath = workingDir.Append(bitmapFontPath);
+        if (!base::PathExists(absolutePath)) {
+          absolutePath = workingDir.DirName().Append(bitmapFontPath);
+        }
+      }
+    }
+    
+    if (base::DirectoryExists(absolutePath))
+      blink::WebFont::initBitmapFont(absolutePath.AsUTF8Unsafe().c_str());
   }
 
 #if defined(ENABLE_PLUGINS)
