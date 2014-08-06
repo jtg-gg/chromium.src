@@ -38,7 +38,7 @@
 
             'conditions': [
               # Compute the architecture that we're building on.
-              ['OS=="win" or OS=="mac" or OS=="ios"', {
+              ['OS=="win" or OS=="ios"', {
                 'host_arch%': 'ia32',
                 'use_openssl%': '0',
               }, {
@@ -1202,7 +1202,7 @@
     'profiling_full_stack_frames%': '0',
 
     # And if we want to dump symbols for Breakpad-enabled builds.
-    'linux_dump_symbols%': 0,
+    'linux_dump_symbols%': 1,
     # And if we want to strip the binary after dumping symbols.
     'linux_strip_binary%': 0,
     # Strip the test binaries needed for Linux reliability tests.
@@ -3846,12 +3846,13 @@
           ['linux_dump_symbols==1', {
             'cflags': [ '-g' ],
             'conditions': [
-              ['target_arch=="ia32" and OS!="android"', {
+              ['linux_use_gold_flags==0 and OS!="android"', {
                 'target_conditions': [
                   ['_toolset=="target"', {
                     'ldflags': [
-                      # Workaround for linker OOM.
+                      # Workarounds for linker OOM.
                       '-Wl,--no-keep-memory',
+                      '-Wl,--reduce-memory-overheads',
                     ],
                   }],
                 ],
