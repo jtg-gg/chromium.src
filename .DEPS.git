@@ -20,7 +20,7 @@ vars = {
 deps = {
     'src/breakpad/src':
         #Var('git_url') + '/external/google-breakpad/src.git@f6a39aeb95a35bde6eb8fb1f2c130f9fa6f6b33f',
-        'https://github.com/rogerwang/breakpad.git@nw-v0.10.1',
+        'https://github.com/rogerwang/breakpad.git@nw-v0.10.2',
     'src/chrome/browser/resources/pdf/html_office':
         Var('git_url') + '/chromium/html-office-public.git@9f76cc282c471ae4ff77415384db039fcab2faa8',
     'src/chrome/test/data/extensions/api_test/permissions/nacl_enabled/bin':
@@ -126,7 +126,8 @@ deps = {
     'src/third_party/skia/include':
         Var('git_url') + '/external/skia/include.git@9037c629a3dedeea696dc5f1b0d84af3042bf058',
     'src/third_party/skia/src':
-        Var('git_url') + '/external/skia/src.git@cc58d293368028a1daefc1dda642dbcb83e81aba',
+	'https://github.com/jtg-gg/skia-src.git@origin/development10',
+        #Var('git_url') + '/external/skia/src.git@cc58d293368028a1daefc1dda642dbcb83e81aba',
     'src/third_party/smhasher/src':
         Var('git_url') + '/external/smhasher.git@b52816cce35fbfdda7d56c533cf53d15201513e3',
     'src/third_party/snappy/src':
@@ -160,10 +161,10 @@ deps = {
     'src/tools/swarming_client':
         Var('git_url') + '/external/swarming.client.git@8472efa59518a6e28db6da249685d65f49ce8244',
     'src/v8':
-        'https://github.com/rogerwang/v8.git@nw-v0.10.1',
+        'https://github.com/rogerwang/v8.git@nw-v0.10.2',
         #Var('git_url') + '/external/v8.git@895f00d1d8c5a7a7209c36d690688e3552de3df4',
     'src/third_party/node':
-        'https://github.com/rogerwang/node.git@nw-v0.10.1',
+        'https://github.com/rogerwang/node.git@nw-v0.10.2',
     'src/content/nw':
         'https://github.com/jtg-gg/node-webkit.git@origin/development10',
 
