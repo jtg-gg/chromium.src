@@ -127,8 +127,15 @@ bool StatusIconWin::DisplayBalloon(const gfx::ImageSkia& icon,
   InitIconData(&icon_data);
   icon_data.uFlags = NIF_INFO;
   icon_data.dwInfoFlags = NIIF_INFO;
+  
+  if (sizeof(icon_data.szInfoTitle)/sizeof(WCHAR) <= title.length())
+    return false;
   wcscpy_s(icon_data.szInfoTitle, title.c_str());
+
+  if (sizeof(icon_data.szInfo)/sizeof(WCHAR) <= contents.length())
+    return false;
   wcscpy_s(icon_data.szInfo, contents.c_str());
+  
   icon_data.uTimeout = 0;
 
   base::win::Version win_version = base::win::GetVersion();
