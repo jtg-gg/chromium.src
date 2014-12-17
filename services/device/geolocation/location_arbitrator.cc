@@ -58,7 +58,7 @@ void LocationArbitrator::StartProvider(bool enable_high_accuracy) {
 
   if (providers_.empty()) {
     RegisterSystemProvider();
-    RegisterNetworkProvider();
+    //RegisterNetworkProvider();
   }
   DoStartProviders();
 }
@@ -156,7 +156,7 @@ LocationArbitrator::NewNetworkLocationProvider(
 
 std::unique_ptr<LocationProvider>
 LocationArbitrator::NewSystemLocationProvider() {
-#if defined(OS_WIN) || defined(OS_MACOSX) || defined(OS_LINUX) || \
+#if defined(OS_LINUX) || \
     defined(OS_FUCHSIA)
   return nullptr;
 #else
