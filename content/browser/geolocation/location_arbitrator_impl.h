@@ -106,6 +106,7 @@ class CONTENT_EXPORT LocationArbitratorImpl : public LocationArbitrator {
       token_store_callback_;
   std::vector<std::unique_ptr<LocationProvider>> providers_;
   bool enable_high_accuracy_;
+  std::map<const LocationProvider*, int> providers_results_count_;
   // The provider which supplied the current |position_|
   const LocationProvider* position_provider_;
   bool is_permission_granted_;
