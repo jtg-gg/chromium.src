@@ -14,6 +14,7 @@
 #include "build/build_config.h"
 #include "device/geolocation/network_location_provider.h"
 #include "device/geolocation/public/cpp/geoposition.h"
+#include "device/geolocation/system_location_provider.h"
 #include "device/geolocation/wifi_polling_policy.h"
 
 namespace device {
@@ -176,7 +177,7 @@ LocationArbitrator::NewNetworkLocationProvider(
 
 std::unique_ptr<LocationProvider>
 LocationArbitrator::NewSystemLocationProvider() {
-#if defined(OS_WIN) || defined(OS_MACOSX) || defined(OS_LINUX) || \
+#if defined(OS_LINUX) || \
     defined(OS_FUCHSIA)
   return nullptr;
 #else
