@@ -170,7 +170,11 @@ void GeolocationProviderImpl::OnClientsChanged() {
                       base::Unretained(this));
   } else {
     if (!IsRunning()) {
+#if defined(OS_MACOSX)
+      StartWithOptions(Options(base::MessagePumpType::UI, 0));
+#else
       Start();
+#endif
       if (user_did_opt_into_location_services_)
         InformProvidersPermissionGranted();
     }
