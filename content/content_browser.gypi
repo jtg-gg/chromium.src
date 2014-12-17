@@ -1916,6 +1916,7 @@
           '-limm32.lib',
           '-lsensorsapi.lib',
           '-lportabledeviceguids.lib',
+          '-llocationapi.lib',
         ],
         'msvs_settings': {
           'VCLinkerTool': {
@@ -1923,6 +1924,7 @@
               'dinput8.dll',
               'user32.dll',
               'dwmapi.dll',
+              'locationapi.dll',
             ],
           },
         },
@@ -2018,6 +2020,11 @@
         '../third_party/sudden_motion_sensor/sudden_motion_sensor.gyp:sudden_motion_sensor',
         '../ui/accelerated_widget_mac/accelerated_widget_mac.gyp:accelerated_widget_mac',
       ],
+      'link_settings': {
+        'libraries': [
+          '$(SDKROOT)/System/Library/Frameworks/CoreLocation.framework',
+        ],
+      },
     }],
     ['chromeos==1', {
       'dependencies': [

@@ -43,6 +43,11 @@ component("device_geolocation") {
     "network_location_provider.h",
     "network_location_request.cc",
     "network_location_request.h",
+    "system_location_provider.h",
+    "system_location_provider_mac.h",
+    "system_location_provider_mac.mm",
+    "system_location_provider_win.h",
+    "system_location_provider_win.cc",
     "wifi_data.cc",
     "wifi_data.h",
     "wifi_data_provider.cc",
@@ -111,7 +116,7 @@ component("device_geolocation") {
   }
 
   if (is_mac) {
-    libs = [ "Foundation.framework" ]
+    libs = [ "Foundation.framework", "CoreLocation.framework" ]
   }
 }
 

@@ -234,6 +234,7 @@ source_set("browser") {
       "oleacc.lib",
       "sensorsapi.lib",
       "portabledeviceguids.lib",
+      "locationapi.lib",
     ]
 
     # TODI(GYP)
@@ -243,6 +244,7 @@ source_set("browser") {
     #             'dinput8.dll',
     #             'user32.dll',
     #             'dwmapi.dll',
+    #             'locationapi.dll',
     #           ],
   }
 
