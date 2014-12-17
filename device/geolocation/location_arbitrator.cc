@@ -15,13 +15,14 @@
 #include "device/geolocation/access_token_store.h"
 #include "device/geolocation/geolocation_delegate.h"
 #include "device/geolocation/network_location_provider.h"
+#include "device/geolocation/system_location_provider.h"
 
 namespace device {
 
 // To avoid oscillations, set this to twice the expected update interval of a
 // a GPS-type location provider (in case it misses a beat) plus a little.
 const int64_t LocationArbitrator::kFixStaleTimeoutMilliseconds =
-    11 * base::Time::kMillisecondsPerSecond;
+    2000 * base::Time::kMillisecondsPerSecond;
 
 LocationArbitrator::LocationArbitrator(
     std::unique_ptr<GeolocationDelegate> delegate,
@@ -94,7 +95,7 @@ void LocationArbitrator::StopProvider() {
   // the newly constructed providers.
   position_provider_ = nullptr;
   position_ = Geoposition();
-
+  providers_results_count_.clear();
   providers_.clear();
   is_running_ = false;
 }
@@ -128,14 +129,16 @@ void LocationArbitrator::RegisterSystemProvider() {
 
 void LocationArbitrator::OnLocationUpdate(const LocationProvider* provider,
                                           const Geoposition& new_position) {
+  providers_results_count_[provider]++;
   DCHECK(new_position.Validate() ||
          new_position.error_code != Geoposition::ERROR_CODE_NONE);
-  if (!IsNewPositionBetter(position_, new_position,
-                           provider == position_provider_))
-    return;
-  position_provider_ = provider;
-  position_ = new_position;
-  arbitrator_update_callback_.Run(this, position_);
+  if (IsNewPositionBetter(position_, new_position,
+                          provider == position_provider_)) {
+    position_provider_ = provider;
+    position_ = new_position;
+  }
+  if (providers_results_count_.size() >= providers_.size())
+    arbitrator_update_callback_.Run(this, position_);
 }
 
 const Geoposition& LocationArbitrator::GetPosition() {
@@ -172,7 +175,7 @@ LocationArbitrator::NewNetworkLocationProvider(
 
 std::unique_ptr<LocationProvider>
 LocationArbitrator::NewSystemLocationProvider() {
-#if defined(OS_WIN) || defined(OS_MACOSX) || defined(OS_LINUX) || \
+#if defined(OS_LINUX) || \
     defined(OS_FUCHSIA)
   return nullptr;
 #else
