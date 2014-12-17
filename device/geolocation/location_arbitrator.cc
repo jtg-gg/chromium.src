@@ -14,13 +14,14 @@
 #include "build/build_config.h"
 #include "device/geolocation/network_location_provider.h"
 #include "device/geolocation/public/cpp/geoposition.h"
+#include "device/geolocation/system_location_provider.h"
 
 namespace device {
 
 // To avoid oscillations, set this to twice the expected update interval of a
 // a GPS-type location provider (in case it misses a beat) plus a little.
 const base::TimeDelta LocationArbitrator::kFixStaleTimeoutTimeDelta =
-    base::TimeDelta::FromSeconds(11);
+    base::TimeDelta::FromSeconds(2000);
 
 LocationArbitrator::LocationArbitrator(
     const CustomLocationProviderCallback& custom_location_provider_getter,
@@ -87,7 +88,7 @@ void LocationArbitrator::StopProvider() {
   // the newly constructed providers.
   position_provider_ = nullptr;
   position_ = mojom::Geoposition();
-
+  providers_results_count_.clear();
   providers_.clear();
   is_running_ = false;
 }
@@ -127,14 +128,16 @@ void LocationArbitrator::RegisterSystemProvider() {
 void LocationArbitrator::OnLocationUpdate(
     const LocationProvider* provider,
     const mojom::Geoposition& new_position) {
+  providers_results_count_[provider]++;
   DCHECK(ValidateGeoposition(new_position) ||
          new_position.error_code != mojom::Geoposition::ErrorCode::NONE);
-  if (!IsNewPositionBetter(position_, new_position,
-                           provider == position_provider_))
-    return;
-  position_provider_ = provider;
-  position_ = new_position;
-  arbitrator_update_callback_.Run(this, position_);
+  if (IsNewPositionBetter(position_, new_position,
+                          provider == position_provider_)) {
+    position_provider_ = provider;
+    position_ = new_position;
+  }
+  if (providers_results_count_.size() >= providers_.size())
+    arbitrator_update_callback_.Run(this, position_);
 }
 
 const mojom::Geoposition& LocationArbitrator::GetPosition() {
@@ -162,7 +165,7 @@ LocationArbitrator::NewNetworkLocationProvider(
 
 std::unique_ptr<LocationProvider>
 LocationArbitrator::NewSystemLocationProvider() {
-#if defined(OS_WIN) || defined(OS_MACOSX) || defined(OS_LINUX) || \
+#if defined(OS_LINUX) || \
     defined(OS_FUCHSIA)
   return nullptr;
 #else
