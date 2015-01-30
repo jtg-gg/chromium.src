@@ -133,10 +133,10 @@ deps = {
   'src/third_party/trace-viewer':
    Var('chromium_git') + '/external/trace-viewer.git' + '@' + '2a348ed4cbdf27a8c9f0431d34ecbabf66182f08',
 
-  'src/third_party/WebKit': 'https://github.com/nwjs/blink.git@origin/nw12',
+  'src/third_party/WebKit': 'https://github.com/jtg-gg/blink.git@origin/dev12-m41',
 
   'src/third_party/node': 'https://github.com/nwjs/node.git@origin/nw12',
-  'src/content/nw': 'https://github.com/nwjs/nw.js.git@origin/nw12',
+  'src/content/nw': 'https://github.com/jtg-gg/node-webkit.git@origin/dev12-m41',
 
   'src/third_party/icu':
    Var('chromium_git') + '/chromium/deps/icu.git' + '@' + '51c1a4ce5f362676aa1f1cfdb5b7e52edabfa5aa',
@@ -186,7 +186,8 @@ deps = {
     Var('chromium_git') + '/external/sfntly/cpp/src.git' + '@' +  Var('sfntly_revision'),
 
   'src/third_party/skia':
-   Var('chromium_git') + '/skia.git' + '@' +  Var('skia_revision'),
+  'https://github.com/jtg-gg/skia.git@origin/dev12-m41',
+   #Var('chromium_git') + '/skia.git' + '@' +  Var('skia_revision'),
 
   'src/third_party/ots':
     Var('chromium_git') + '/external/ots.git' + '@' + '98897009f3ea8a5fa3e20a4a74977da7aaa8e61a',
@@ -218,8 +219,8 @@ deps = {
   'src/third_party/libvpx':
    Var('chromium_git') + '/chromium/deps/libvpx.git' + '@' +  Var('libvpx_revision'),
 
-  'src/third_party/ffmpeg':
-   Var('chromium_git') + '/chromium/third_party/ffmpeg.git' + '@' + 'b9d631d0ad277109678e86d729acc889793b4b94',
+  'src/third_party/ffmpeg': 'https://github.com/jtg-gg/nwjs-ffmpeg.git@origin/dev12-m41',
+   #Var('chromium_git') + '/chromium/third_party/ffmpeg.git' + '@' + 'b9d631d0ad277109678e86d729acc889793b4b94',
 
   'src/third_party/libjingle/source/talk':
     Var('chromium_git') + '/external/webrtc/trunk/talk.git' + '@' + 'b40ea517179d49b2a39084ab05aaae85600bfbc2', # from svn revision 8033
