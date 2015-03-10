@@ -29,7 +29,7 @@
         }, {
           'sources' : [ 'simd_stub.c' ],
         }],
-        ['OS=="android"', {
+        ['OS=="android" or OS=="linux"', {
           'toolsets': ['target', 'host'],
         }],
       ],
