@@ -558,7 +558,7 @@
             {
               'destination': '<(PRODUCT_DIR)',
               'files': [
-                '<(SHARED_INTERMEDIATE_DIR)/repack/chrome_100_percent.pak'
+                '<(SHARED_INTERMEDIATE_DIR)/repack/nw_100_percent.pak'
               ],
             },
             {
@@ -593,7 +593,7 @@
                 {
                   'destination': '<(PRODUCT_DIR)',
                   'files': [
-                    '<(SHARED_INTERMEDIATE_DIR)/repack/chrome_200_percent.pak',
+                    '<(SHARED_INTERMEDIATE_DIR)/repack/nw_200_percent.pak',
                   ],
                 },
               ],
@@ -603,7 +603,7 @@
                 {
                   'destination': '<(PRODUCT_DIR)',
                   'files': [
-                    '<(SHARED_INTERMEDIATE_DIR)/repack/chrome_material_100_percent.pak',
+                    '<(SHARED_INTERMEDIATE_DIR)/repack/nw_material_100_percent.pak',
                   ],
                 },
               ],
@@ -613,7 +613,7 @@
                 {
                   'destination': '<(PRODUCT_DIR)',
                   'files': [
-                    '<(SHARED_INTERMEDIATE_DIR)/repack/chrome_material_200_percent.pak',
+                    '<(SHARED_INTERMEDIATE_DIR)/repack/nw_material_200_percent.pak',
                   ],
                 },
               ],

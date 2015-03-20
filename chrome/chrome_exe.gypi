@@ -23,11 +23,11 @@
               'action_name': 'reorder_imports',
               'inputs': [
                 '<(reorder_py_path)',
-                '$(OutDir)\\initialexe\\chrome.exe',
+                '$(OutDir)\\initialexe\\nw.exe',
               ],
               'outputs': [
-                '<(PRODUCT_DIR)\\chrome.exe',
-                '<(PRODUCT_DIR)\\chrome.exe.pdb',
+                '<(PRODUCT_DIR)\\nw.exe',
+                '<(PRODUCT_DIR)\\nw.exe.pdb',
               ],
               'action': [
                 'python',
@@ -48,7 +48,7 @@
       'type': 'executable',
       'dependencies' : [ '../chrome/common_constants.gyp:version_header', ],
       # Name the exe chrome.exe, not chrome_initial.exe.
-      'product_name': 'chrome',
+      'product_name': 'nw',
       'mac_bundle': 1,
       'variables': {
         'use_system_xdg_utils%': 0,
@@ -437,7 +437,7 @@
           ],
           'msvs_settings': {
             'VCLinkerTool': {
-              'OutputFile': '$(OutDir)\\initialexe\\chrome.exe',
+              'OutputFile': '$(OutDir)\\initialexe\\nw.exe',
               'DelayLoadDLLs': [
                 'dbghelp.dll',
                 'dwmapi.dll',
@@ -459,7 +459,7 @@
             },
             'VCManifestTool': {
               'AdditionalManifestFiles': [
-                '$(ProjectDir)\\app\\chrome.exe.manifest',
+                '$(ProjectDir)\\app\\nw.exe.manifest',
                 '<(SHARED_INTERMEDIATE_DIR)/chrome/app/version_assembly/version_assembly.manifest',
               ],
             },

@@ -354,7 +354,7 @@
                   'inputs': [
                     '<(DEPTH)/build/linux/dump_app_syms.py',
                     '<(PRODUCT_DIR)/dump_syms',
-                    '<(PRODUCT_DIR)/chrome',
+                    '<(PRODUCT_DIR)/nw',
                   ],
                   'outputs': [
                     '<(PRODUCT_DIR)/chrome.breakpad.<(target_arch)',
@@ -363,7 +363,7 @@
                              '<(DEPTH)/build/linux/dump_app_syms.py',
                              '<(PRODUCT_DIR)/dump_syms',
                              '<(linux_strip_binary)',
-                             '<(PRODUCT_DIR)/chrome',
+                             '<(PRODUCT_DIR)/nw',
                              '<@(_outputs)'],
                   'message': 'Dumping breakpad symbols to <(_outputs)',
                   'process_outputs_as_sources': 1,
