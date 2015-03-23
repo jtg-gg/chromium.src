@@ -46,7 +46,8 @@
             'chromium_child_dependencies': [
               # Use whatever CLD2 data access mode that the application
               # embedder is using.
-              '<(DEPTH)/third_party/cld_2/cld_2.gyp:cld2_platform_impl', ],
+              #'<(DEPTH)/third_party/cld_2/cld_2.gyp:cld2_platform_impl', 
+             ],
           }],
           ['enable_plugins==1 and disable_nacl==0', {
             'chromium_child_dependencies': [

@@ -52,7 +52,7 @@ using base::UserMetricsAction;
 namespace chrome {
 namespace {
 
-const char kHashMark[] = "#";
+//const char kHashMark[] = "#";
 
 void OpenBookmarkManagerWithHash(Browser* browser,
                                  const std::string& action,
@@ -304,23 +304,27 @@ void ShowSettingsSubPageInTabbedBrowser(Browser* browser,
 
 void ShowContentSettingsExceptions(Browser* browser,
                                    ContentSettingsType content_settings_type) {
+#if 0
   ShowSettingsSubPage(
       browser, GenerateContentSettingsExceptionsSubPage(content_settings_type));
+#endif
 }
 
 void ShowContentSettingsExceptionsInWindow(
     Profile* profile,
     ContentSettingsType content_settings_type) {
+#if 0
   DCHECK(switches::SettingsWindowEnabled());
   ShowSettingsSubPageForProfile(
       profile, GenerateContentSettingsExceptionsSubPage(content_settings_type));
+#endif
 }
 
 void ShowContentSettings(Browser* browser,
                          ContentSettingsType content_settings_type) {
+#if 0
   ShowSettingsSubPage(
       browser,
-#if 0
       kContentSettingsSubPage + std::string(kHashMark) +
           options::ContentSettingsHandler::ContentSettingsTypeToGroupName(
               content_settings_type));

@@ -823,6 +823,7 @@ void SaveCreditCard(Browser* browser) {
 #endif
 
 void Translate(Browser* browser) {
+#if 0
   if (!browser->window()->IsActive())
     return;
 
@@ -840,6 +841,7 @@ void Translate(Browser* browser) {
   }
   browser->window()->ShowTranslateBubble(
       web_contents, step, translate::TranslateErrors::NONE, true);
+#endif
 }
 
 void ManagePasswordsForPage(Browser* browser) {

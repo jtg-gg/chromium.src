@@ -1304,13 +1304,13 @@ void BrowserView::ShowTranslateBubble(
     if (rvh->IsFocusedElementEditable())
       return;
   }
-
+#if 0
   ChromeTranslateClient* chrome_translate_client =
       ChromeTranslateClient::FromWebContents(web_contents);
   translate::LanguageState& language_state =
       chrome_translate_client->GetLanguageState();
   language_state.SetTranslateEnabled(true);
-
+#endif
   if (IsMinimized())
     return;
 

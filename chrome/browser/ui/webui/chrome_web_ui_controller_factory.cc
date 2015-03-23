@@ -345,7 +345,6 @@ WebUIFactoryFunction GetWebUIFactoryFunction(WebUI* web_ui,
     return &NewWebUI<InstantUI>;
   if (url.host() == chrome::kChromeUIInterstitialHost)
     return &NewWebUI<InterstitialUI>;
-#endif
   if (url.host() == chrome::kChromeUIInvalidationsHost)
     return &NewWebUI<InvalidationsUI>;
   if (url.host() == chrome::kChromeUILocalStateHost)
@@ -374,6 +373,7 @@ WebUIFactoryFunction GetWebUIFactoryFunction(WebUI* web_ui,
     return &NewWebUI<WebDialogUI>;
   if (url.host() == chrome::kChromeUITranslateInternalsHost)
     return &NewWebUI<TranslateInternalsUI>;
+#endif
   if (url.host() == chrome::kChromeUIUserActionsHost)
     return &NewWebUI<UserActionsUI>;
   if (url.host() == chrome::kChromeUIVersionHost)

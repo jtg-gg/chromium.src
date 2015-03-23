@@ -1449,7 +1449,7 @@ int ChromeBrowserMainParts::PreMainMessageLoopRunImpl() {
 #endif  // defined(ENABLE_BACKGROUND)
   // Post-profile init ---------------------------------------------------------
 
-  TranslateService::Initialize();
+  //TranslateService::Initialize();
 
   // Needs to be done before PostProfileInit, since login manager on CrOS is
   // called inside PostProfileInit.
@@ -1640,7 +1640,7 @@ int ChromeBrowserMainParts::PreMainMessageLoopRunImpl() {
 
   // This must be called prior to RegisterComponentsForUpdate, in case the CLD
   // data source is based on the Component Updater.
-  translate::BrowserCldUtils::ConfigureDefaultDataProvider();
+  //translate::BrowserCldUtils::ConfigureDefaultDataProvider();
 #if 0
   if (!parsed_command_line().HasSwitch(switches::kDisableComponentUpdate))
     RegisterComponentsForUpdate();
@@ -1827,7 +1827,7 @@ void ChromeBrowserMainParts::PostMainMessageLoopRun() {
   // Some tests don't set parameters.ui_task, so they started translate
   // language fetch that was never completed so we need to cleanup here
   // otherwise it will be done by the destructor in a wrong thread.
-  TranslateService::Shutdown(parameters().ui_task == NULL);
+  //TranslateService::Shutdown(parameters().ui_task == NULL);
 
   if (notify_result_ == ProcessSingleton::PROCESS_NONE)
     process_singleton_->Cleanup();
