@@ -620,7 +620,7 @@
       # See http://code.google.com/p/chromium/wiki/Clang for details.
       # If this is set, clang is used as both host and target compiler in
       # cross-compile builds.
-      'clang%': 0,
+      'clang%': 1,
 
       # Use experimental lld linker instead of the platform's default linker.
       'use_lld%': 0,
@@ -1372,12 +1372,12 @@
     'profiling_full_stack_frames%': '0',
 
     # And if we want to dump symbols for Breakpad-enabled builds.
-    'linux_dump_symbols%': 0,
+    'linux_dump_symbols%': 1,
     # And if we want to strip the binary after dumping symbols.
     'linux_strip_binary%': 0,
     # If we want stack unwind support for backtrace().
     'debug_unwind_tables%': 1,
-    'release_unwind_tables%': 1,
+    'release_unwind_tables%': 0,
 
     # Override where to find binutils
     'binutils_version%': 0,

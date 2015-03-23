@@ -428,11 +428,13 @@ WebUIFactoryFunction GetWebUIFactoryFunction(WebUI* web_ui,
   // Settings are implemented with native UI elements on Android.
   // Handle chrome://settings if settings in a window and about in settings
   // are enabled.
+#if 0
   if (url.host() == chrome::kChromeUISettingsFrameHost ||
       (url.host() == chrome::kChromeUISettingsHost &&
        ::switches::AboutInSettingsEnabled())) {
     return &NewWebUI<options::OptionsUI>;
   }
+#endif
   if (url.host() == chrome::kChromeUISyncFileSystemInternalsHost)
     return &NewWebUI<SyncFileSystemInternalsUI>;
   if (url.host() == chrome::kChromeUISystemInfoHost)
@@ -795,7 +797,6 @@ base::RefCountedMemory* ChromeWebUIControllerFactory::GetFaviconResourceBytes(
   // Android uses the native download manager.
   if (page_url.host() == chrome::kChromeUIDownloadsHost)
     return DownloadsUI::GetFaviconResourceBytes(scale_factor);
-
   // Android doesn't use the Options pages.
   if (page_url.host() == chrome::kChromeUISettingsHost ||
       page_url.host() == chrome::kChromeUISettingsFrameHost)

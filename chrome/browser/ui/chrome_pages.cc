@@ -129,10 +129,12 @@ void ShowHelpImpl(Browser* browser,
 #endif
 }
 
+#if 0
 std::string GenerateContentSettingsExceptionsSubPage(ContentSettingsType type) {
   return kContentSettingsExceptionsSubPage + std::string(kHashMark) +
          options::ContentSettingsHandler::ContentSettingsTypeToGroupName(type);
 }
+#endif
 
 }  // namespace
 
@@ -318,9 +320,11 @@ void ShowContentSettings(Browser* browser,
                          ContentSettingsType content_settings_type) {
   ShowSettingsSubPage(
       browser,
+#if 0
       kContentSettingsSubPage + std::string(kHashMark) +
           options::ContentSettingsHandler::ContentSettingsTypeToGroupName(
               content_settings_type));
+#endif
 }
 
 void ShowClearBrowsingDataDialog(Browser* browser) {

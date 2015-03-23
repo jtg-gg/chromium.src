@@ -187,7 +187,7 @@
           # GN version: //chrome/browser:resources
           'action_name': 'generate_browser_resources',
           'variables': {
-            'grit_grd_file': 'browser/browser_resources.grd',
+            'grit_grd_file': 'browser/nwjs_resources.grd',
             'grit_additional_defines': [
               '-E', 'additional_modules_list_file=<(additional_modules_list_file)',
               '-E', 'root_gen_dir=<(SHARED_INTERMEDIATE_DIR)',
