@@ -410,7 +410,7 @@
       'use_titlecase_in_grd%': 0,
 
       # Remoting compilation is enabled by default. Set to 0 to disable.
-      'remoting%': 1,
+      'remoting%': 0,
 
       # Configuration policy is enabled by default. Set to 0 to disable.
       'configuration_policy%': 1,
@@ -539,7 +539,7 @@
       'enable_extensions%': 1,
 
       # Enable Google Now.
-      'enable_google_now%': 1,
+      'enable_google_now%': 0,
 
       # Enable basic printing support and UI.
       'enable_basic_printing%': 1,
@@ -1077,7 +1077,7 @@
       'google_default_client_id%': '',
       'google_default_client_secret%': '',
       # Native Client is enabled by default.
-      'disable_nacl%': '0',
+      'disable_nacl%': '1',
 
       # Native Client toolchains, enabled by default.
       'disable_pnacl%': 0,
@@ -1982,7 +1982,7 @@
           }],
           ['component=="static_library"', {
             # Turn on multiple dll by default on Windows when in static_library.
-            'chrome_multiple_dll%': 1,
+            'chrome_multiple_dll%': 0,
           }],
           ['asan==1 or syzyasan==1', {
             'win_use_allocator_shim%': 0,
