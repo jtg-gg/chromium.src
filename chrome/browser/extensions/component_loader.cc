@@ -528,6 +528,7 @@ void ComponentLoader::EnableBackgroundExtensionsForTesting() {
 
 void ComponentLoader::AddDefaultComponentExtensions(
     bool skip_session_components) {
+#if 0
   // Do not add component extensions that have background pages here -- add them
   // to AddDefaultComponentExtensionsWithBackgroundPages.
 #if defined(OS_CHROMEOS)
@@ -567,6 +568,7 @@ void ComponentLoader::AddDefaultComponentExtensions(
   }
 
   AddKeyboardApp();
+#endif
 
   AddDefaultComponentExtensionsWithBackgroundPages(skip_session_components);
 
@@ -608,6 +610,7 @@ void ComponentLoader::AddDefaultComponentExtensionsWithBackgroundPages(
     return;
   }
 
+#if 0 //nwjs
 #if defined(OS_CHROMEOS) && defined(GOOGLE_CHROME_BUILD)
   // Since this is a v2 app it has a background page.
   AddWithNameAndDescription(
@@ -686,8 +689,12 @@ void ComponentLoader::AddDefaultComponentExtensionsWithBackgroundPages(
 
 #endif  // defined(GOOGLE_CHROME_BUILD)
 
+#endif //nwjs
+
+#if 0
   Add(IDR_CRYPTOTOKEN_MANIFEST,
       base::FilePath(FILE_PATH_LITERAL("cryptotoken")));
+#endif
 }
 
 void ComponentLoader::DeleteData(int manifest_resource_id,

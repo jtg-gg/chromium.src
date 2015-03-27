@@ -331,11 +331,12 @@ ExtensionService::ExtensionService(Profile* profile,
                                       profile->GetPrefs(),
                                       g_browser_process->local_state(),
                                       profile));
-
+#if 0
   if (extensions_enabled_) {
     extensions::ExternalProviderImpl::CreateExternalProviders(
         this, profile_, &external_extension_providers_);
   }
+#endif
 
   // Set this as the ExtensionService for app sorting to ensure it causes syncs
   // if required.
