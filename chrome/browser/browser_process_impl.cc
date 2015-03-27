@@ -258,8 +258,10 @@ void BrowserProcessImpl::StartTearDown() {
   // PostDelayedTask operation on the IO thread. (The IO thread will handle that
   // URLFetcher operation before going away.)
   intranet_redirect_detector_.reset();
+#if 0
   if (safe_browsing_service_.get())
     safe_browsing_service()->ShutDown();
+#endif
 #if defined(ENABLE_PLUGIN_INSTALLATION)
   plugins_resource_service_.reset();
 #endif
@@ -1165,9 +1167,11 @@ void BrowserProcessImpl::CreateSafeBrowsingService() {
   // Set this flag to true so that we don't retry indefinitely to
   // create the service class if there was an error.
   created_safe_browsing_service_ = true;
+#if 0
   safe_browsing_service_ =
       safe_browsing::SafeBrowsingService::CreateSafeBrowsingService();
   safe_browsing_service_->Initialize();
+#endif
 }
 
 void BrowserProcessImpl::CreateGCMDriver() {

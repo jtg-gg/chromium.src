@@ -264,7 +264,7 @@ ExtensionService::ExtensionService(Profile* profile,
                                    bool autoupdate_enabled,
                                    bool extensions_enabled,
                                    extensions::OneShotEvent* ready)
-    : extensions::Blacklist::Observer(blacklist),
+    :
       profile_(profile),
       system_(extensions::ExtensionSystem::Get(profile)),
       extension_prefs_(extension_prefs),
@@ -1422,7 +1422,6 @@ void ExtensionService::OnLoadedInstalledExtensions() {
   if (updater_)
     updater_->Start();
 
-  OnBlacklistUpdated();
 }
 
 void ExtensionService::AddExtension(const Extension* extension) {
@@ -2397,11 +2396,13 @@ void ExtensionService::MaybeFinishDelayedInstallations() {
   }
 }
 
+#if 0
 void ExtensionService::OnBlacklistUpdated() {
   blacklist_->GetBlacklistedIDs(
       registry_->GenerateInstalledExtensionsSet()->GetIDs(),
       base::Bind(&ExtensionService::ManageBlacklist, AsWeakPtr()));
 }
+#endif
 
 void ExtensionService::ManageBlacklist(
     const extensions::Blacklist::BlacklistStateMap& state_map) {

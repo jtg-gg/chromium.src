@@ -419,7 +419,7 @@
       # for safe browsing feature. Safe browsing can be compiled in 3 different
       # levels: 0 disables it, 1 enables it fully, and 2 enables mobile
       # protection via an external API.
-      'safe_browsing%': 1,
+      'safe_browsing%': 0,
 
       # Web speech is enabled by default. Set to 0 to disable.
       'enable_web_speech%': 1,

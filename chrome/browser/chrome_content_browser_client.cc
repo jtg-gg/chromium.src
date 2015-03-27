@@ -570,10 +570,12 @@ class SafeBrowsingSSLCertReporter : public SSLCertReporter {
   // SSLCertReporter implementation
   void ReportInvalidCertificateChain(
       const std::string& serialized_report) override {
+#if 0
     if (safe_browsing_ui_manager_) {
       safe_browsing_ui_manager_->ReportInvalidCertificateChain(
           serialized_report, base::Bind(&base::DoNothing));
     }
+#endif
   }
 
  private:
@@ -1991,12 +1993,8 @@ void ChromeContentBrowserClient::AllowCertificateError(
   if (expired_previous_decision)
     options_mask |= SSLBlockingPage::EXPIRED_BUT_PREVIOUSLY_ALLOWED;
 
-  safe_browsing::SafeBrowsingService* safe_browsing_service =
-      g_browser_process->safe_browsing_service();
   scoped_ptr<SafeBrowsingSSLCertReporter> cert_reporter(
-      new SafeBrowsingSSLCertReporter(safe_browsing_service
-                                          ? safe_browsing_service->ui_manager()
-                                          : nullptr));
+      new SafeBrowsingSSLCertReporter(nullptr));
   SSLErrorHandler::HandleSSLError(tab, cert_error, ssl_info, request_url,
                                   options_mask, cert_reporter.Pass(), callback);
 }
