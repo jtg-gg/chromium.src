@@ -141,7 +141,7 @@ Browser* CreateBrowser(Profile* profile) {
   }
 
   Browser* browser = chrome::GetLastActiveBrowser();
-  CHECK(browser);
+  //CHECK(browser);
   return browser;
 }
 
@@ -740,7 +740,7 @@ class AppControllerProfileObserver : public ProfileInfoCacheObserver {
 
   // If enabled, keep Chrome alive when apps are open instead of quitting all
   // apps.
-  quitWithAppsController_ = new QuitWithAppsController();
+  // quitWithAppsController_ = new QuitWithAppsController();
 
   // Dynamically update shortcuts for "Close Window" and "Close Tab" menu items.
   [[closeTabMenuItem_ menu] setDelegate:self];
