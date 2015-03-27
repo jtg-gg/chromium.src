@@ -3161,6 +3161,7 @@
         '../components/url_formatter/url_formatter.gyp:url_formatter',
         '../content/content.gyp:content_browser',
         '../content/content.gyp:content_common',
+        'nw_content',
         '../courgette/courgette.gyp:courgette_lib',
         '../crypto/crypto.gyp:crypto',
         '../google_apis/google_apis.gyp:google_apis',

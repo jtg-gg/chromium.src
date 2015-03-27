@@ -48,6 +48,7 @@
 #include "ui/base/resource/resource_bundle.h"
 #include "ui/base/ui_base_switches.h"
 
+#include "content/nw/src/nw_base.h"
 #if defined(OS_WIN)
 #include <atlbase.h>
 #include <malloc.h>
@@ -389,7 +390,7 @@ void InitializeUserDataDir() {
 
   // Append the fallback user data directory to the commandline. Otherwise,
   // child or service processes will attempt to use the invalid directory.
-  if (specified_directory_was_invalid)
+  //if (specified_directory_was_invalid)
     command_line->AppendSwitchPath(switches::kUserDataDir, user_data_dir);
 }
 
@@ -669,6 +670,8 @@ void ChromeMainDelegate::PreSandboxStartup() {
   crash_reporter::SetCrashReporterClient(g_chrome_crash_client.Pointer());
 #endif
 
+  if (process_type.empty())
+    nw::InitNWPackage();
 #if defined(OS_MACOSX)
   // On the Mac, the child executable lives at a predefined location within
   // the app bundle's versioned directory.

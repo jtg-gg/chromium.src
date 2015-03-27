@@ -4,6 +4,8 @@
 
 #include "chrome/browser/chrome_browser_main.h"
 
+#include "content/nw/src/nw_content.h"
+
 #include <set>
 #include <string>
 #include <vector>
@@ -833,9 +835,13 @@ void ChromeBrowserMainParts::PostMainMessageLoopStart() {
 
 int ChromeBrowserMainParts::PreCreateThreads() {
   TRACE_EVENT0("startup", "ChromeBrowserMainParts::PreCreateThreads");
+
   result_code_ = PreCreateThreadsImpl();
 
   if (result_code_ == content::RESULT_CODE_NORMAL_EXIT) {
+    result_code_ = nw::MainPartsPreCreateThreadsHook();
+    if (result_code_ != content::RESULT_CODE_NORMAL_EXIT)
+      return result_code_;
 #if !defined(OS_ANDROID)
     // These members must be initialized before exiting this function normally.
     DCHECK(master_prefs_.get());
@@ -1849,6 +1855,7 @@ void ChromeBrowserMainParts::PostDestroyThreads() {
   process_singleton_.reset();
   device_event_log::Shutdown();
 
+  nw::MainPartsPostDestroyThreadsHook();
   // We need to do this check as late as possible, but due to modularity, this
   // may be the last point in Chrome.  This would be more effective if done at
   // a higher level on the stack, so that it is impossible for an early return

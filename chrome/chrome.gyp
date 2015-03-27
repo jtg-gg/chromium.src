@@ -91,6 +91,7 @@
     ],  # conditions
   },  # variables
   'includes': [
+    '../content/nw/nw.gypi',
     # Place some targets in gypi files to reduce contention on this file.
     # By using an include, we keep everything in a single xcodeproj file.
     # Note on Win64 targets: targets that end with win64 be used

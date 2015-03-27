@@ -406,12 +406,12 @@
         ['OS=="win"', {
           'dependencies': [
             'chrome_dll',
-            'chrome_nacl_win64',
             'chrome_process_finder',
             'chrome_version_resources',
             'installer_util',
             'file_pre_reader',
             '../base/base.gyp:base',
+            'nw_base',
             '../crypto/crypto.gyp:crypto',
             '../breakpad/breakpad.gyp:breakpad_handler',
             '../breakpad/breakpad.gyp:breakpad_sender',
@@ -421,7 +421,7 @@
             '../sandbox/sandbox.gyp:sandbox',
             '../ui/gfx/gfx.gyp:gfx',
             '../win8/metro_driver/metro_driver.gyp:metro_driver',
-            '../win8/delegate_execute/delegate_execute.gyp:*',
+            #'../win8/delegate_execute/delegate_execute.gyp:*',
           ],
           'sources': [
             '<(SHARED_INTERMEDIATE_DIR)/chrome_version/chrome_exe_version.rc',
