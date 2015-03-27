@@ -694,11 +694,11 @@ void ChromeMainDelegate::PreSandboxStartup() {
   // Initialize the user data dir for any process type that needs it.
   if (chrome::ProcessNeedsProfileDir(process_type))
     InitializeUserDataDir();
-
+#if 0
   // Register component_updater PathProvider after DIR_USER_DATA overidden by
   // command line flags. Maybe move the chrome PathProvider down here also?
   component_updater::RegisterPathProvider(chrome::DIR_USER_DATA);
-
+#endif
   // Enable Message Loop related state asap.
   if (command_line.HasSwitch(switches::kMessageLoopHistogrammer))
     base::MessageLoop::EnableHistogrammer(true);

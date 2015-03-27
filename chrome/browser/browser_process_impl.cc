@@ -908,6 +908,7 @@ net_log::ChromeNetLog* BrowserProcessImpl::net_log() {
   return net_log_.get();
 }
 
+#if 0
 component_updater::ComponentUpdateService*
 BrowserProcessImpl::component_updater() {
   if (!component_updater_.get()) {
@@ -924,12 +925,15 @@ BrowserProcessImpl::component_updater() {
   }
   return component_updater_.get();
 }
+#endif
 
+#if 0
 CRLSetFetcher* BrowserProcessImpl::crl_set_fetcher() {
   if (!crl_set_fetcher_)
     crl_set_fetcher_ = new CRLSetFetcher();
   return crl_set_fetcher_.get();
 }
+
 
 component_updater::PnaclComponentInstaller*
 BrowserProcessImpl::pnacl_component_installer() {
@@ -954,6 +958,7 @@ BrowserProcessImpl::supervised_user_whitelist_installer() {
   }
   return supervised_user_whitelist_installer_.get();
 }
+#endif
 
 void BrowserProcessImpl::ResourceDispatcherHostCreated() {
   resource_dispatcher_host_delegate_.reset(

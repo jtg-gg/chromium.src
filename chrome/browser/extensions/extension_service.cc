@@ -306,8 +306,8 @@ ExtensionService::ExtensionService(Profile* profile,
 
   extensions::ExtensionManagementFactory::GetForBrowserContext(profile_)
       ->AddObserver(this);
-
-  // Set up the ExtensionUpdater.
+#if 0
+  // Set up the ExtensionUpdater
   if (autoupdate_enabled) {
     int update_frequency = extensions::kDefaultUpdateFrequencySeconds;
     if (command_line->HasSwitch(switches::kExtensionsUpdateFrequency)) {
@@ -325,7 +325,7 @@ ExtensionService::ExtensionService(Profile* profile,
         base::Bind(ChromeExtensionDownloaderFactory::CreateForProfile,
                    profile)));
   }
-
+#endif
   component_loader_.reset(
       new extensions::ComponentLoader(this,
                                       profile->GetPrefs(),

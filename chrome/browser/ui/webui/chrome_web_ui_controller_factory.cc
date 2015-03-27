@@ -324,8 +324,10 @@ WebUIFactoryFunction GetWebUIFactoryFunction(WebUI* web_ui,
   // All platform builds of Chrome will need to have a cloud printing
   // dialog as backup.  It's just that on Chrome OS, it's the only
   // print dialog.
+#if 0
   if (url.host() == chrome::kChromeUIComponentsHost)
     return &NewWebUI<ComponentsUI>;
+#endif
   if (url.spec() == chrome::kChromeUIConstrainedHTMLTestURL)
     return &NewWebUI<ConstrainedWebDialogUI>;
   if (url.host() == chrome::kChromeUICrashesHost)
@@ -759,8 +761,10 @@ base::RefCountedMemory* ChromeWebUIControllerFactory::GetFaviconResourceBytes(
   if (!content::HasWebUIScheme(page_url))
     return NULL;
 
+#if 0
   if (page_url.host() == chrome::kChromeUIComponentsHost)
     return ComponentsUI::GetFaviconResourceBytes(scale_factor);
+#endif
 
 #if defined(OS_WIN)
   if (page_url.host() == chrome::kChromeUIConflictsHost)

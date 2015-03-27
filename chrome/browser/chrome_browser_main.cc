@@ -436,6 +436,7 @@ OSStatus KeychainCallback(SecKeychainEvent keychain_event,
 }
 #endif  // defined(OS_MACOSX)
 
+#if 0
 void RegisterComponentsForUpdate() {
   component_updater::ComponentUpdateService* cus =
       g_browser_process->component_updater();
@@ -493,6 +494,7 @@ void RegisterComponentsForUpdate() {
   RegisterCAPSComponent(cus);
 #endif  // defined(OS_WIN)
 }
+#endif // disable component updater
 
 #if !defined(OS_ANDROID)
 bool ProcessSingletonNotificationCallback(
@@ -1639,10 +1641,10 @@ int ChromeBrowserMainParts::PreMainMessageLoopRunImpl() {
   // This must be called prior to RegisterComponentsForUpdate, in case the CLD
   // data source is based on the Component Updater.
   translate::BrowserCldUtils::ConfigureDefaultDataProvider();
-
+#if 0
   if (!parsed_command_line().HasSwitch(switches::kDisableComponentUpdate))
     RegisterComponentsForUpdate();
-
+#endif
 #if defined(OS_ANDROID)
   variations::VariationsService* variations_service =
       browser_process_->variations_service();
