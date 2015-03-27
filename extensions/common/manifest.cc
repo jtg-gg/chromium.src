@@ -131,6 +131,12 @@ Manifest::Manifest(Location location, scoped_ptr<base::DictionaryValue> value)
 
   if (value_->HasKey(keys::kNWJSInternalFlag)) {
     type_ = TYPE_NWJS_APP;
+  }else if (value_->HasKey(keys::kPermissions)) {
+    base::ListValue* perm;
+    value_->GetList(keys::kPermissions, &perm);
+    base::StringValue node("node");
+    if (perm->Find(node) != perm->end())
+      type_ = TYPE_NWJS_APP;
   }
 
   CHECK_NE(type_, TYPE_UNKNOWN);

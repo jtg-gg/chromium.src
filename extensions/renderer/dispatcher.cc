@@ -10,7 +10,6 @@
 #include "base/command_line.h"
 #include "base/containers/scoped_ptr_map.h"
 #include "base/debug/alias.h"
-#include "base/lazy_instance.h"
 #include "base/memory/scoped_ptr.h"
 #include "base/metrics/histogram_macros.h"
 #include "base/metrics/user_metrics_action.h"
@@ -109,6 +108,11 @@
 #include "ui/base/resource/resource_bundle.h"
 #include "v8/include/v8.h"
 
+#include "base/files/file_util.h"
+#include "content/nw/src/nw_content.h"
+#include "third_party/node/src/node_webkit.h"
+#include "third_party/WebKit/public/web/WebScopedMicrotaskSuppression.h"
+
 using base::UserMetricsAction;
 using blink::WebDataSource;
 using blink::WebDocument;
@@ -196,6 +200,11 @@ class ChromeNativeHandler : public ObjectBackedNativeHandler {
 base::LazyInstance<WorkerScriptContextSet> g_worker_script_context_set =
     LAZY_INSTANCE_INITIALIZER;
 
+int nw_uv_run(uv_loop_t* loop, uv_run_mode mode) {
+  blink::WebScopedMicrotaskSuppression suppression;
+  return uv_run(loop, mode);
+}
+
 }  // namespace
 
 // Note that we can't use Blink public APIs in the constructor becase Blink
@@ -278,6 +287,12 @@ void Dispatcher::DidCreateScriptContext(
     v8::Local<v8::Object> chrome = AsObjectOrEmpty(GetOrCreateChrome(context));
     if (!chrome.IsEmpty())
       module_system->SetLazyField(chrome, "Event", kEventBindings, "Event");
+
+    if (context->extension()->GetType() == Manifest::TYPE_NWJS_APP &&
+        context->context_type() == Feature::BLESSED_EXTENSION_CONTEXT) {
+
+      nw::ContextCreationHook(frame, context);
+    }
   }
 
   UpdateBindingsForContext(context);
@@ -898,6 +913,7 @@ void Dispatcher::WebKitInitialized() {
     func(extension_resource_scheme);
   }
 
+  node::g_nw_uv_run = nw_uv_run;
   // For extensions, we want to ensure we call the IdleHandler every so often,
   // even if the extension keeps up activity.
   if (set_idle_notifications_) {
@@ -921,6 +937,7 @@ void Dispatcher::WebKitInitialized() {
   EnableCustomElementWhiteList();
 
   is_webkit_initialized_ = true;
+
 }
 
 void Dispatcher::IdleNotification() {
@@ -1051,6 +1068,11 @@ void Dispatcher::OnLoaded(
     //    browser to figure this out itself - but again, cost/benefit.
     if (!extension_registry->Contains(extension->id()))
       extension_registry->Insert(extension);
+
+    if (extension->GetType() == Manifest::TYPE_NWJS_APP) {
+      VLOG(1) << "NW: change working dir: " << extension->path().AsUTF8Unsafe();
+      base::SetCurrentDirectory(extension->path());
+    }
   }
 
   // Update the available bindings for all contexts. These may have changed if
@@ -1303,6 +1325,12 @@ void Dispatcher::UpdateBindingsForContext(ScriptContext* context) {
   v8::HandleScope handle_scope(context->isolate());
   v8::Context::Scope context_scope(context->v8_context());
 
+  bool nodejs_enabled = false;
+  if (context->extension()) {
+    nodejs_enabled = context->extension()->is_nwjs_app();
+    context->extension()->manifest()->GetBoolean(manifest_keys::kNWJSEnableNode, &nodejs_enabled);
+  }
+
   // TODO(kalman): Make the bindings registration have zero overhead then run
   // the same code regardless of context type.
   switch (context->context_type()) {
@@ -1335,6 +1363,9 @@ void Dispatcher::UpdateBindingsForContext(ScriptContext* context) {
           api_feature_provider->GetAllFeatureNames();
       for (const std::string& api_name : apis) {
         Feature* feature = api_feature_provider->GetFeature(api_name);
+        if (api_name.substr(0, 3) == "nw." && !nodejs_enabled)
+          continue;
+
         DCHECK(feature);
 
         // Internal APIs are included via require(api_name) from internal code

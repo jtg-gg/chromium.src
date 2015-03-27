@@ -12,6 +12,8 @@ const char kNWJSInternalManifest[] = "__nwjs_manifest";
 const char kNWJSInternalMainFilename[] = "__nwjs_filename";
 const char kNWJSContentVerifyFlag[] = "__nwjs_cv";
 const char kNWJSMain[] = "main";
+const char kNWJSMixedContext[] = "mixed_context";
+const char kNWJSEnableNode[] = "nodejs";
 
 const char kAboutPage[] = "about_page";
 const char kAllFrames[] = "all_frames";

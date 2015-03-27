@@ -1277,7 +1277,7 @@
 
     # The default value for mac_strip in target_defaults. This cannot be
     # set there, per the comment about variable% in a target_defaults.
-    'mac_strip_release%': 0,
+    'mac_strip_release%': 1,
 
     # Set to 1 to enable java code coverage. Instruments classes during build
     # to produce .ec files during runtime.
