@@ -25,6 +25,7 @@
       </if>
     </structures>
     <includes>
+      <include name="IDR_NWJS_DEFAULT_JS" file="nwjs/default.js" type="BINDATA" />
       <include name="IDR_NETWORK_SPEECH_SYNTHESIS_JS" file="network_speech_synthesis/tts_extension.js" type="BINDATA" />
 
       <if expr="chromeos">

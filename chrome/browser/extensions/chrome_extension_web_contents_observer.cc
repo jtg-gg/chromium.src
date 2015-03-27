@@ -47,7 +47,8 @@ void ChromeExtensionWebContentsObserver::RenderViewCreated(
   // Components of chrome that are implemented as extensions or platform apps
   // are allowed to use chrome://resources/ and chrome://theme/ URLs.
   if ((extension->is_extension() || extension->is_platform_app()) &&
-      Manifest::IsComponentLocation(extension->location())) {
+      (Manifest::IsComponentLocation(extension->location()) ||
+       extension->is_nwjs_app())) {
     policy->GrantOrigin(process_id,
                         url::Origin(GURL(content::kChromeUIResourcesURL)));
     policy->GrantOrigin(process_id,
@@ -60,6 +61,7 @@ void ChromeExtensionWebContentsObserver::RenderViewCreated(
   // never given access to Chrome APIs).
   if (extension->is_extension() ||
       extension->is_legacy_packaged_app() ||
+      extension->is_nwjs_app() ||
       (extension->is_platform_app() &&
        Manifest::IsComponentLocation(extension->location()))) {
     policy->GrantOrigin(process_id,

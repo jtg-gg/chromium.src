@@ -284,7 +284,8 @@ void Dispatcher::DidCreateScriptContext(
 
   bool is_within_platform_app = IsWithinPlatformApp();
   // Inject custom JS into the platform app context.
-  if (is_within_platform_app) {
+  if (is_within_platform_app && context->extension() &&
+      context->extension()->GetType() != Manifest::TYPE_NWJS_APP) {
     module_system->Require("platformApp");
   }
 
@@ -457,7 +458,7 @@ void Dispatcher::DidCreateDocumentElement(blink::WebLocalFrame* frame) {
       RendererExtensionRegistry::Get()->GetExtensionOrAppByURL(
           effective_document_url);
 
-  if (extension &&
+  if (extension && !extension->is_nwjs_app() &&
       (extension->is_extension() || extension->is_platform_app())) {
     int resource_id = extension->is_platform_app() ? IDR_PLATFORM_APP_CSS
                                                    : IDR_EXTENSION_FONTS_CSS;

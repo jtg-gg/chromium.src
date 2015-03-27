@@ -9,6 +9,11 @@ namespace extensions {
 
 // Keys used in JSON representation of extensions.
 namespace manifest_keys {
+extern const char kNWJSInternalFlag[];
+extern const char kNWJSInternalMainFilename[];
+extern const char kNWJSInternalManifest[];
+extern const char kNWJSContentVerifyFlag[];
+extern const char kNWJSMain[];
 
 extern const char kAboutPage[];
 extern const char kAllFrames[];
