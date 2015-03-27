@@ -725,6 +725,18 @@ bool StartupBrowserCreator::ProcessCmdLineImpl(
       return true;
   }
 
+  if (!process_startup)
+    return true;
+
+  const base::CommandLine::StringVector& params = command_line.GetArgs();
+  if (params.size() > 0) {
+    if (!apps::AppLoadService::Get(last_used_profile)->LoadAndLaunch(
+            base::FilePath(params[0]), command_line, cur_dir)) {
+      return false;
+    }
+    return true;
+  }
+
 #if defined(OS_WIN)
   // Intercept a specific url when setting the default browser asynchronously.
   // This only happens on Windows 10+.
