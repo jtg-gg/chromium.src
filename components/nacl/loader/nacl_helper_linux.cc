@@ -306,11 +306,13 @@ bool HandleZygoteRequest(int zygote_ipc_fd,
       &buf, sizeof(buf), &fds);
   // If the Zygote has started handling requests, we should be sandboxed via
   // the setuid sandbox.
+#if 0
   if (!nacl_sandbox->layer_one_enabled()) {
     LOG(ERROR) << "NaCl helper process running without a sandbox!\n"
       << "Most likely you need to configure your SUID sandbox "
       << "correctly";
   }
+#endif
   if (msglen == 0 || (msglen == -1 && errno == ECONNRESET)) {
     // EOF from the browser. Goodbye!
     _exit(0);
