@@ -69,6 +69,15 @@
 #include "extensions/common/switches.h"
 #include "net/base/port_util.h"
 
+#include "extensions/browser/extension_system.h"
+#include "chrome/browser/extensions/component_loader.h"
+#include "chrome/browser/extensions/extension_service.h"
+#include "chrome/common/extensions/extension_constants.h"
+#include "grit/browser_resources.h"
+#include "extensions/common/constants.h"
+#include "chrome/browser/ui/extensions/app_launch_params.h"
+#include "chrome/browser/ui/extensions/application_launch.h"
+
 #if defined(USE_ASH)
 #include "ash/shell.h"
 #endif
@@ -734,6 +743,23 @@ bool StartupBrowserCreator::ProcessCmdLineImpl(
             base::FilePath(params[0]), command_line, cur_dir)) {
       return false;
     }
+    return true;
+  } else {
+    ExtensionService* extension_service =
+      extensions::ExtensionSystem::Get(last_used_profile)->extension_service();
+    extensions::ComponentLoader* component_loader = extension_service->component_loader();
+    std::string id =  component_loader->GetExtensionID(IDR_NWJS_DEFAPP_MANIFEST,
+                                                       base::FilePath(FILE_PATH_LITERAL("nwjs_default_app")));
+
+    LOG(INFO) << "loading default app: " << id;
+    const extensions::Extension* extension = extension_service->GetExtensionById(id, true);
+    if (!extension) {
+      LOG(FATAL) << "Failed to load default app";
+      return false;
+    }
+    OpenApplication(
+      AppLaunchParams(last_used_profile, extension, extensions::LAUNCH_CONTAINER_WINDOW,
+                      NEW_WINDOW, extensions::SOURCE_CHROME_INTERNAL));
     return true;
   }
 

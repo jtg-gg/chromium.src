@@ -576,6 +576,27 @@ void ComponentLoader::AddDefaultComponentExtensions(
   Add(pdf_extension_util::GetManifest(),
       base::FilePath(FILE_PATH_LITERAL("pdf")));
 #endif
+
+  base::CommandLine& command_line(*base::CommandLine::ForCurrentProcess());
+
+  //match the condition in startup_browser_creator.cc
+  if (command_line.HasSwitch("nwapp") || command_line.GetArgs().size() > 0)
+    return;
+
+  std::string url;
+  if (command_line.HasSwitch("url")) {
+      url = command_line.GetSwitchValueASCII("url");
+  }
+  std::string manifest_contents =
+        ResourceBundle::GetSharedInstance().GetRawDataResource(IDR_NWJS_DEFAPP_MANIFEST).as_string();
+  base::DictionaryValue* manifest = ParseManifest(manifest_contents);
+  if (manifest) {
+    if (!url.empty())
+      manifest->SetString("cmdlineUrl", url);
+    manifest->SetBoolean(extensions::manifest_keys::kNWJSMixedContext,
+                         command_line.HasSwitch("mixed-context"));
+    Add(manifest, base::FilePath(FILE_PATH_LITERAL("nwjs_default_app")), true);
+  }
 }
 
 void ComponentLoader::AddDefaultComponentExtensionsForKioskMode(
