@@ -361,6 +361,7 @@
           'dependencies': [
             '<(DEPTH)/device/usb/usb.gyp:device_usb',
             '<(DEPTH)/chrome/common/extensions/api/api.gyp:chrome_api',
+            '<(DEPTH)/content/nw/src/api/api.gyp:nw_api',
             '<(DEPTH)/extensions/common/api/api.gyp:extensions_api',
             '<(DEPTH)/extensions/extensions.gyp:extensions_common',
             '<(DEPTH)/extensions/extensions_resources.gyp:extensions_resources',

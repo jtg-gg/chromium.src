@@ -110,6 +110,7 @@
 
 #include "base/files/file_util.h"
 #include "content/nw/src/nw_content.h"
+#include "content/nw/src/nw_custom_bindings.h"
 #include "third_party/node/src/node_webkit.h"
 #include "third_party/WebKit/public/web/WebScopedMicrotaskSuppression.h"
 
@@ -142,9 +143,9 @@ void CrashOnException(const v8::TryCatch& trycatch) {
 //
 // Note that this isn't necessarily an object, since webpages can write, for
 // example, "window.chrome = true".
-v8::Local<v8::Value> GetOrCreateChrome(ScriptContext* context) {
+v8::Local<v8::Value> GetOrCreateChrome(ScriptContext* context, const char* name = nullptr) {
   v8::Local<v8::String> chrome_string(
-      v8::String::NewFromUtf8(context->isolate(), "chrome"));
+       v8::String::NewFromUtf8(context->isolate(), name ? name : "chrome"));
   v8::Local<v8::Object> global(context->v8_context()->Global());
   v8::Local<v8::Value> chrome(global->Get(chrome_string));
   if (chrome->IsUndefined()) {
@@ -473,6 +474,11 @@ void Dispatcher::DidCreateDocumentElement(blink::WebLocalFrame* frame) {
       RendererExtensionRegistry::Get()->GetExtensionOrAppByURL(
           effective_document_url);
 
+  if (extension &&
+      (extension->is_extension() || extension->is_platform_app())) {
+    nw::DocumentElementHook(frame, extension, effective_document_url);
+  }
+
   if (extension && !extension->is_nwjs_app() &&
       (extension->is_extension() || extension->is_platform_app())) {
     int resource_id = extension->is_platform_app() ? IDR_PLATFORM_APP_CSS
@@ -747,6 +753,16 @@ std::vector<std::pair<std::string, int> > Dispatcher::GetJsResources() {
       std::make_pair("media_router_bindings", IDR_MEDIA_ROUTER_BINDINGS_JS));
 #endif  // defined(ENABLE_MEDIA_ROUTER)
 
+  resources.push_back(std::make_pair("nw.App",       IDR_NWAPI_APP_JS));
+  resources.push_back(std::make_pair("nw.Window",    IDR_NWAPI_WINDOW_JS));
+  resources.push_back(std::make_pair("nw.Clipboard", IDR_NWAPI_CLIPBOARD_JS));
+  resources.push_back(std::make_pair("nw.Menu",      IDR_NWAPI_MENU_JS));
+  resources.push_back(std::make_pair("nw.MenuItem",  IDR_NWAPI_MENUITEM_JS));
+  resources.push_back(std::make_pair("nw.Screen",    IDR_NWAPI_SCREEN_JS));
+  resources.push_back(std::make_pair("nw.Shell",     IDR_NWAPI_SHELL_JS));
+  resources.push_back(std::make_pair("nw.Shortcut",  IDR_NWAPI_SHORTCUT_JS));
+  resources.push_back(std::make_pair("nw.Obj",       IDR_NWAPI_OBJECT_JS));
+  resources.push_back(std::make_pair("nw.test",      IDR_NWAPI_TEST_JS));
   return resources;
 }
 
@@ -841,6 +857,9 @@ void Dispatcher::RegisterNativeHandlers(ModuleSystem* module_system,
       scoped_ptr<NativeHandler>(new IdGeneratorCustomBindings(context)));
   module_system->RegisterNativeHandler(
       "runtime", scoped_ptr<NativeHandler>(new RuntimeCustomBindings(context)));
+
+  module_system->RegisterNativeHandler(
+      "nw_natives", scoped_ptr<NativeHandler>(new NWCustomBindings(context)));
 }
 
 bool Dispatcher::OnControlMessageReceived(const IPC::Message& message) {
@@ -1562,7 +1581,13 @@ v8::Local<v8::Object> Dispatcher::GetOrCreateBindObjectIfAvailable(
   std::string ancestor_name;
   bool only_ancestor_available = false;
 
-  for (size_t i = 0; i < split.size() - 1; ++i) {
+  const char* prefix = nullptr;
+  int start = 0;
+  if (split[0] == "nw") {
+    prefix = "nw";
+    start = 1;
+  }
+  for (size_t i = start; i < split.size() - 1; ++i) {
     ancestor_name += (i ? "." : "") + split[i];
     if (api_feature_provider->GetFeature(ancestor_name) &&
         context->GetAvailability(ancestor_name).is_available() &&
@@ -1572,7 +1597,7 @@ v8::Local<v8::Object> Dispatcher::GetOrCreateBindObjectIfAvailable(
     }
 
     if (bind_object.IsEmpty()) {
-      bind_object = AsObjectOrEmpty(GetOrCreateChrome(context));
+      bind_object = AsObjectOrEmpty(GetOrCreateChrome(context, prefix));
       if (bind_object.IsEmpty())
         return v8::Local<v8::Object>();
     }
@@ -1585,7 +1610,7 @@ v8::Local<v8::Object> Dispatcher::GetOrCreateBindObjectIfAvailable(
   if (bind_name)
     *bind_name = split.back();
 
-  return bind_object.IsEmpty() ? AsObjectOrEmpty(GetOrCreateChrome(context))
+  return bind_object.IsEmpty() ? AsObjectOrEmpty(GetOrCreateChrome(context, prefix))
                                : bind_object;
 }
 
