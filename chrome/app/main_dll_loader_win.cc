@@ -128,7 +128,7 @@ HMODULE MainDllLoader::Load(base::string16* version, base::FilePath* module) {
   const bool pre_read = !metro_mode_;
   HMODULE dll = LoadModuleWithDirectory(*module, pre_read);
   if (!dll) {
-    PLOG(ERROR) << "Failed to load Chrome DLL from " << module->value();
+    PLOG(ERROR) << "Failed to load NW DLL from " << module->value();
     return nullptr;
   }
 
