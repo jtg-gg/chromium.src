@@ -14,7 +14,7 @@
 {
   "SRCDIR": "../..",
 
-  "chrome/browser/nwjs_resources.grd": {
+  "chrome/browser/browser_resources.grd": {
     "includes": [400],
     "structures": [750],
   },
