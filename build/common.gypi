@@ -99,6 +99,7 @@
           # based on 'buildtype' (i.e. we don't care about saving symbols for
           # non-Official # builds).
           'buildtype%': 'Dev',
+          'nwjs_sdk%': 0,
 
           # Override branding to select the desired branding flavor.
           'branding%': 'Chromium',
@@ -162,6 +163,7 @@
         'enable_hidpi%': '<(enable_hidpi)',
         'enable_topchrome_md%': '<(enable_topchrome_md)',
         'buildtype%': '<(buildtype)',
+        'nwjs_sdk%': '<(nwjs_sdk)',
         'branding%': '<(branding)',
         'branding_path_component%': '<(branding)',
         'host_arch%': '<(host_arch)',
@@ -343,6 +345,7 @@
       'enable_app_list%': '<(enable_app_list)',
       'use_default_render_theme%': '<(use_default_render_theme)',
       'buildtype%': '<(buildtype)',
+      'nwjs_sdk%': '<(nwjs_sdk)',
       'branding%': '<(branding)',
       'branding_path_component%': '<(branding_path_component)',
       'arm_version%': '<(arm_version)',
@@ -1090,6 +1093,7 @@
     },
 
     # Copy conditionally-set variables out one scope.
+    'nwjs_sdk%': '<(nwjs_sdk)',
     'branding%': '<(branding)',
     'branding_path_component%': '<(branding_path_component)',
     'buildtype%': '<(buildtype)',
@@ -1546,6 +1550,9 @@
     'libjpeg_turbo_gyp_path': '<(DEPTH)/third_party/libjpeg_turbo/libjpeg.gyp',
 
     'conditions': [
+      ['nwjs_sdk!=1', {
+        'locales==': [ 'en-US', ],
+      }],
       ['buildtype=="Official"', {
         # Continue to embed build meta data in Official builds, basically the
         # time it was built.
@@ -2061,6 +2068,9 @@
       }],
 
       # Set up -D and -E flags passed into grit.
+      ['nwjs_sdk==1', {
+        'grit_defines': ['-D', 'nwjs_sdk'],
+      }],
       ['branding=="Chrome"', {
         # TODO(mmoss) The .grd files look for _google_chrome, but for
         # consistency they should look for google_chrome_build like C++.
@@ -2636,6 +2646,9 @@
         'dependencies': [
           '<(DEPTH)/build/win/asan.gyp:asan_dynamic_runtime',
         ],
+      }],
+      ['nwjs_sdk==1', {
+        'defines': ['NWJS_SDK'],
       }],
       ['branding=="Chrome"', {
         'defines': ['GOOGLE_CHROME_BUILD'],
