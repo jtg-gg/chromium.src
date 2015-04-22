@@ -658,6 +658,7 @@ bool Extension::LoadExtent(const char* key,
       return false;
     }
 
+#if 0
     // Do not allow authors to claim "<all_urls>".
     if (pattern.match_all_urls()) {
       *error = ErrorUtils::FormatErrorMessageUTF16(
@@ -681,6 +682,7 @@ bool Extension::LoadExtent(const char* key,
           value_error, base::SizeTToString(i), errors::kNoWildCardsInPaths);
       return false;
     }
+#endif
     pattern.SetPath(pattern.path() + '*');
 
     extent->AddPattern(pattern);
