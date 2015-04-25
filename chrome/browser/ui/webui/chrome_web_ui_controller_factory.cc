@@ -219,11 +219,13 @@ WebUIController* NewWebUI<ExtensionWebUI>(WebUI* web_ui,
 }
 #endif  // defined(ENABLE_EXTENSIONS)
 
+#if defined(NWJS_SDK)
 // Special case for older about: handlers.
 template<>
 WebUIController* NewWebUI<AboutUI>(WebUI* web_ui, const GURL& url) {
   return new AboutUI(web_ui, url.host());
 }
+#endif
 
 #if defined(OS_CHROMEOS)
 template<>
@@ -275,6 +277,7 @@ bool NeedsExtensionWebUI(Profile* profile, const GURL& url) {
 }
 #endif
 
+#if defined(NWJS_SDK)
 bool IsAboutUI(const GURL& url) {
   return (url.host() == chrome::kChromeUIChromeURLsHost ||
           url.host() == chrome::kChromeUICreditsHost ||
@@ -296,6 +299,7 @@ bool IsAboutUI(const GURL& url) {
 #endif
           );  // NOLINT
 }
+#endif
 
 // Returns a function that can be used to create the right type of WebUI for a
 // tab, based on its URL. Returns NULL if the URL doesn't have WebUI associated
@@ -603,8 +607,11 @@ WebUIFactoryFunction GetWebUIFactoryFunction(WebUI* web_ui,
     return &NewWebUI<media_router::MediaRouterUI>;
   }
 #endif
+
+#if defined(NWJS_SDK)
   if (IsAboutUI(url))
     return &NewWebUI<AboutUI>;
+#endif
 
   if (dom_distiller::IsEnableDomDistillerSet() &&
       url.host() == dom_distiller::kChromeUIDomDistillerHost) {

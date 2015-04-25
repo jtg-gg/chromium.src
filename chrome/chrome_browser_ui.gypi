@@ -2890,6 +2890,12 @@
             '../net/net.gyp:net',
           ],
         }],
+        ['nwjs_sdk==0', {
+          'sources!': [
+            'browser/ui/webui/about_ui.cc',
+            'browser/ui/webui/about_ui.h',
+          ],
+        }],
         ['enable_basic_printing==1 or enable_print_preview==1', {
           'dependencies': [
             '../printing/printing.gyp:printing',
