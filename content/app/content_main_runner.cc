@@ -570,7 +570,7 @@ class ContentMainRunnerImpl : public ContentMainRunner {
       tracked_objects::ScopedTracker::Enable();
 
 #if !defined(OS_IOS)
-    SetProcessTitleFromCommandLine(argv);
+    //SetProcessTitleFromCommandLine(argv);
 #endif
 #endif  // !OS_ANDROID
 
