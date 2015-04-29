@@ -461,7 +461,7 @@
             'VCManifestTool': {
               'AdditionalManifestFiles': [
                 '$(ProjectDir)\\app\\nw.exe.manifest',
-                '<(SHARED_INTERMEDIATE_DIR)/chrome/app/version_assembly/version_assembly.manifest',
+                #'<(SHARED_INTERMEDIATE_DIR)/chrome/app/version_assembly/version_assembly.manifest',
               ],
             },
           },
