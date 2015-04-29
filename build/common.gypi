@@ -3142,7 +3142,7 @@
               '_SCL_SECURE_NO_DEPRECATE',
             ],
             'msvs_disabled_warnings': [
-              4800,
+              4800, 4275, 4267, 4090, 4146, 4334, 4068
             ],
             'msvs_settings': {
               'VCCLCompilerTool': {
