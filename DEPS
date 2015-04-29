@@ -13,6 +13,8 @@ vars = {
     '194294e69d44eac48bc1fb063bd607189650aa5e',
   'deqp_url':
     'https://android.googlesource.com/platform/external/deqp',
+  'nwjs_git':
+    'https://github.com/nwjs',
   'google_toolbox_for_mac_revision':
     '401878398253074c515c03cb3a3f8bb0cc8da6e9',
   'googlecode_url':
@@ -162,7 +164,12 @@ deps = {
   'src/tools/swarming_client':
     (Var("chromium_git")) + '/external/swarming.client.git@8fce79620b04bbe5415ace1103db27505bdc4c06',
   'src/v8':
-    (Var("chromium_git")) + '/v8/v8.git@d3de228428dd15d5fc50e5988611e23b83a2abc5'
+    #(Var("chromium_git")) + '/v8/v8.git@d3de228428dd15d5fc50e5988611e23b83a2abc5'
+    (Var("nwjs_git")) + '/v8.git@nw13',
+  'src/content/nw':
+    (Var("nwjs_git")) + '/nw.js.git@nw13',
+  'src/third_party/node':
+    (Var("nwjs_git")) + '/node.git@nw13',
 }
 
 deps_os = {
