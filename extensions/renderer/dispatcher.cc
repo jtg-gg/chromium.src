@@ -447,6 +447,15 @@ void Dispatcher::WillReleaseScriptContext(
   if (!context)
     return;
 
+  //FIXME: upstream removed unload_event: we should check our event
+  //f66545e9e5d0308c15f51764e311425894e3ad09
+  
+  if (context && context->extension() &&
+      context->extension()->is_nwjs_app() &&
+      script_context_set_->size() == 1) {
+    nw::OnRenderProcessShutdownHook(context);
+  }
+
   // TODO(kalman): Make |request_sender| use |context->AddInvalidationObserver|.
   // In fact |request_sender_| should really be owned by ScriptContext.
   request_sender_->InvalidateSource(context);

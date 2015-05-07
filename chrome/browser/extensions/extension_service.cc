@@ -100,6 +100,8 @@
 #include "storage/browser/fileapi/file_system_context.h"
 #endif
 
+#include "content/nw/src/nw_content.h"
+
 using content::BrowserContext;
 using content::BrowserThread;
 using content::DevToolsAgentHost;
@@ -295,6 +297,8 @@ ExtensionService::ExtensionService(Profile* profile,
                  content::NotificationService::AllBrowserContextsAndSources());
   registrar_.Add(this,
                  extensions::NOTIFICATION_EXTENSION_PROCESS_TERMINATED,
+                 content::NotificationService::AllBrowserContextsAndSources());
+  registrar_.Add(this, content::NOTIFICATION_RENDERER_PROCESS_CLOSED,
                  content::NotificationService::AllBrowserContextsAndSources());
   registrar_.Add(this, content::NOTIFICATION_RENDERER_PROCESS_TERMINATED,
                  content::NotificationService::AllBrowserContextsAndSources());
@@ -2222,6 +2226,12 @@ void ExtensionService::Observe(int type,
       base::ThreadTaskRunnerHandle::Get()->PostTask(
           FROM_HERE, base::Bind(&ExtensionService::TrackTerminatedExtension,
                                 AsWeakPtr(), host->extension()->id()));
+      break;
+    }
+    case content::NOTIFICATION_RENDERER_PROCESS_CLOSED: {
+      content::RenderProcessHost* process =
+          content::Source<content::RenderProcessHost>(source).ptr();
+      nw::RendererProcessTerminatedHook(process, details);
       break;
     }
     case content::NOTIFICATION_RENDERER_PROCESS_TERMINATED: {
