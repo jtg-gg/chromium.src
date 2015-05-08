@@ -1553,6 +1553,9 @@
       ['nwjs_sdk!=1', {
         'locales==': [ 'en-US', ],
       }],
+      ['nwjs_sdk==1', {
+        'locales==': [ 'en-US', ],
+      }],
       ['buildtype=="Official"', {
         # Continue to embed build meta data in Official builds, basically the
         # time it was built.
