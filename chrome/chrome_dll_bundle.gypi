@@ -262,9 +262,14 @@
         '<(SHARED_INTERMEDIATE_DIR)/repack/nw_200_percent.pak',
       ],
     }],
-    ['icu_use_data_file_flag==1', {
+    ['icu_use_data_file_flag==1 and nwjs_sdk==1', {
       'mac_bundle_resources': [
         '<(PRODUCT_DIR)/icudtl.dat',
+      ],
+    }],
+    ['icu_use_data_file_flag==1 and nwjs_sdk==0', {
+      'mac_bundle_resources': [
+        '<(DEPTH)/third_party/icu/android/icudtl.dat',
       ],
     }],
     ['v8_use_external_startup_data==1', {
