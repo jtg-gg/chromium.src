@@ -66,7 +66,7 @@ MessageCenterNotificationManager::MessageCenterNotificationManager(
   || (defined(OS_LINUX) && !defined(OS_CHROMEOS))
   // On Windows, Linux and Mac, the notification manager owns the tray icon and
   // views.Other platforms have global ownership and Create will return NULL.
-  tray_.reset(message_center::CreateMessageCenterTray());
+  //tray_.reset(message_center::CreateMessageCenterTray());
 #endif
 }
 
