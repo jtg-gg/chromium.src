@@ -386,7 +386,7 @@ class AppControllerProfileObserver : public ProfileInfoCacheObserver {
   [self initMenuState];
 
   // Initialize the Profile menu.
-  [self initProfileMenu];
+  //[self initProfileMenu];
 }
 
 - (void)unregisterEventHandlers {

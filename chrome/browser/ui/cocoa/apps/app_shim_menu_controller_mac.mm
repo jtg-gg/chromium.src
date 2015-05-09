@@ -75,6 +75,7 @@ void AddDuplicateItem(NSMenuItem* top_level_item,
   [[top_level_item submenu] addItem:item];
 }
 
+#if 0
 // Finds an item with |item_tag| and removes it from the submenu of
 // |top_level_item|.
 void RemoveMenuItemWithTag(NSMenuItem* top_level_item,
@@ -132,6 +133,7 @@ void SetItemWithTagVisible(NSMenuItem* top_level_item,
   [alternate_item setHidden:!visible];
   [menu_item setHidden:!visible];
 }
+#endif
 
 // Return the Extension (if any) associated with the given window. If it is not
 // a platform app nor hosted app, but it is a browser, |is_browser| will be set
@@ -393,6 +395,7 @@ void SetChromeCyclesWindows(int sequence_number) {
               resourceId:IDS_EXIT_MAC
                   action:@selector(quitCurrentPlatformApp)
            keyEquivalent:@"q"]);
+#if 0
   newDoppelganger_.reset([[DoppelgangerMenuItem alloc]
       initWithController:self
                  menuTag:IDC_FILE_MENU
@@ -417,6 +420,7 @@ void SetChromeCyclesWindows(int sequence_number) {
               resourceId:0
                   action:nil
            keyEquivalent:@"o"]);
+#endif
   allToFrontDoppelganger_.reset([[DoppelgangerMenuItem alloc]
       initWithController:self
                  menuTag:IDC_WINDOW_MENU
@@ -440,18 +444,21 @@ void SetChromeCyclesWindows(int sequence_number) {
   [appMenu addItem:[NSMenuItem separatorItem]];
   [appMenu addItem:[quitDoppelganger_ menuItem]];
 
+#if 0
   // File menu.
   fileMenuItem_.reset([NewTopLevelItemFrom(IDC_FILE_MENU) retain]);
   [[fileMenuItem_ submenu] addItem:[newDoppelganger_ menuItem]];
   [[fileMenuItem_ submenu] addItem:[openDoppelganger_ menuItem]];
   [[fileMenuItem_ submenu] addItem:[NSMenuItem separatorItem]];
   [[fileMenuItem_ submenu] addItem:[closeWindowDoppelganger_ menuItem]];
+#endif
 
   // Edit menu. We copy the menu because the last two items, "Start Dictation"
   // and "Special Characters" are added by OSX, so we can't copy them
   // explicitly.
   editMenuItem_.reset([[[NSApp mainMenu] itemWithTag:IDC_EDIT_MENU] copy]);
 
+#if 0
   // View menu. Remove "Always Show Bookmark Bar" and separator.
   viewMenuItem_.reset([[[NSApp mainMenu] itemWithTag:IDC_VIEW_MENU] copy]);
   RemoveMenuItemWithTag(viewMenuItem_, IDC_SHOW_BOOKMARK_BAR, YES);
@@ -461,6 +468,7 @@ void SetChromeCyclesWindows(int sequence_number) {
   AddDuplicateItem(historyMenuItem_, IDC_HISTORY_MENU, IDC_BACK);
   AddDuplicateItem(historyMenuItem_, IDC_HISTORY_MENU, IDC_FORWARD);
 
+#endif
   // Window menu.
   windowMenuItem_.reset([NewTopLevelItemFrom(IDC_WINDOW_MENU) retain]);
   AddDuplicateItem(windowMenuItem_, IDC_WINDOW_MENU, IDC_MINIMIZE_WINDOW);
@@ -566,14 +574,15 @@ void SetChromeCyclesWindows(int sequence_number) {
   [aboutDoppelganger_ enableForApp:app];
   [hideDoppelganger_ enableForApp:app];
   [quitDoppelganger_ enableForApp:app];
-  [newDoppelganger_ enableForApp:app];
-  [openDoppelganger_ enableForApp:app];
-  [closeWindowDoppelganger_ enableForApp:app];
+  //[newDoppelganger_ enableForApp:app];
+  //[openDoppelganger_ enableForApp:app];
+  //[closeWindowDoppelganger_ enableForApp:app];
 
   [appMenuItem_ setTitle:base::SysUTF8ToNSString(appId_)];
   [[appMenuItem_ submenu] setTitle:title];
 
   [mainMenu addItem:appMenuItem_];
+#if 0
   [mainMenu addItem:fileMenuItem_];
 
   SetItemWithTagVisible(editMenuItem_,
@@ -581,23 +590,28 @@ void SetChromeCyclesWindows(int sequence_number) {
                         app->is_hosted_app(), true);
   SetItemWithTagVisible(editMenuItem_, IDC_FIND_MENU, app->is_hosted_app(),
                         false);
+#endif
   [mainMenu addItem:editMenuItem_];
 
+#if 0
   if (app->is_hosted_app()) {
     [mainMenu addItem:viewMenuItem_];
     [mainMenu addItem:historyMenuItem_];
   }
+#endif
   [mainMenu addItem:windowMenuItem_];
 }
 
 - (void)removeMenuItems {
   NSMenu* mainMenu = [NSApp mainMenu];
   [mainMenu removeItem:appMenuItem_];
-  [mainMenu removeItem:fileMenuItem_];
+  //[mainMenu removeItem:fileMenuItem_];
+#if 0
   if ([mainMenu indexOfItem:viewMenuItem_] >= 0)
     [mainMenu removeItem:viewMenuItem_];
   if ([mainMenu indexOfItem:historyMenuItem_] >= 0)
     [mainMenu removeItem:historyMenuItem_];
+#endif
   [mainMenu removeItem:editMenuItem_];
   [mainMenu removeItem:windowMenuItem_];
 
@@ -608,9 +622,9 @@ void SetChromeCyclesWindows(int sequence_number) {
   [aboutDoppelganger_ disable];
   [hideDoppelganger_ disable];
   [quitDoppelganger_ disable];
-  [newDoppelganger_ disable];
-  [openDoppelganger_ disable];
-  [closeWindowDoppelganger_ disable];
+  //[newDoppelganger_ disable];
+  //[openDoppelganger_ disable];
+  //[closeWindowDoppelganger_ disable];
 }
 
 - (void)quitCurrentPlatformApp {
