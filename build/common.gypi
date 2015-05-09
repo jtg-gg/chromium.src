@@ -1970,7 +1970,7 @@
             'mac_keystone%': 1,
           }, { # else: branding!="Chrome" or buildtype!="Official"
             'mac_breakpad_uploads%': 0,
-            'mac_breakpad%': 1,
+            'mac_breakpad%': 0,
             'mac_keystone%': 0,
           }],
         ],
