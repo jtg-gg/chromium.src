@@ -1469,6 +1469,7 @@ class AppControllerProfileObserver : public ProfileInfoCacheObserver {
   if (profilesAdded)
     [dockMenu addItem:[NSMenuItem separatorItem]];
 
+#if 0
   NSString* titleStr = l10n_util::GetNSStringWithFixup(IDS_NEW_WINDOW_MAC);
   base::scoped_nsobject<NSMenuItem> item(
       [[NSMenuItem alloc] initWithTitle:titleStr
@@ -1493,6 +1494,7 @@ class AppControllerProfileObserver : public ProfileInfoCacheObserver {
     [item setEnabled:[self validateUserInterfaceItem:item]];
     [dockMenu addItem:item];
   }
+#endif
 
   // TODO(rickcam): Mock out BackgroundApplicationListModel, then add unit
   // tests which use the mock in place of the profile-initialized model.
