@@ -40,7 +40,7 @@ const AcceleratorMapping kAppWindowAcceleratorMap[] = {
   { ui::VKEY_W, ui::EF_SHIFT_DOWN | ui::EF_CONTROL_DOWN, IDC_CLOSE_WINDOW },
   { ui::VKEY_F4, ui::EF_ALT_DOWN, IDC_CLOSE_WINDOW },
 #if defined(NWJS_SDK)
-  { ui::VKEY_I, ui::EF_SHIFT_DOWN | ui::EF_CONTROL_DOWN, IDC_DEV_TOOLS },
+  { ui::VKEY_F12, ui::EF_NONE, IDC_DEV_TOOLS_TOGGLE },
 #endif
 };
 
@@ -333,6 +333,12 @@ bool ChromeNativeAppWindowViews::AcceleratorPressed(
       web_contents = app_window()->web_contents();
       if (web_contents) {
         DevToolsWindow::OpenDevToolsWindow(web_contents);
+      }
+      return true;
+    case IDC_DEV_TOOLS_TOGGLE:
+      web_contents = app_window()->web_contents();
+      if (web_contents) {
+        DevToolsWindow::OpenDevToolsWindow(web_contents, DevToolsToggleAction::Toggle());
       }
       return true;
 #endif
