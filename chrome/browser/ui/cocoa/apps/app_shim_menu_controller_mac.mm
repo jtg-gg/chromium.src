@@ -24,6 +24,8 @@
 
 using extensions::Extension;
 
+#include "chrome/browser/devtools/devtools_window.h"
+
 namespace {
 
 // When an app window loses main status, AppKit may make another app window main
@@ -356,6 +358,7 @@ void SetChromeCyclesWindows(int sequence_number) {
 - (void)hideCurrentPlatformApp;
 // If the currently focused window belongs to a platform app, focus the app.
 - (void)focusCurrentPlatformApp;
+- (void)showDevtools;
 @end
 
 @implementation AppShimMenuController
@@ -475,6 +478,18 @@ void SetChromeCyclesWindows(int sequence_number) {
   AddDuplicateItem(windowMenuItem_, IDC_WINDOW_MENU, IDC_MAXIMIZE_WINDOW);
   [[windowMenuItem_ submenu] addItem:[NSMenuItem separatorItem]];
   [[windowMenuItem_ submenu] addItem:[allToFrontDoppelganger_ menuItem]];
+#if defined(NWJS_SDK)
+  [[windowMenuItem_ submenu] setAutoenablesItems:NO];
+  NSMenuItem* item = [[NSMenuItem alloc]
+		      initWithTitle:@"Devtools"
+		      action:@selector(showDevtools)
+                      keyEquivalent:@"i"];
+  [item setTag:IDC_DEV_TOOLS_CONSOLE];
+  [item setTarget:self];
+  [item setEnabled:YES];
+  [item setKeyEquivalentModifierMask:NSCommandKeyMask | NSAlternateKeyMask];
+  [[windowMenuItem_ submenu] addItem:item];
+#endif
 }
 
 - (void)registerEventHandlers {
@@ -665,6 +680,14 @@ void SetChromeCyclesWindows(int sequence_number) {
           [NSApp keyWindow]);
   if (appWindow)
     apps::ExtensionAppShimHandler::FocusAppForWindow(appWindow);
+}
+
+- (void)showDevtools {
+  extensions::AppWindow* appWindow =
+      AppWindowRegistryUtil::GetAppWindowForNativeWindowAnyProfile(
+          [NSApp keyWindow]);
+  if (appWindow)
+    DevToolsWindow::OpenDevToolsWindow(appWindow->web_contents());
 }
 
 @end
