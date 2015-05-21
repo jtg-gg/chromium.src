@@ -351,7 +351,7 @@ void InProcessVideoCaptureDeviceLauncher::DoStartDesktopCaptureOnDeviceThread(
   video_capture_device = std::make_unique<ScreenCaptureDeviceAndroid>();
 #else
   if (!video_capture_device)
-    video_capture_device = DesktopCaptureDevice::Create(desktop_id);
+    video_capture_device = DesktopCaptureDevice::Create(desktop_id, params);
 #endif  // defined (OS_ANDROID)
 
   if (video_capture_device)
