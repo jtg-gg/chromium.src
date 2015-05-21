@@ -253,6 +253,7 @@ struct MediaTrackConstraintSetPlatform {
   // Constraints not exposed in Blink at the moment, only through
   // the legacy name interface.
   StringConstraint media_stream_source;  // tab, screen, desktop, system
+  BooleanConstraint window_to_front; 
   BooleanConstraint render_to_associated_sink;
   BooleanConstraint goog_echo_cancellation;
   BooleanConstraint goog_experimental_echo_cancellation;

@@ -148,6 +148,11 @@ template <>
 struct COMPONENT_EXPORT(MEDIA_CAPTURE_MOJOM_TRAITS)
     StructTraits<media::mojom::VideoCaptureParamsDataView,
                  media::VideoCaptureParams> {
+  static bool bring_window_to_front(
+      const media::VideoCaptureParams& params) {
+    return params.bring_window_to_front;
+  }
+
   static media::VideoCaptureFormat requested_format(
       const media::VideoCaptureParams& params) {
     return params.requested_format;

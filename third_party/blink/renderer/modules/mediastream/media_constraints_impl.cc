@@ -77,6 +77,7 @@ const char kMaxHeight[] = "maxHeight";
 const char kMinHeight[] = "minHeight";
 const char kMaxFrameRate[] = "maxFrameRate";
 const char kMinFrameRate[] = "minFrameRate";
+const char kWindowToFront[] = "windowToFront";
 const char kMediaStreamSource[] = "chromeMediaSource";
 const char kMediaStreamSourceId[] =
     "chromeMediaSourceId";                           // mapped to deviceId
@@ -291,6 +292,8 @@ static void ParseOldStyleNames(
       result.frame_rate.SetMax(atof(constraint.value_.Utf8().c_str()));
     } else if (constraint.name_.Equals(kEchoCancellation)) {
       result.echo_cancellation.SetExact(ToBoolean(constraint.value_));
+    } else if (constraint.name_.Equals(kWindowToFront)) {
+      result.window_to_front.SetExact(ToBoolean(constraint.value_));
     } else if (constraint.name_.Equals(kMediaStreamSource)) {
       // TODO(hta): This has only a few legal values. Should be
       // represented as an enum, and cause type errors.
