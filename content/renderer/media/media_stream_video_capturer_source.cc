@@ -420,6 +420,8 @@ void MediaStreamVideoCapturerSource::StartSourceImpl(
     const VideoCaptureDeliverFrameCB& frame_callback) {
   media::VideoCaptureParams new_params;
   new_params.requested_format = format;
+  GetOptionalConstraintValueAsBoolean(constraints, MediaStreamVideoSource::kWindowToFront,
+                                      &new_params.bring_window_to_front);
   if (IsContentVideoCaptureDevice(device_info())) {
     SetContentCaptureParamsFromConstraints(
         constraints, device_info().device.type, &new_params);

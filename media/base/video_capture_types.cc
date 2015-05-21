@@ -110,6 +110,7 @@ bool VideoCaptureFormat::ComparePixelFormatPreference(
 
 VideoCaptureParams::VideoCaptureParams()
     : resolution_change_policy(RESOLUTION_POLICY_FIXED_RESOLUTION),
+      bring_window_to_front(true),
       power_line_frequency(PowerLineFrequency::FREQUENCY_DEFAULT) {}
 
 bool VideoCaptureParams::IsValid() const {
