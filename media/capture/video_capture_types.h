@@ -134,6 +134,8 @@ struct CAPTURE_EXPORT VideoCaptureParams {
            power_line_frequency == other.power_line_frequency;
   }
 
+  bool bring_window_to_front;
+
   // Requests a resolution and format at which the capture will occur.
   VideoCaptureFormat requested_format;
 
