@@ -358,6 +358,7 @@ bool StructTraits<media::mojom::VideoCaptureParamsDataView,
                   media::VideoCaptureParams>::
     Read(media::mojom::VideoCaptureParamsDataView data,
          media::VideoCaptureParams* out) {
+  out->bring_window_to_front = data.bring_window_to_front();
   if (!data.ReadRequestedFormat(&out->requested_format))
     return false;
   if (!data.ReadResolutionChangePolicy(&out->resolution_change_policy))
