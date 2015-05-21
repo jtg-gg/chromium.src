@@ -411,7 +411,7 @@ void InProcessBuildableVideoCaptureDevice::DoStartDesktopCaptureOnDeviceThread(
 #endif  // defined(USE_AURA)
 #if BUILDFLAG(ENABLE_WEBRTC)
     if (!video_capture_device)
-      video_capture_device = DesktopCaptureDevice::Create(desktop_id);
+      video_capture_device = DesktopCaptureDevice::Create(desktop_id, params);
 #endif  // BUILDFLAG(ENABLE_WEBRTC)
 #endif  // defined (OS_ANDROID)
   }
