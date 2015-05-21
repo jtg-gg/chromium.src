@@ -384,6 +384,7 @@ WebMediaTrackConstraintSet::WebMediaTrackConstraintSet()
     , deviceId("deviceId")
     , groupId("groupId")
     , mediaStreamSource("mediaStreamSource")
+    , windowToFront("windowToFront")
     , renderToAssociatedSink("chromeRenderToAssociatedSink")
     , hotwordEnabled("hotwordEnabled")
     , googEchoCancellation("googEchoCancellation")
@@ -430,7 +431,7 @@ std::vector<const BaseConstraint*> WebMediaTrackConstraintSet::allConstraints() 
     const BaseConstraint* temp[] = {
         &width, &height, &aspectRatio, &frameRate, &facingMode, &volume,
         &sampleRate, &sampleSize, &echoCancellation, &latency, &channelCount,
-        &deviceId, &groupId, &mediaStreamSource, &renderToAssociatedSink,
+        &deviceId, &groupId, &mediaStreamSource, &windowToFront, &renderToAssociatedSink,
         &hotwordEnabled, &googEchoCancellation,
         &googExperimentalEchoCancellation, &googAutoGainControl,
         &googExperimentalAutoGainControl, &googNoiseSuppression,
