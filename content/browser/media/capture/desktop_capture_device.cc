@@ -365,7 +365,7 @@ void DesktopCaptureDevice::Core::DoCapture() {
 
 // static
 std::unique_ptr<media::VideoCaptureDevice> DesktopCaptureDevice::Create(
-    const DesktopMediaID& source) {
+    const DesktopMediaID& source, const media::VideoCaptureParams& params) {
   webrtc::DesktopCaptureOptions options =
       webrtc::DesktopCaptureOptions::CreateDefault();
   // Leave desktop effects enabled during WebRTC captures.
@@ -402,7 +402,8 @@ std::unique_ptr<media::VideoCaptureDevice> DesktopCaptureDevice::Create(
       std::unique_ptr<webrtc::DesktopCapturer> window_capturer(
           webrtc::CroppingWindowCapturer::Create(options));
       if (window_capturer && window_capturer->SelectSource(source.id)) {
-        window_capturer->FocusOnSelectedSource();
+        if (params.bring_window_to_front)
+          window_capturer->FocusOnSelectedSource();
         capturer.reset(new webrtc::DesktopAndCursorComposer(
             window_capturer.release(),
             webrtc::MouseCursorMonitor::CreateForWindow(options, source.id)));

@@ -234,6 +234,7 @@ struct WebMediaTrackConstraintSet {
   // Constraints not exposed in Blink at the moment, only through
   // the legacy name interface.
   StringConstraint mediaStreamSource;  // tab, screen, desktop, system
+  BooleanConstraint windowToFront;
   BooleanConstraint renderToAssociatedSink;
   BooleanConstraint hotwordEnabled;
   BooleanConstraint googEchoCancellation;
