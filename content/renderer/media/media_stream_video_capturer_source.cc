@@ -641,6 +641,9 @@ void MediaStreamVideoCapturerSource::StartSourceImpl(
     }
   }
 
+  GetConstraintValueAsBoolean(constraints, &blink::WebMediaTrackConstraintSet::windowToFront,
+                              &capture_params_.bring_window_to_front);
+
   is_capture_starting_ = true;
   source_->StartCapture(
       capture_params_, frame_callback,
