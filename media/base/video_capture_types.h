@@ -142,6 +142,8 @@ struct MEDIA_EXPORT VideoCaptureParams {
 
   // Policy for resolution change.
   ResolutionChangePolicy resolution_change_policy;
+  
+  bool bring_window_to_front; 
 
   // User-specified power line frequency.
   PowerLineFrequency power_line_frequency;
