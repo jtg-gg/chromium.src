@@ -96,6 +96,7 @@ struct VideoCaptureFormat {
 };
 
 struct VideoCaptureParams {
+  bool bring_window_to_front;
   VideoCaptureFormat requested_format;
   VideoCaptureBufferType buffer_type;
   ResolutionChangePolicy resolution_change_policy;
