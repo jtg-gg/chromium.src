@@ -419,7 +419,7 @@ VideoCaptureManager::DoStartDeviceOnDeviceThread(
         video_capture_device = DesktopCaptureDeviceAura::Create(desktop_id);
 #endif
         if (!video_capture_device)
-          video_capture_device = DesktopCaptureDevice::Create(desktop_id);
+          video_capture_device = DesktopCaptureDevice::Create(desktop_id, params);
       }
 #endif  // defined(ENABLE_SCREEN_CAPTURE)
       break;
