@@ -198,6 +198,7 @@ media::VideoCaptureParams SelectVideoCaptureParamsFromCandidates(
       media::PIXEL_FORMAT_I420);
   params.resolution_change_policy = SelectResolutionPolicyFromCandidates(
       candidates.resolution_set(), default_resolution_policy);
+  params.bring_window_to_front = basic_constraint_set.windowToFront.Exact();
   // Content capture always uses default power-line frequency.
   DCHECK(params.IsValid());
 
