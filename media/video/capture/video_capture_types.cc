@@ -70,7 +70,7 @@ std::string VideoCaptureFormat::PixelFormatToString(VideoPixelFormat format) {
 }
 
 VideoCaptureParams::VideoCaptureParams()
-    : resolution_change_policy(RESOLUTION_POLICY_FIXED) {}
+    : resolution_change_policy(RESOLUTION_POLICY_FIXED), bring_window_to_front(true) {}
 
 ImageCaptureFormat::ImageCaptureFormat() : pixel_format(PIXEL_FORMAT_UNKNOWN) {
 }

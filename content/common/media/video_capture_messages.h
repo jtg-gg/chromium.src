@@ -23,6 +23,7 @@ IPC_ENUM_TRAITS_MAX_VALUE(media::ResolutionChangePolicy,
 IPC_STRUCT_TRAITS_BEGIN(media::VideoCaptureParams)
   IPC_STRUCT_TRAITS_MEMBER(requested_format)
   IPC_STRUCT_TRAITS_MEMBER(resolution_change_policy)
+  IPC_STRUCT_TRAITS_MEMBER(bring_window_to_front)
 IPC_STRUCT_TRAITS_END()
 
 // TODO(nick): device_id in these messages is basically just a route_id. We

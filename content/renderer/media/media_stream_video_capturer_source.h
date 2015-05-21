@@ -110,6 +110,11 @@ class CONTENT_EXPORT MediaStreamVideoCapturerSource
   void StartSourceImpl(
       const media::VideoCaptureFormat& format,
       const VideoCaptureDeliverFrameCB& frame_callback) override;
+  
+  void StartSourceImpl(
+      const media::VideoCaptureFormat& format,
+      const VideoCaptureDeliverFrameCB& frame_callback,
+      const bool bring_window_to_front) override;
 
   void StopSourceImpl() override;
 

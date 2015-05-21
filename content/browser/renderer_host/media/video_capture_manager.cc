@@ -253,7 +253,7 @@ void VideoCaptureManager::DoStartDeviceOnDeviceThread(
 #endif
       if (id.type != DesktopMediaID::TYPE_NONE &&
           id.type != DesktopMediaID::TYPE_AURA_WINDOW) {
-        video_capture_device = DesktopCaptureDevice::Create(id);
+        video_capture_device = DesktopCaptureDevice::Create(id, params);
         if (notification_window_ids_.find(session_id) !=
             notification_window_ids_.end()) {
           static_cast<DesktopCaptureDevice*>(video_capture_device.get())

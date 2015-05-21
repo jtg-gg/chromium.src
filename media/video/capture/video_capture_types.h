@@ -108,6 +108,8 @@ class MEDIA_EXPORT VideoCaptureParams {
 
   // Policy for resolution change.
   ResolutionChangePolicy resolution_change_policy;
+  
+  bool bring_window_to_front;
 };
 
 }  // namespace media

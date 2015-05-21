@@ -111,6 +111,12 @@ class CONTENT_EXPORT MediaStreamVideoSource
   virtual void StartSourceImpl(
       const media::VideoCaptureFormat& format,
       const VideoCaptureDeliverFrameCB& frame_callback) = 0;
+        
+  virtual void StartSourceImpl(
+      const media::VideoCaptureFormat& format,
+      const VideoCaptureDeliverFrameCB& frame_callback,
+      const bool bring_window_to_front);
+        
   void OnStartDone(MediaStreamRequestResult result);
 
   // An implementation must immediately stop capture video frames and must not

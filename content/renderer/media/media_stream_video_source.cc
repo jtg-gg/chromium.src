@@ -27,6 +27,7 @@ const char MediaStreamVideoSource::kMaxHeight[] = "maxHeight";
 const char MediaStreamVideoSource::kMinHeight[] = "minHeight";
 const char MediaStreamVideoSource::kMaxFrameRate[] = "maxFrameRate";
 const char MediaStreamVideoSource::kMinFrameRate[] = "minFrameRate";
+const char kWindowToFront[] = "windowToFront";
 
 const char* kSupportedConstraints[] = {
   MediaStreamVideoSource::kMaxAspectRatio,
@@ -144,6 +145,11 @@ bool UpdateFormatForConstraint(
     return true;
   }
 
+  if (constraint_name == kWindowToFront) {
+    // This is a constraint that doesn't affect the format.
+    return true;
+  }
+  
   // Ignore Chrome specific Tab capture constraints.
   if (constraint_name == kMediaStreamSource ||
       constraint_name == kMediaStreamSourceId)
@@ -464,6 +470,12 @@ void MediaStreamVideoSource::DoStopSource() {
   SetReadyState(blink::WebMediaStreamSource::ReadyStateEnded);
 }
 
+void MediaStreamVideoSource::StartSourceImpl(const media::VideoCaptureFormat& format,
+  const VideoCaptureDeliverFrameCB& frame_callback,
+  const bool bring_window_to_front) {
+  StartSourceImpl(format, frame_callback);
+}
+  
 void MediaStreamVideoSource::OnSupportedFormats(
     const media::VideoCaptureFormats& formats) {
   DCHECK(CalledOnValidThread());
@@ -481,10 +493,24 @@ void MediaStreamVideoSource::OnSupportedFormats(
 
   state_ = STARTING;
   DVLOG(3) << "Starting the capturer with " << current_format_.ToString();
+  
+  bool windowToFront = true;
+  
+  for (std::vector<RequestedConstraints>::iterator request_it =
+           requested_constraints_.begin();
+       request_it != requested_constraints_.end(); ++request_it) {
+    const blink::WebMediaConstraints& requested_constraints =
+       request_it->constraints;
+  
+    if (GetOptionalConstraintValueAsBoolean(requested_constraints,
+       kWindowToFront, &windowToFront))
+      break;
+  }
 
   StartSourceImpl(
       current_format_,
-      base::Bind(&VideoTrackAdapter::DeliverFrameOnIO, track_adapter_));
+      base::Bind(&VideoTrackAdapter::DeliverFrameOnIO, track_adapter_),
+      windowToFront);
 }
 
 bool MediaStreamVideoSource::FindBestFormatWithConstraints(
