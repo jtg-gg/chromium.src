@@ -73,6 +73,7 @@ const char kMaxHeight[] = "maxHeight";
 const char kMinHeight[] = "minHeight";
 const char kMaxFrameRate[] = "maxFrameRate";
 const char kMinFrameRate[] = "minFrameRate";
+const char kWindowToFront[] = "windowToFront";
 // From content/common/media/media_stream_options.cc
 const char kMediaStreamSource[] = "chromeMediaSource";
 const char kMediaStreamSourceId[] =
@@ -292,6 +293,8 @@ static void parseOldStyleNames(
       result.frameRate.setMin(atof(constraint.m_value.utf8().c_str()));
     } else if (constraint.m_name.equals(kMaxFrameRate)) {
       result.frameRate.setMax(atof(constraint.m_value.utf8().c_str()));
+    } else if (constraint.m_name.equals(kWindowToFront)) {
+      result.windowToFront.setExact(toBoolean(constraint.m_value));
     } else if (constraint.m_name.equals(kEchoCancellation)) {
       result.echoCancellation.setExact(toBoolean(constraint.m_value));
     } else if (constraint.m_name.equals(kMediaStreamSource)) {
