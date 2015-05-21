@@ -28,6 +28,7 @@ IPC_STRUCT_TRAITS_BEGIN(media::VideoCaptureParams)
   IPC_STRUCT_TRAITS_MEMBER(requested_format)
   IPC_STRUCT_TRAITS_MEMBER(resolution_change_policy)
   IPC_STRUCT_TRAITS_MEMBER(power_line_frequency)
+  IPC_STRUCT_TRAITS_MEMBER(bring_window_to_front)
 IPC_STRUCT_TRAITS_END()
 
 IPC_STRUCT_BEGIN(VideoCaptureMsg_BufferReady_Params)
