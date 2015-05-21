@@ -56,6 +56,7 @@ class CONTENT_EXPORT MediaStreamVideoSource
   static const char kMinHeight[];  // minHeight
   static const char kMaxFrameRate[];  // maxFrameRate
   static const char kMinFrameRate[];  // minFrameRate
+  static const char kWindowToFront[];
 
   enum {
     // Default resolution. If no constraints are specified and the delegate

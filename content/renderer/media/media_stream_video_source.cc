@@ -27,6 +27,7 @@ const char MediaStreamVideoSource::kMaxHeight[] = "maxHeight";
 const char MediaStreamVideoSource::kMinHeight[] = "minHeight";
 const char MediaStreamVideoSource::kMaxFrameRate[] = "maxFrameRate";
 const char MediaStreamVideoSource::kMinFrameRate[] = "minFrameRate";
+const char MediaStreamVideoSource::kWindowToFront[] = "windowToFront";
 
 // TODO(mcasas): Find a way to guarantee all constraints are added to the array.
 const char* kSupportedConstraints[] = {
