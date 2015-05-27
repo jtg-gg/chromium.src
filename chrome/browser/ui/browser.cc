@@ -1690,7 +1690,8 @@ void Browser::WebContentsCreated(WebContents* source_contents,
                                  int opener_render_frame_id,
                                  const std::string& frame_name,
                                  const GURL& target_url,
-                                 WebContents* new_contents) {
+                                 WebContents* new_contents,
+                                 const base::string16& nw_window_manifest) {
   // Adopt the WebContents now, so all observers are in place, as the network
   // requests for its initial navigation will start immediately. The WebContents
   // will later be inserted into this browser using Browser::Navigate via

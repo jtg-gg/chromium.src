@@ -145,6 +145,8 @@
 #include "chrome/renderer/media/webrtc_logging_message_filter.h"
 #endif
 
+#include "content/nw/src/nw_content.h"
+
 using autofill::AutofillAgent;
 using autofill::PasswordAutofillAgent;
 using autofill::PasswordGenerationAgent;
@@ -364,6 +366,15 @@ ChromeContentRendererClient::ChromeContentRendererClient() {
 }
 
 ChromeContentRendererClient::~ChromeContentRendererClient() {
+}
+
+void ChromeContentRendererClient::willHandleNavigationPolicy(content::RenderView* rv,
+                                                             blink::WebFrame* frame,
+                                                             const blink::WebURLRequest& request,
+                                                             blink::WebNavigationPolicy* policy,
+                                                             blink::WebString* manifest,
+                                                             bool new_win) {
+  nw::willHandleNavigationPolicy(rv, frame, request, policy, manifest, new_win);
 }
 
 void ChromeContentRendererClient::RenderThreadStarted() {
