@@ -3076,6 +3076,7 @@
       'dependencies': [
         # NOTE: New dependencies should generally be added in the OS!="ios"
         # dependencies block below, rather than here.
+        'nw_base',
         'browser_ui',
         'chrome_resources.gyp:chrome_extra_resources',
         'chrome_resources.gyp:chrome_resources',

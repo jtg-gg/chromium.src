@@ -275,6 +275,8 @@
 #include "chrome/browser/media/router/presentation_service_delegate_impl.h"
 #endif
 
+#include "content/nw/src/common/shell_switches.h"
+
 using base::FileDescriptor;
 using blink::WebWindowFeatures;
 using content::AccessTokenStore;
@@ -1540,6 +1542,7 @@ void ChromeContentBrowserClient::AppendExtraCommandLineSwitches(
       autofill::switches::kDisableAccessorySuggestionView,
       autofill::switches::kEnableAccessorySuggestionView,
 #endif
+      switches::kEnableSpellChecking,
       autofill::switches::kDisableFillOnAccountSelect,
       autofill::switches::kDisablePasswordGeneration,
       autofill::switches::kEnableFillOnAccountSelect,

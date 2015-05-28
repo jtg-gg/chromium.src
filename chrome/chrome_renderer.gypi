@@ -237,6 +237,7 @@
       'type': 'static_library',
       'variables': { 'enable_wexit_time_destructors': 1, },
       'dependencies': [
+        'nw_base',
         'common',
         'common_mojo_bindings',
         'chrome_resources.gyp:chrome_resources',

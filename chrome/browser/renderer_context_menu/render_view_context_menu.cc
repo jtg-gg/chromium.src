@@ -4,6 +4,8 @@
 
 #include "chrome/browser/renderer_context_menu/render_view_context_menu.h"
 
+#include "content/nw/src/common/shell_switches.h"
+
 #include <algorithm>
 #include <set>
 #include <utility>
@@ -1178,7 +1180,11 @@ void RenderViewContextMenu::AppendSearchProvider() {
 }
 
 void RenderViewContextMenu::AppendEditableItems() {
-  const bool use_spellcheck_and_search = !chrome::IsRunningInForcedAppMode();
+  bool use_spellcheck_and_search = !chrome::IsRunningInForcedAppMode();
+  const base::CommandLine* command_line =
+      base::CommandLine::ForCurrentProcess();
+  if (!command_line->HasSwitch(switches::kEnableSpellChecking))
+    use_spellcheck_and_search = false;
 
   if (use_spellcheck_and_search)
     AppendSpellingSuggestionsSubMenu();
@@ -1218,11 +1224,13 @@ void RenderViewContextMenu::AppendEditableItems() {
 }
 
 void RenderViewContextMenu::AppendLanguageSettings() {
+#if 0
   const bool use_spellcheck_and_search = !chrome::IsRunningInForcedAppMode();
 
   if (use_spellcheck_and_search)
     menu_model_.AddItemWithStringId(IDC_CONTENT_CONTEXT_LANGUAGE_SETTINGS,
                                     IDS_CONTENT_CONTEXT_LANGUAGE_SETTINGS);
+#endif
 }
 
 void RenderViewContextMenu::AppendSpellingSuggestionsSubMenu() {

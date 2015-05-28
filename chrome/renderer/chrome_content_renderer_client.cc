@@ -146,6 +146,7 @@
 #endif
 
 #include "content/nw/src/nw_content.h"
+#include "content/nw/src/common/shell_switches.h"
 
 using autofill::AutofillAgent;
 using autofill::PasswordAutofillAgent;
@@ -389,10 +390,11 @@ void ChromeContentRendererClient::RenderThreadStarted() {
 
   prescient_networking_dispatcher_.reset(
       new network_hints::PrescientNetworkingDispatcher());
+  base::CommandLine* command_line = base::CommandLine::ForCurrentProcess();
 #if defined(ENABLE_SPELLCHECK)
   // ChromeRenderViewTest::SetUp() creates a Spellcheck and injects it using
   // SetSpellcheck(). Don't overwrite it.
-  if (!spellcheck_) {
+  if (!spellcheck_ && command_line->HasSwitch(switches::kEnableSpellChecking)) {
     spellcheck_.reset(new SpellCheck());
     thread->AddObserver(spellcheck_.get());
   }
@@ -423,7 +425,6 @@ void ChromeContentRendererClient::RenderThreadStarted() {
   thread->RegisterExtension(extensions_v8::ExternalExtension::Get());
   thread->RegisterExtension(extensions_v8::LoadTimesExtension::Get());
 
-  base::CommandLine* command_line = base::CommandLine::ForCurrentProcess();
   if (command_line->HasSwitch(switches::kEnableBenchmarking))
     thread->RegisterExtension(extensions_v8::BenchmarkingExtension::Get());
   if (command_line->HasSwitch(switches::kEnableNetBenchmarking))
@@ -566,15 +567,16 @@ void ChromeContentRendererClient::RenderViewCreated(
       scoped_ptr<printing::PrintWebViewHelper::Delegate>(
           new ChromePrintWebViewHelperDelegate()));
 #endif
+  base::CommandLine* command_line = base::CommandLine::ForCurrentProcess();
 #if defined(ENABLE_SPELLCHECK)
-  new SpellCheckProvider(render_view, spellcheck_.get());
+  if (command_line->HasSwitch(switches::kEnableSpellChecking))
+    new SpellCheckProvider(render_view, spellcheck_.get());
 #endif
   new prerender::PrerendererClient(render_view);
 #if defined(FULL_SAFE_BROWSING)
   safe_browsing::ThreatDOMDetails::Create(render_view);
 #endif
 
-  base::CommandLine* command_line = base::CommandLine::ForCurrentProcess();
   if (command_line->HasSwitch(switches::kInstantProcess))
     new SearchBox(render_view);
 
