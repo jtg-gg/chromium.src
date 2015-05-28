@@ -1157,6 +1157,15 @@ bool ChromeContentBrowserClient::MayReuseHost(
 
 bool ChromeContentBrowserClient::ShouldTryToUseExistingProcessHost(
     content::BrowserContext* browser_context, const GURL& url) {
+  // PDF extension should use new process, or there is a loop of IPC
+  // message BrowserPluginHostMsg_SetFocus and InputMsg_SetFocus
+  // #4335
+
+  if (url.SchemeIs(extensions::kExtensionScheme) && url.host() == extension_misc::kPdfExtensionId)
+    return false;
+
+  return true;
+#if 0
   // It has to be a valid URL for us to check for an extension.
   if (!url.is_valid())
     return false;
@@ -1168,6 +1177,7 @@ bool ChromeContentBrowserClient::ShouldTryToUseExistingProcessHost(
           profile, url);
 #else
   return false;
+#endif
 #endif
 }
 
