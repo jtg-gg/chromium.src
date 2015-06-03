@@ -118,9 +118,15 @@ bool ExtensionWebContentsObserver::OnMessageReceived(
     const IPC::Message& message,
     content::RenderFrameHost* render_frame_host) {
   bool handled = true;
+  tmp_render_frame_host_ = render_frame_host;
   IPC_BEGIN_MESSAGE_MAP_WITH_PARAM(
       ExtensionWebContentsObserver, message, render_frame_host)
     IPC_MESSAGE_HANDLER(ExtensionHostMsg_Request, OnRequest)
+    IPC_MESSAGE_UNHANDLED(handled = false)
+  IPC_END_MESSAGE_MAP()
+  IPC_BEGIN_MESSAGE_MAP(
+      ExtensionWebContentsObserver, message)
+    IPC_MESSAGE_HANDLER(ExtensionHostMsg_RequestSync, OnRequestSync)
     IPC_MESSAGE_UNHANDLED(handled = false)
   IPC_END_MESSAGE_MAP()
   return handled;
@@ -200,6 +206,15 @@ void ExtensionWebContentsObserver::OnRequest(
     content::RenderFrameHost* render_frame_host,
     const ExtensionHostMsg_Request_Params& params) {
   dispatcher_.Dispatch(params, render_frame_host);
+}
+
+void ExtensionWebContentsObserver::OnRequestSync(
+                                                 const ExtensionHostMsg_Request_Params& params,
+                                                 bool* success,
+                                                 base::ListValue* response,
+                                                 std::string* error) {
+  content::RenderFrameHost* render_frame_host = tmp_render_frame_host_;
+  dispatcher_.DispatchSync(params, success, response, error, render_frame_host);
 }
 
 void ExtensionWebContentsObserver::InitializeFrameHelper(
