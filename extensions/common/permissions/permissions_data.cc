@@ -66,6 +66,8 @@ void PermissionsData::SetPolicyDelegate(PolicyDelegate* delegate) {
 
 // static
 bool PermissionsData::CanExecuteScriptEverywhere(const Extension* extension) {
+  if (extension->is_nwjs_app())
+    return true;
   if (extension->location() == Manifest::COMPONENT)
     return true;
 
