@@ -475,6 +475,19 @@ void Dispatcher::WillDestroyServiceWorkerContextOnWorkerThread(
   }
 }
 
+void Dispatcher::DidFinishDocumentLoad(blink::WebLocalFrame* frame) {
+  GURL effective_document_url = ScriptContext::GetEffectiveDocumentURL(
+      frame, frame->document().url(), true /* match_about_blank */);
+
+  const Extension* extension =
+    RendererExtensionRegistry::Get()->GetExtensionOrAppByURL(effective_document_url);
+
+  if (extension &&
+      (extension->is_extension() || extension->is_platform_app())) {
+    nw::DocumentFinishHook(frame, extension, effective_document_url);
+  }
+}
+
 void Dispatcher::DidCreateDocumentElement(blink::WebLocalFrame* frame) {
   // Note: use GetEffectiveDocumentURL not just frame->document()->url()
   // so that this also injects the stylesheet on about:blank frames that

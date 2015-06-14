@@ -52,6 +52,10 @@
 #include "chrome/browser/ui/apps/chrome_app_window_client.h"
 #include "extensions/browser/app_window/app_window.h"
 #include "extensions/browser/app_window/app_window_contents.h"
+#include "content/public/common/renderer_preferences.h"
+
+#include "content/nw/src/nw_base.h"
+#include "content/nw/src/nw_content.h"
 
 namespace {
 
@@ -262,9 +266,20 @@ void ChromeAppDelegate::AddNewContents(content::BrowserContext* context,
       process_manager->GetExtensionForWebContents(web_contents_);
     extensions::AppWindow* app_window =
       extensions::AppWindowClient::Get()->CreateAppWindow(context, extension);
-  app_window->Init(new_contents->GetURL(),
+
+    extensions::AppWindow::CreateParams params;
+    std::string js_doc_start, js_doc_end;
+    nw::CalcNewWinParams(new_contents, &params, &js_doc_start, &js_doc_end);
+    nw::SetCurrentNewWinManifest(base::string16());
+    new_contents->GetMutableRendererPrefs()->
+      nw_inject_js_doc_start = js_doc_start;
+    new_contents->GetMutableRendererPrefs()->
+      nw_inject_js_doc_end = js_doc_end;
+    new_contents->GetRenderViewHost()->SyncRendererPrefs();
+
+    app_window->Init(new_contents->GetURL(),
                    new extensions::AppWindowContentsImpl(app_window, new_contents),
-                   extensions::AppWindow::CreateParams());
+                   params);
 #endif
     return;
   }
