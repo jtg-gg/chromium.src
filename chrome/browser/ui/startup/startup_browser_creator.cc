@@ -738,6 +738,13 @@ bool StartupBrowserCreator::ProcessCmdLineImpl(
     return true;
 
   const base::CommandLine::StringVector& params = command_line.GetArgs();
+  if (command_line.HasSwitch("nwapp")) {
+	  if (!apps::AppLoadService::Get(last_used_profile)->LoadAndLaunch(
+		  base::FilePath(command_line.GetSwitchValueNative("nwapp")), command_line, cur_dir)) {
+		  return false;
+	  }
+	  return true;
+  }  
   if (params.size() > 0) {
     if (!apps::AppLoadService::Get(last_used_profile)->LoadAndLaunch(
             base::FilePath(params[0]), command_line, cur_dir)) {
