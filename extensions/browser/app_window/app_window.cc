@@ -56,6 +56,9 @@
 #endif
 
 #include "extensions/browser/extension_host.h"
+#include "extensions/common/extension_messages.h"
+
+#include "content/public/browser/render_frame_host.h"
 
 using content::BrowserContext;
 using content::ConsoleMessageLevel;
@@ -251,6 +254,21 @@ AppWindow::AppWindow(BrowserContext* context,
   ExtensionsBrowserClient* client = ExtensionsBrowserClient::Get();
   CHECK(!client->IsGuestSession(context) || context->IsOffTheRecord())
       << "Only off the record window may be opened in the guest mode.";
+}
+
+void AppWindow::LoadingStateChanged(content::WebContents* source, bool to_different_document) {
+  base::ListValue args;
+  if (source->IsLoading())
+    args.AppendString("loading");
+  else
+    args.AppendString("loaded");
+  content::RenderFrameHost* rfh = web_contents()->GetMainFrame();
+  rfh->Send(new ExtensionMsg_MessageInvoke(rfh->GetRoutingID(),
+                                           extension_id(),
+                                           "nw.Window",
+                                           "LoadingStateChanged",
+                                           args,
+                                           false));
 }
 
 void AppWindow::Init(const GURL& url,

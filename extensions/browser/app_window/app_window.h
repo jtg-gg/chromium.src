@@ -372,6 +372,8 @@ class AppWindow : public content::WebContentsDelegate,
   friend class PlatformAppBrowserTest;
 
   // content::WebContentsDelegate implementation.
+  void LoadingStateChanged(content::WebContents* source,
+                           bool to_different_document) override;
   content::JavaScriptDialogManager* GetJavaScriptDialogManager(
       content::WebContents* source) override;
   void CloseContents(content::WebContents* contents) override;
