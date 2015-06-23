@@ -41,6 +41,7 @@
 #include "ui/base/l10n/l10n_util.h"
 #include "url/gurl.h"
 
+#include "base/command_line.h"
 #include "content/nw/src/nw_content.h"
 
 namespace extensions {
@@ -237,12 +238,17 @@ scoped_ptr<base::DictionaryValue> LoadManifest(
     const base::FilePath& extension_path,
     std::string* error) {
   base::FilePath manifest_path = extension_path.Append(kNWJSManifestFilename);
+  
   if (!base::PathExists(manifest_path))
     return LoadManifest(extension_path, kManifestFilename, error);
 
   scoped_ptr<base::DictionaryValue> manifest =
     LoadManifest(extension_path, kNWJSManifestFilename, error);
   nw::LoadNWAppAsExtensionHook(manifest.get(), error);
+
+  base::CommandLine* cmdline = base::CommandLine::ForCurrentProcess();
+  if (cmdline->HasSwitch("mixed-context"))
+    manifest->SetBoolean(manifest_keys::kNWJSMixedContext, true);
 
   return manifest.Pass();
 }
