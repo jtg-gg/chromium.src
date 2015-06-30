@@ -76,6 +76,14 @@ LIBOBJ += fts2.o \
           fts2_tokenizer.o \
 	  fts2_tokenizer1.o
 
+LIBOBJ += \
+  crypto.o \
+  crypto_impl.o \
+  crypto_openssl.o \
+  crypto_libtomcrypt.o \
+  crypto_cc.o
+
+
 # All of the source code files.
 #
 SRC = \
@@ -168,6 +176,15 @@ SRC = \
   $(TOP)/src/wal.h \
   $(TOP)/src/walker.c \
   $(TOP)/src/where.c
+
+SRC += \
+  $(TOP)/src/crypto.h \
+  $(TOP)/src/sqlcipher.h \
+  $(TOP)/src/crypto.c \
+  $(TOP)/src/crypto_impl.c \
+  $(TOP)/src/crypto_libtomcrypt.c \
+  $(TOP)/src/crypto_openssl.c \
+  $(TOP)/src/crypto_cc.c
 
 # Source code for extensions
 #
@@ -374,7 +391,7 @@ libsqlite3.a:	$(LIBOBJ)
 sqlite3$(EXE):	$(TOP)/src/shell.c libsqlite3.a sqlite3.h
 	$(TCCX) $(READLINE_FLAGS) -o sqlite3$(EXE)                  \
 		$(TOP)/src/shell.c $(SHELL_ICU)                     \
-		libsqlite3.a $(LIBREADLINE) $(TLIBS) $(THREADLIB) -ldl
+		libsqlite3.a $(LIBREADLINE) $(TLIBS) $(THREADLIB) -ldl -lssl -lcrypto
 
 # This target creates a directory named "tsrc" and fills it with
 # copies of all of the C source code and header files needed to
@@ -530,7 +547,7 @@ TESTFIXTURE_FLAGS += -DSQLITE_SERVER=1 -DSQLITE_PRIVATE="" -DSQLITE_CORE
 testfixture$(EXE): $(TESTSRC2) libsqlite3.a $(TESTSRC) $(TOP)/src/tclsqlite.c
 	$(TCCX) $(TCL_FLAGS) -DTCLSH=1 $(TESTFIXTURE_FLAGS)                  \
 		$(TESTSRC) $(TESTSRC2) $(TOP)/src/tclsqlite.c                \
-		-o testfixture$(EXE) $(LIBTCL) $(THREADLIB) libsqlite3.a
+		-o testfixture$(EXE) $(LIBTCL) $(THREADLIB) libsqlite3.a -lssl -lcrypto
 
 amalgamation-testfixture$(EXE): sqlite3.c $(TESTSRC) $(TOP)/src/tclsqlite.c
 	$(TCCX) $(TCL_FLAGS) -DTCLSH=1 $(TESTFIXTURE_FLAGS)                  \

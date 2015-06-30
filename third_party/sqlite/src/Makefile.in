@@ -283,6 +283,15 @@ SRC = \
   $(TOP)/src/walker.c \
   $(TOP)/src/where.c
 
+SRC += \
+  $(TOP)/src/crypto.h \
+  $(TOP)/src/sqlcipher.h \
+  $(TOP)/src/crypto.c \
+  $(TOP)/src/crypto_impl.c \
+  $(TOP)/src/crypto_libtomcrypt.c \
+  $(TOP)/src/crypto_openssl.c \
+  $(TOP)/src/crypto_cc.c
+
 # Source code for extensions
 #
 SRC += \

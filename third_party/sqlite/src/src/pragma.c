@@ -53,6 +53,10 @@ static u8 getBoolean(const char *z){
   return getSafetyLevel(z)&1;
 }
 
+u8 sqlite3GetBoolean(const char *z, u8 dflt) {
+  return getBoolean(z);
+}
+
 /*
 ** Interpret the given string as a locking mode value.
 */
@@ -343,6 +347,16 @@ void sqlite3Pragma(
   if( sqlite3AuthCheck(pParse, SQLITE_PRAGMA, zLeft, zRight, zDb) ){
     goto pragma_out;
   }
+
+/* BEGIN SQLCIPHER */
+#ifdef SQLITE_HAS_CODEC
+  extern int sqlcipher_codec_pragma(sqlite3*, int, Parse *, const char *, const char *);
+  if(sqlcipher_codec_pragma(db, iDb, pParse, zLeft, zRight)) { 
+    /* sqlcipher_codec_pragma executes internal */
+    goto pragma_out;
+  }
+#endif
+/* END SQLCIPHER */  
  
 #ifndef SQLITE_OMIT_PAGER_PRAGMAS
   /*

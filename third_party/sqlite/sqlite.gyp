@@ -17,6 +17,9 @@
       'SQLITE_SEPARATE_CACHE_POOLS',
       'THREADSAFE',
       '_HAS_EXCEPTIONS=0',
+      'SQLITE_HAS_CODEC=1',
+      'SQLITE_TEMP_STORE=2',
+      'NODE_OPENSSL',
     ],
   },
   'targets': [
@@ -94,6 +97,7 @@
           'dependencies': [
             '../icu/icu.gyp:icui18n',
             '../icu/icu.gyp:icuuc',
+            '../node/deps/openssl/openssl.gyp:openssl',
           ],
           'direct_dependent_settings': {
             'include_dirs': [
@@ -221,5 +225,21 @@
         },
       ],
     }],
+    ['OS == "win" and not use_system_sqlite', {
+      'targets': [
+        {
+          'target_name': 'sqlite_shell',
+          'type': 'executable',
+          'dependencies': [
+            '../icu/icu.gyp:icuuc',
+            'sqlite',
+          ],
+          'sources': [
+            'src/src/shell.c',
+            'src/src/shell_icu_win.c',
+          ],
+        },
+      ],
+    },],
   ],
 }

@@ -84,6 +84,8 @@ if {$addstatic} {
 # text of the file in-line.  The file only needs to be included once.
 #
 foreach hdr {
+   crypto.h
+   sqlcipher.h
    btree.h
    btreeInt.h
    fts3.h
@@ -210,6 +212,12 @@ proc copy_file {filename} {
 #
 foreach file {
    sqliteInt.h
+
+   crypto.c
+   crypto_impl.c
+   crypto_libtomcrypt.c
+   crypto_openssl.c
+   crypto_cc.c
 
    global.c
    ctime.c
