@@ -33,6 +33,10 @@ class BrowserContext;
 class WebContents;
 }
 
+namespace nw {
+class Menu;
+}
+
 namespace extensions {
 
 class AppDelegate;
@@ -363,6 +367,7 @@ class AppWindow : public content::WebContentsDelegate,
   void SetAppWindowContentsForTesting(scoped_ptr<AppWindowContents> contents) {
     app_window_contents_ = contents.Pass();
   }
+  nw::Menu* menu_;
 
  protected:
   ~AppWindow() override;

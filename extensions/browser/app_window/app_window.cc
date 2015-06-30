@@ -236,7 +236,7 @@ gfx::Size AppWindow::CreateParams::GetWindowMaximumSize(
 AppWindow::AppWindow(BrowserContext* context,
                      AppDelegate* app_delegate,
                      const Extension* extension)
-    : browser_context_(context),
+    : menu_(nullptr), browser_context_(context),
       extension_id_(extension->id()),
       window_type_(WINDOW_TYPE_DEFAULT),
       app_delegate_(app_delegate),
