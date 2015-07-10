@@ -21,10 +21,21 @@
 #include "ui/aura/window.h"
 #endif
 
+#include "content/nw/src/nw_content.h"
+
 using extensions::AppWindow;
+using extensions::Extension;
 
 namespace native_app_window {
 
+bool NativeAppWindowViews::ExecuteAppCommand(int command_id) {
+  const Extension* extension = app_window_->GetExtension();
+  if (extension && extension->is_nwjs_app()) {
+    return nw::ExecuteAppCommandHook(command_id, app_window_);
+  }
+  return false;
+}
+  
 NativeAppWindowViews::NativeAppWindowViews()
     : app_window_(NULL),
       web_view_(NULL),
