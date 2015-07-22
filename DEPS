@@ -687,6 +687,17 @@ hooks = [
   {
     'action': [
       'python',
+      'src/content/nw/tools/patcher.py',
+      '--patch-config', 'src/content/nw/patch/patch.cfg'
+    ],
+    'pattern':
+      '.',
+    'name':
+      'nw_patch'
+  },
+  {
+    'action': [
+      'python',
       'src/build/gyp_chromium'
     ],
     'pattern':
