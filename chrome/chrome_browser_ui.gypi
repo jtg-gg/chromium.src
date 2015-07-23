@@ -2894,6 +2894,7 @@
           'sources!': [
             'browser/ui/webui/about_ui.cc',
             'browser/ui/webui/about_ui.h',
+            '<@(chrome_browser_ui_media_router_sources)',
           ],
         }],
         ['enable_basic_printing==1 or enable_print_preview==1', {

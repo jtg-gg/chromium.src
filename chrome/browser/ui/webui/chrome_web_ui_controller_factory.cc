@@ -602,10 +602,12 @@ WebUIFactoryFunction GetWebUIFactoryFunction(WebUI* web_ui,
     return &NewWebUI<WebRtcLogsUI>;
 #endif
 #if defined(ENABLE_MEDIA_ROUTER) && !defined(OS_ANDROID)
+#if defined(NWJS_SDK)
   if (url.host() == chrome::kChromeUIMediaRouterHost &&
       media_router::MediaRouterEnabled(profile)) {
     return &NewWebUI<media_router::MediaRouterUI>;
   }
+#endif
 #endif
 
 #if defined(NWJS_SDK)
