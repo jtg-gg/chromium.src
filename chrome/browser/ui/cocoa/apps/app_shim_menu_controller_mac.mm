@@ -26,6 +26,8 @@ using extensions::Extension;
 
 #include "chrome/browser/devtools/devtools_window.h"
 
+#include "content/nw/src/api/menu/menu.h"
+
 namespace {
 
 // When an app window loses main status, AppKit may make another app window main
@@ -215,6 +217,7 @@ void SetAppCyclesWindows(const std::string& app_id, int sequence_number) {
     [[NSApp keyWindow] makeKeyAndOrderFront:nil];
 }
 
+#if 0
 // Sets the window cycle list to Chrome browser windows only.
 void SetChromeCyclesWindows(int sequence_number) {
   if (g_window_cycle_sequence_number != sequence_number)
@@ -230,6 +233,7 @@ void SetChromeCyclesWindows(int sequence_number) {
   if (any_change)
     [[NSApp keyWindow] makeKeyAndOrderFront:nil];
 }
+#endif
 
 }  // namespace
 
@@ -521,8 +525,17 @@ void SetChromeCyclesWindows(int sequence_number) {
     const Extension* extension = GetExtensionForNSWindow(window, &is_browser);
     // Ignore is_browser: if a window becomes main that does not belong to an
     // extension or browser, treat it the same as switching to a browser.
-    if (extension)
+
+    extensions::AppWindow* appWindow =
+        AppWindowRegistryUtil::GetAppWindowForNativeWindowAnyProfile(
+            window);
+    if (extension) {
+      if (appWindow->menu_) {
+        [NSApp setMainMenu:appWindow->menu_->menu_];
+        return;
+      }
       [self appBecameMain:extension];
+    }
     else
       [self chromeBecameMain];
   } else if ([name isEqualToString:NSWindowDidResignMainNotification]) {
@@ -565,6 +578,7 @@ void SetChromeCyclesWindows(int sequence_number) {
 }
 
 - (void)chromeBecameMain {
+#if 0
   if (appId_.empty())
     return;
 
@@ -575,6 +589,7 @@ void SetChromeCyclesWindows(int sequence_number) {
         FROM_HERE,
         base::Bind(&SetChromeCyclesWindows, ++g_window_cycle_sequence_number));
   }
+#endif
 }
 
 - (void)addMenuItems:(const Extension*)app {

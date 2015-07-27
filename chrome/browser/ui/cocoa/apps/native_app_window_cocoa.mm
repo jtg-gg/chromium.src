@@ -44,6 +44,7 @@
 // desired size.
 
 using extensions::AppWindow;
+using extensions::AppWindowRegistry;
 
 @interface NSWindow (NSPrivateApis)
 - (void)setBottomCornerRounded:(BOOL)rounded;
@@ -180,6 +181,22 @@ std::vector<gfx::Rect> CalculateNonDraggableRegions(
   if (appWindow_)
     return appWindow_->HandledByExtensionCommand(event, priority);
   return NO;
+}
+
+- (void)closeAllWindowsQuit:(id)sender {
+  if (!appWindow_)
+    return;
+  AppWindowRegistry* registry = AppWindowRegistry::Get(appWindow_->app_window_->browser_context());
+  if (!registry)
+    return;
+
+  AppWindowRegistry::AppWindowList windows =
+    registry->GetAppWindowsForApp(appWindow_->app_window_->GetExtension()->id());
+
+  for (AppWindow* window : windows) {
+    if (window->NWCanClose())
+      window->GetBaseWindow()->Close();
+  }
 }
 
 @end

@@ -44,6 +44,7 @@ class SkRegion;
 - (BOOL)handledByExtensionCommand:(NSEvent*)event
     priority:(ui::AcceleratorManager::HandlerPriority)priority;
 
+- (void)closeAllWindowsQuit:(id)sender;
 @end
 
 // Cocoa bridge to AppWindow.
@@ -183,7 +184,9 @@ class NativeAppWindowCocoa : public extensions::NativeAppWindow,
   // Hides the window unconditionally. Used by Hide and HideWithApp.
   void HideWithoutMarkingHidden();
 
+public:
   extensions::AppWindow* app_window_;  // weak - AppWindow owns NativeAppWindow.
+private:
 
   bool has_frame_;
 
