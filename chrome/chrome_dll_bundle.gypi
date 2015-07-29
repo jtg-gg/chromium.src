@@ -150,6 +150,7 @@
         ['disable_nacl!=1', {
           'files': [
             '<(PRODUCT_DIR)/nacl_irt_x86_64.nexe',
+            '<(PRODUCT_DIR)/pnacl',
           ],
         }],
       ],
