@@ -314,7 +314,7 @@ void AudioInputDevice::AudioThreadCallback::Process(uint32 pending_data) {
 
   // Deliver captured data to the client in floating point format
   // and update the audio-delay measurement.
-  int audio_delay_milliseconds = pending_data / bytes_per_ms_;
+  int audio_delay_milliseconds = ((int)pending_data) / bytes_per_ms_;
   capture_callback_->Capture(
       audio_bus, audio_delay_milliseconds, volume, key_pressed);
 
