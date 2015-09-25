@@ -21,7 +21,8 @@
     'chromium_child_dependencies': [
       'common',
       '../sync/sync.gyp:sync',
-      '../third_party/node/node.gyp:node',
+      #'../v8/tools/gyp/v8.gyp:v8_libplatform',
+      #'../third_party/node/node.gyp:node',
     ],
     'allocator_target': '../base/allocator/allocator.gyp:allocator',
     'grit_out_dir': '<(SHARED_INTERMEDIATE_DIR)/chrome',

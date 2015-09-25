@@ -124,6 +124,9 @@ using blink::WebVector;
 using blink::WebView;
 using content::RenderThread;
 
+UVRunFn g_uv_run_fn = nullptr;
+SetUVRunFn g_set_uv_run_fn = nullptr;
+
 namespace extensions {
 
 namespace {
@@ -201,9 +204,9 @@ class ChromeNativeHandler : public ObjectBackedNativeHandler {
 base::LazyInstance<WorkerScriptContextSet> g_worker_script_context_set =
     LAZY_INSTANCE_INITIALIZER;
 
-int nw_uv_run(uv_loop_t* loop, uv_run_mode mode) {
+int nw_uv_run(void* loop, int mode) {
   blink::WebScopedMicrotaskSuppression suppression;
-  return uv_run(loop, mode);
+  return g_uv_run_fn(loop, mode);
 }
 
 }  // namespace
@@ -932,7 +935,7 @@ void Dispatcher::WebKitInitialized() {
     func(extension_resource_scheme);
   }
 
-  node::g_nw_uv_run = nw_uv_run;
+  g_set_uv_run_fn(nw_uv_run);
   // For extensions, we want to ensure we call the IdleHandler every so often,
   // even if the extension keeps up activity.
   if (set_idle_notifications_) {

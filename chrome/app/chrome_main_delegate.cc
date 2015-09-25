@@ -154,6 +154,8 @@ base::LazyInstance<ChromeCrashReporterClient>::Leaky g_chrome_crash_client =
 extern int NaClMain(const content::MainFunctionParams&);
 extern int ServiceProcessMain(const content::MainFunctionParams&);
 
+NodeStartFn g_node_start_fn = nullptr;
+
 namespace {
 
 #if defined(OS_WIN)
@@ -448,7 +450,6 @@ bool ChromeMainDelegate::BasicStartupComplete(int* exit_code) {
 
   const base::CommandLine& command_line =
       *base::CommandLine::ForCurrentProcess();
-
 
 #if defined(OS_WIN)
   // Browser should not be sandboxed.

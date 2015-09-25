@@ -29,7 +29,25 @@
 #include <sys/event.h>
 #include <sys/time.h>
 
+#include <vector>
 #include "third_party/node/src/node_webkit.h"
+
+VoidHookFn g_msg_pump_dtor_osx_fn = nullptr, g_uv_sem_post_fn = nullptr, g_uv_sem_wait_fn = nullptr;
+VoidPtr3Fn g_msg_pump_ctor_osx_fn = nullptr;
+IntVoidFn g_nw_uvrun_nowait_fn = nullptr;
+IntVoidFn g_uv_backend_timeout_fn = nullptr;
+IntVoidFn g_uv_backend_fd_fn = nullptr;
+
+extern GetNodeEnvFn g_get_node_env_fn;
+
+
+VoidHookFn g_msg_pump_ctor_fn = nullptr;
+VoidHookFn g_msg_pump_dtor_fn = nullptr;
+VoidHookFn g_msg_pump_sched_work_fn = nullptr, g_msg_pump_nest_leave_fn = nullptr, g_msg_pump_need_work_fn = nullptr;
+VoidHookFn g_msg_pump_did_work_fn = nullptr, g_msg_pump_pre_loop_fn = nullptr, g_msg_pump_nest_enter_fn = nullptr;
+VoidIntHookFn g_msg_pump_delay_work_fn = nullptr;
+VoidHookFn g_msg_pump_clean_ctx_fn = nullptr;
+GetPointerFn g_uv_default_loop_fn = nullptr;
 
 namespace base {
 
@@ -53,8 +71,10 @@ void CFRunLoopRemoveSourceFromAllModes(CFRunLoopRef rl,
 void NoOp(void* info) {
 }
 
-void UvNoOp(uv_async_t* handle) {
+#if 0
+void UvNoOp(void* handle) {
 }
+#endif
 
 }  // namespace
 
@@ -183,11 +203,7 @@ void MessagePumpUVNSRunLoop::PreWaitObserverHook() {
   // call tick callback before sleep in mach port
   // in the same way node upstream handle this in MakeCallBack,
   // or the tick callback is blocked in some cases
-  if (node::g_env) {
-    v8::Isolate* isolate = v8::Isolate::GetCurrent();
-    v8::HandleScope scope(isolate);
-    node::CallTickCallback(node::g_env, v8::Undefined(isolate));
-  }
+  g_msg_pump_did_work_fn(&ctx_);
 }
 
 MessagePumpUVNSRunLoop::MessagePumpUVNSRunLoop()
@@ -199,19 +215,8 @@ MessagePumpUVNSRunLoop::MessagePumpUVNSRunLoop()
                                        &source_context);
   CFRunLoopAddSourceToAllModes(run_loop(), quit_source_);
 
-  // Add dummy handle for libuv, otherwise libuv would quit when there is
-  // nothing to do.
-  uv_async_init(uv_default_loop(), &dummy_uv_handle_, UvNoOp);
-
-  // Start worker that will interrupt main loop when having uv events.
   embed_closed_ = 0;
-  uv_sem_init(&embed_sem_, 0);
-  uv_thread_create(&embed_thread_, EmbedThreadRunner, this);
-
-  // Execute loop for once.
-  uv_run(uv_default_loop(), UV_RUN_NOWAIT);
-  node::g_nw_uv_run = uv_run;
-
+  g_msg_pump_ctor_osx_fn(&ctx_, (void*)EmbedThreadRunner, this);
 }
 
 MessagePumpUVNSRunLoop::~MessagePumpUVNSRunLoop() {
@@ -219,7 +224,7 @@ MessagePumpUVNSRunLoop::~MessagePumpUVNSRunLoop() {
   CFRelease(quit_source_);
   // Clear uv.
   embed_closed_ = 1;
-  uv_thread_join(&embed_thread_);
+  g_msg_pump_dtor_osx_fn(&ctx_);
 }
 
 void MessagePumpUVNSRunLoop::DoRun(Delegate* delegate) {
@@ -234,16 +239,16 @@ void MessagePumpUVNSRunLoop::DoRun(Delegate* delegate) {
     // NSRunLoop manages autorelease pools itself.
     [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
                              beforeDate:[NSDate distantFuture]];
-    if (node::g_env && nesting_level() == 0) {
+    if (g_get_node_env_fn() && nesting_level() == 0) {
         isolate = v8::Isolate::GetCurrent();
         v8::HandleScope scope(isolate);
         // Deal with uv events.
-	if (!(*node::g_nw_uv_run)(uv_default_loop(), UV_RUN_NOWAIT)) {
+	if (!g_nw_uvrun_nowait_fn()) {
 	  VLOG(1) << "Quit from uv";
 	  keep_running_ = false; // Quit from uv.
           break;
 	}
-        if(0 == uv_backend_timeout(uv_default_loop())) {
+        if(0 == g_uv_backend_timeout_fn()) {
            [NSApp postEvent:[NSEvent otherEventWithType:NSApplicationDefined
                                       location:NSZeroPoint
                                  modifierFlags:0
@@ -256,7 +261,7 @@ void MessagePumpUVNSRunLoop::DoRun(Delegate* delegate) {
               atStart:NO];
         }
         // Tell the worker thread to continue polling.
-        uv_sem_post(&embed_sem_);
+        g_uv_sem_post_fn(&ctx_);
     }
   }
 
@@ -264,7 +269,7 @@ void MessagePumpUVNSRunLoop::DoRun(Delegate* delegate) {
   // Resume uv.
   if (nesting_level() > 0) {
     pause_uv_ = false;
-    uv_sem_post(&embed_sem_);
+    g_uv_sem_post_fn(&ctx_);
   }
 }
 
@@ -282,20 +287,18 @@ void MessagePumpUVNSRunLoop::EmbedThreadRunner(void *arg) {
   struct kevent errors[1];
 
   while (!message_pump->embed_closed_) {
-    uv_loop_t* loop = uv_default_loop();
-
     // We should at leat poll every 500ms.
     // theoratically it's not needed, but act as a fail-safe
     // for unknown corner cases
 
-    int timeout = uv_backend_timeout(loop);
+    int timeout = g_uv_backend_timeout_fn();
 #if 1
     if (timeout > 500 || timeout < 0)
       timeout = 500;
 #endif
 
     // Wait for new libuv events.
-    int fd = uv_backend_fd(loop);
+    int fd = g_uv_backend_fd_fn();
 
     do {
       struct timespec ts;
@@ -323,7 +326,7 @@ void MessagePumpUVNSRunLoop::EmbedThreadRunner(void *arg) {
     }
 
     // Wait for the main loop to deal with events.
-    uv_sem_wait(&message_pump->embed_sem_);
+    g_uv_sem_wait_fn(&message_pump->ctx_);
   }
 }
 

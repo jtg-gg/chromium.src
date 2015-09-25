@@ -184,28 +184,29 @@
                 '../build/linux/system.gyp:xext',
               ],
             }],
-            ['OS=="linux" and enable_plugins==1', {
-              'dependencies': [
-                '../pdf/pdf.gyp:pdf',
-              ],
-            }],
+            #['OS=="linux" and enable_plugins==1', {
+            #  'dependencies': [
+            #    '../pdf/pdf.gyp:pdf',
+            #  ],
+            #}],
           ],
-          'sources': [
-            'app/chrome_dll_resource.h',
-            'app/chrome_main.cc',
-            'app/chrome_main_delegate.cc',
-            'app/chrome_main_delegate.h',
-          ],
+          #'sources': [
+          #  'app/chrome_dll_resource.h',
+          #  'app/chrome_main.cc',
+          #  'app/chrome_main_delegate.cc',
+          #  'app/chrome_main_delegate.h',
+          #],
           'dependencies': [
-            # On Linux, link the dependencies (libraries) that make up actual
-            # Chromium functionality directly into the executable.
-            '<@(chromium_browser_dependencies)',
-            '<@(chromium_child_dependencies)',
-            '../content/content.gyp:content_app_both',
-            # Needed for chrome_main.cc initialization of libraries.
-            '../build/linux/system.gyp:pangocairo',
-            # Needed to use the master_preferences functions
-            'installer_util',
+            ## On Linux, link the dependencies (libraries) that make up actual
+            ## Chromium functionality directly into the executable.
+            #'<@(chromium_browser_dependencies)',
+            #'<@(chromium_child_dependencies)',
+            #'../content/content.gyp:content_app_both',
+            ## Needed for chrome_main.cc initialization of libraries.
+            #'../build/linux/system.gyp:pangocairo',
+            ## Needed to use the master_preferences functions
+            #'installer_util',
+            'chrome_dll',
           ],
         }],
         ['OS=="mac"', {

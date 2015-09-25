@@ -32,7 +32,7 @@
       ],
      },
     ],
-    ['OS=="mac" or OS=="win"', {
+    ['OS=="mac" or OS=="win" or OS=="linux"', {
       'targets': [
         {
           # GN version: //chrome:chrome_dll
@@ -148,6 +148,9 @@
                 'chrome_user32_delay_imports',
               ],
             },],
+            ['OS=="linux"', {
+              'product_name': 'nw'
+            }],
             ['OS=="win"', {
               'product_name': 'nw',
               'dependencies': [

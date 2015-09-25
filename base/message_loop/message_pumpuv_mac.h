@@ -35,7 +35,8 @@
 #include "base/basictypes.h"
 
 #include <CoreFoundation/CoreFoundation.h>
-#include "third_party/node/deps/uv/include/uv.h"
+#include "v8.h"
+#include "third_party/node/src/node_webkit.h"
 
 #include "base/memory/weak_ptr.h"
 #include "base/message_loop/timer_slack.h"
@@ -83,15 +84,7 @@ class BASE_EXPORT MessagePumpUVNSRunLoop : public MessagePumpCFRunLoopBase {
   // Flag to pause the libuv loop.
   bool pause_uv_;
 
-  // Thread for polling events.
-  uv_thread_t embed_thread_;
-
-  // Semaphore to wait for main loop in the polling thread.
-  uv_sem_t embed_sem_;
-
-  // Dummy handle to make uv's loop not quit.
-  uv_async_t dummy_uv_handle_;
-
+  msg_pump_context_t ctx_;
   // Whether we're done.
   int embed_closed_;
 
