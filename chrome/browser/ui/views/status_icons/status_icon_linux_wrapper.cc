@@ -8,15 +8,12 @@
 #include "ui/views/linux_ui/linux_ui.h"
 
 StatusIconLinuxWrapper::StatusIconLinuxWrapper(
-    views::StatusIconLinux* status_icon)
-    : menu_model_(NULL) {
+    views::StatusIconLinux* status_icon) {
   status_icon_.reset(status_icon);
   status_icon_->set_delegate(this);
 }
 
 StatusIconLinuxWrapper::~StatusIconLinuxWrapper() {
-  if (menu_model_)
-    menu_model_->RemoveObserver(this);
 }
 
 void StatusIconLinuxWrapper::SetImage(const gfx::ImageSkia& image) {
@@ -62,13 +59,5 @@ StatusIconLinuxWrapper* StatusIconLinuxWrapper::CreateWrappedStatusIcon(
 
 void StatusIconLinuxWrapper::UpdatePlatformContextMenu(
     ui::MenuModel* model) {
-  // If a menu already exists, remove ourself from its oberver list.
-  if (menu_model_)
-    menu_model_->RemoveObserver(this);
-
   status_icon_->UpdatePlatformContextMenu(model);
-  menu_model_ = static_cast<StatusIconMenuModel*>(model);
-
-  if (model)
-    menu_model_->AddObserver(this);
 }

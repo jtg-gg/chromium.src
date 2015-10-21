@@ -112,6 +112,7 @@
       <include name="IDR_NWAPI_SHELL_JS" file="../../../content/nw/src/resources/api_nw_shell.js" type="BINDATA" />
       <include name="IDR_NWAPI_OBJECT_JS" file="../../../content/nw/src/resources/api_nw_object.js" type="BINDATA" />
       <include name="IDR_NWAPI_TEST_JS" file="../../../content/nw/src/resources/api_nw_test.js" type="BINDATA" />
+      <include name="IDR_NWAPI_TRAY_JS" file="../../../content/nw/src/resources/api_nw_tray.js" type="BINDATA" />
     </includes>
     <structures>
       <!-- Extension styles. -->

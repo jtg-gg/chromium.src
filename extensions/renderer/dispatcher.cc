@@ -788,6 +788,7 @@ std::vector<std::pair<std::string, int> > Dispatcher::GetJsResources() {
   resources.push_back(std::make_pair("nw.Shortcut",  IDR_NWAPI_SHORTCUT_JS));
   resources.push_back(std::make_pair("nw.Obj",       IDR_NWAPI_OBJECT_JS));
   resources.push_back(std::make_pair("nw.test",      IDR_NWAPI_TEST_JS));
+  resources.push_back(std::make_pair("nw.Tray",      IDR_NWAPI_TRAY_JS));
   return resources;
 }
 

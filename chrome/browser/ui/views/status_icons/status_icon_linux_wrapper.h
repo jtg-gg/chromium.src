@@ -54,8 +54,6 @@ class StatusIconLinuxWrapper : public StatusIcon,
 
   scoped_ptr<views::StatusIconLinux> status_icon_;
 
-  StatusIconMenuModel* menu_model_;
-
   DISALLOW_COPY_AND_ASSIGN(StatusIconLinuxWrapper);
 };
 
