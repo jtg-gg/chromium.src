@@ -88,8 +88,8 @@ extern RunAtExitFn g_run_at_exit_fn;
 
 #if defined(OS_MACOSX)
 extern VoidHookFn g_msg_pump_dtor_osx_fn, g_uv_sem_post_fn, g_uv_sem_wait_fn;
-extern VoidPtr3Fn g_msg_pump_ctor_osx_fn;
-extern IntVoidFn g_nw_uvrun_nowait_fn;
+extern VoidPtr4Fn g_msg_pump_ctor_osx_fn;
+extern IntVoidFn g_nw_uvrun_nowait_fn, g_uv_runloop_once_fn;
 extern IntVoidFn g_uv_backend_timeout_fn;
 extern IntVoidFn g_uv_backend_fd_fn;
 #endif
@@ -182,8 +182,9 @@ int RendererMain(const MainFunctionParams& parameters) {
       g_emit_exit_fn = (EmitExitFn)base::GetFunctionPointerFromNativeLibrary(node_dll, "g_emit_exit");
       g_run_at_exit_fn = (RunAtExitFn)base::GetFunctionPointerFromNativeLibrary(node_dll, "g_run_at_exit");
 #if defined(OS_MACOSX)
-      g_msg_pump_ctor_osx_fn = (VoidPtr3Fn)base::GetFunctionPointerFromNativeLibrary(node_dll, "g_msg_pump_ctor_osx");
+      g_msg_pump_ctor_osx_fn = (VoidPtr4Fn)base::GetFunctionPointerFromNativeLibrary(node_dll, "g_msg_pump_ctor_osx");
       g_nw_uvrun_nowait_fn = (IntVoidFn)base::GetFunctionPointerFromNativeLibrary(node_dll, "g_nw_uvrun_nowait");
+      g_uv_runloop_once_fn = (IntVoidFn)base::GetFunctionPointerFromNativeLibrary(node_dll, "g_uv_runloop_once");
       g_uv_backend_timeout_fn = (IntVoidFn)base::GetFunctionPointerFromNativeLibrary(node_dll, "g_uv_backend_timeout");
       g_uv_backend_fd_fn = (IntVoidFn)base::GetFunctionPointerFromNativeLibrary(node_dll, "g_uv_backend_fd");
 #endif

@@ -1,6 +1,7 @@
 // Copyright (c) 2012 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
+// Copyright Plask, (c) Dean McNamee <dean@gmail.com>, 2011.  BSD license
 
 
 #import "base/message_loop/message_pump_mac.h"
@@ -31,10 +32,26 @@
 
 #include <vector>
 #include "third_party/node/src/node_webkit.h"
+#include "content/nw/src/nw_content.h"
+
+#define EVENTLOOP_DEBUG 0
+
+#if EVENTLOOP_DEBUG
+#define EVENTLOOP_DEBUG_C(x) x
+#else
+#define EVENTLOOP_DEBUG_C(x) do { } while(0)
+#endif
+
+
+//static bool g_should_quit = false;
+static int g_kqueue_fd = 0;
+static int g_main_thread_pipe_fd = 0;
+static int g_kqueue_thread_pipe_fd = 0;
 
 VoidHookFn g_msg_pump_dtor_osx_fn = nullptr, g_uv_sem_post_fn = nullptr, g_uv_sem_wait_fn = nullptr;
-VoidPtr3Fn g_msg_pump_ctor_osx_fn = nullptr;
+VoidPtr4Fn g_msg_pump_ctor_osx_fn = nullptr;
 IntVoidFn g_nw_uvrun_nowait_fn = nullptr;
+IntVoidFn g_uv_runloop_once_fn = nullptr;
 IntVoidFn g_uv_backend_timeout_fn = nullptr;
 IntVoidFn g_uv_backend_fd_fn = nullptr;
 
@@ -48,6 +65,84 @@ VoidHookFn g_msg_pump_did_work_fn = nullptr, g_msg_pump_pre_loop_fn = nullptr, g
 VoidIntHookFn g_msg_pump_delay_work_fn = nullptr;
 VoidHookFn g_msg_pump_clean_ctx_fn = nullptr;
 GetPointerFn g_uv_default_loop_fn = nullptr;
+
+int
+kevent_hook(int kq, const struct kevent *changelist, int nchanges,
+            struct kevent *eventlist, int nevents,
+            const struct timespec *timeout) {
+  int res;
+
+  EVENTLOOP_DEBUG_C((printf("KQUEUE--- fd: %d changes: %d\n", kq, nchanges)));
+
+#if 0 //EVENTLOOP_DEBUG
+  for (int i = 0; i < nchanges; ++i) {
+    dump_kevent(&changelist[i]);
+  }
+#endif
+
+#if EVENTLOOP_BYPASS_CUSTOM
+  int res = kevent(kq, changelist, nchanges, eventlist, nevents, timeout);
+  printf("---> results: %d\n", res);
+  for (int i = 0; i < res; ++i) {
+    dump_kevent(&eventlist[i]);
+  }
+  return res;
+#endif
+
+  if (eventlist == NULL)  // Just updating the state.
+    return kevent(kq, changelist, nchanges, eventlist, nevents, timeout);
+
+  struct timespec zerotimeout;
+  memset(&zerotimeout, 0, sizeof(zerotimeout));
+
+  // Going for a poll.  A bit less optimial but we break it into two system
+  // calls to make sure that the kqueue state is up to date.  We might as well
+  // also peek since we basically get it for free w/ the same call.
+  EVENTLOOP_DEBUG_C((printf("-- Updating kqueue state and peek\n")));
+  res = kevent(kq, changelist, nchanges, eventlist, nevents, &zerotimeout);
+  if (res != 0) return res;
+
+  /*
+  printf("kevent() blocking\n");
+  res = kevent(kq, NULL, 0, eventlist, nevents, timeout);
+  if (res != 0) return res;
+  return res;
+  */
+
+  /*
+  printf("Going for it...\n");
+  res = kevent(kq, changelist, nchanges, eventlist, nevents, timeout);
+  printf("<- %d\n", res);
+  return res;
+  */
+
+  double ts = 9999;  // Timeout in seconds.  Default to some "future".
+  if (timeout != NULL)
+    ts = timeout->tv_sec + (timeout->tv_nsec / 1000000000.0);
+
+  // NOTE(deanm): We only ever make a single pass, because we need to make
+  // sure that any user code (which could update timers, etc) is reflected
+  // and we have a proper timeout value.  Since user code can run in response
+  // to [NSApp sendEvent] (mouse movement, keypress, etc, etc), we wind down
+  // and go back through the uv loop again to make sure to update everything.
+
+  EVENTLOOP_DEBUG_C((printf("-> Running NSApp iteration: timeout %f\n", ts)));
+
+  // Have the helper thread start select()ing on the kqueue.
+  write(g_main_thread_pipe_fd, "~", 1);
+
+  [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
+                             beforeDate:[NSDate dateWithTimeIntervalSinceNow:ts]];
+
+  // Stop the helper thread if it hasn't already woken up (in which case it
+  // would have already stopped itself).
+  write(g_main_thread_pipe_fd, "!", 1);
+
+  EVENTLOOP_DEBUG_C((printf("<- Finished NSApp iteration\n")));
+
+  // Do the actual kqueue call now (ignore the timeout, don't block).
+  return kevent(kq, NULL, 0, eventlist, nevents, &zerotimeout);
+}
 
 namespace base {
 
@@ -141,21 +236,6 @@ bool MessagePumpUVNSRunLoop::RunWork() {
 
   if (resignal_work_source) {
     CFRunLoopSourceSignal(work_source_);
-  }else if (did_work) {
-    // callbacks in Blink can result in uv status change, so
-    // a run through is needed. This should remove the need for
-    // the 500ms failsafe poll
-
-    [NSApp postEvent:[NSEvent otherEventWithType:NSApplicationDefined
-                                      location:NSZeroPoint
-                                 modifierFlags:0
-                                     timestamp:0
-                                  windowNumber:0
-                                       context:NULL
-                                       subtype:0
-                                         data1:0
-                                         data2:0]
-           atStart:NO];
   }
 
   return resignal_work_source;
@@ -182,18 +262,6 @@ bool MessagePumpUVNSRunLoop::RunIdleWork() {
   bool did_work = delegate_->DoIdleWork();
   if (did_work) {
     CFRunLoopSourceSignal(idle_work_source_);
-    // callbacks in Blink can result in uv status change, so
-    // a run through is needed
-    [NSApp postEvent:[NSEvent otherEventWithType:NSApplicationDefined
-                                      location:NSZeroPoint
-                                 modifierFlags:0
-                                     timestamp:0
-                                  windowNumber:0
-                                       context:NULL
-                                       subtype:0
-                                         data1:0
-                                         data2:0]
-           atStart:NO];
   }
 
   return did_work;
@@ -203,7 +271,7 @@ void MessagePumpUVNSRunLoop::PreWaitObserverHook() {
   // call tick callback before sleep in mach port
   // in the same way node upstream handle this in MakeCallBack,
   // or the tick callback is blocked in some cases
-  g_msg_pump_did_work_fn(&ctx_);
+  nw::KickNextTick();
 }
 
 MessagePumpUVNSRunLoop::MessagePumpUVNSRunLoop()
@@ -216,7 +284,16 @@ MessagePumpUVNSRunLoop::MessagePumpUVNSRunLoop()
   CFRunLoopAddSourceToAllModes(run_loop(), quit_source_);
 
   embed_closed_ = 0;
-  g_msg_pump_ctor_osx_fn(&ctx_, (void*)EmbedThreadRunner, this);
+  int pipefds[2];
+  if (pipe(pipefds) != 0) abort();
+
+  g_uv_default_loop_fn();
+
+  g_kqueue_thread_pipe_fd = pipefds[0];
+  g_main_thread_pipe_fd = pipefds[1];
+  g_kqueue_fd = g_uv_backend_fd_fn();
+
+  g_msg_pump_ctor_osx_fn(&ctx_, (void*)EmbedThreadRunner, (void*)kevent_hook, this);
 }
 
 MessagePumpUVNSRunLoop::~MessagePumpUVNSRunLoop() {
@@ -228,40 +305,18 @@ MessagePumpUVNSRunLoop::~MessagePumpUVNSRunLoop() {
 }
 
 void MessagePumpUVNSRunLoop::DoRun(Delegate* delegate) {
-  v8::Isolate* isolate = NULL;
 
   // Pause uv in nested loop.
   if (nesting_level() > 0) {
     pause_uv_ = true;
-  }
-
-  while (keep_running_) {
-    // NSRunLoop manages autorelease pools itself.
-    [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
-                             beforeDate:[NSDate distantFuture]];
-    if (g_get_node_env_fn() && nesting_level() == 0) {
-        isolate = v8::Isolate::GetCurrent();
-        v8::HandleScope scope(isolate);
-        // Deal with uv events.
-	if (!g_nw_uvrun_nowait_fn()) {
-	  VLOG(1) << "Quit from uv";
-	  keep_running_ = false; // Quit from uv.
-          break;
-	}
-        if(0 == g_uv_backend_timeout_fn()) {
-           [NSApp postEvent:[NSEvent otherEventWithType:NSApplicationDefined
-                                      location:NSZeroPoint
-                                 modifierFlags:0
-                                     timestamp:0
-                                  windowNumber:0
-                                       context:NULL
-                                       subtype:0
-                                         data1:0
-                                         data2:0]
-              atStart:NO];
-        }
-        // Tell the worker thread to continue polling.
-        g_uv_sem_post_fn(&ctx_);
+    while (keep_running_) {
+      // NSRunLoop manages autorelease pools itself.
+      [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
+                               beforeDate:[NSDate distantFuture]];
+    }
+  } else {
+    while (keep_running_) {
+      g_uv_runloop_once_fn();
     }
   }
 
@@ -269,7 +324,6 @@ void MessagePumpUVNSRunLoop::DoRun(Delegate* delegate) {
   // Resume uv.
   if (nesting_level() > 0) {
     pause_uv_ = false;
-    g_uv_sem_post_fn(&ctx_);
   }
 }
 
@@ -277,57 +331,50 @@ void MessagePumpUVNSRunLoop::Quit() {
   keep_running_ = false;
   CFRunLoopSourceSignal(quit_source_);
   CFRunLoopWakeUp(run_loop());
+  write(g_main_thread_pipe_fd, "q", 1);
 }
 
 void MessagePumpUVNSRunLoop::EmbedThreadRunner(void *arg) {
-  base::MessagePumpUVNSRunLoop* message_pump =
-      static_cast<base::MessagePumpUVNSRunLoop*>(arg);
+  bool check_kqueue = false;
 
-  int r;
-  struct kevent errors[1];
+  base::MessagePumpUVNSRunLoop* message_pump = static_cast<base::MessagePumpUVNSRunLoop*>(arg);
 
-  while (!message_pump->embed_closed_) {
-    // We should at leat poll every 500ms.
-    // theoratically it's not needed, but act as a fail-safe
-    // for unknown corner cases
+  NSAutoreleasePool* pool = [NSAutoreleasePool new];  // To avoid the warning.
 
-    int timeout = g_uv_backend_timeout_fn();
-#if 1
-    if (timeout > 500 || timeout < 0)
-      timeout = 500;
-#endif
-
-    // Wait for new libuv events.
-    int fd = g_uv_backend_fd_fn();
-
-    do {
-      struct timespec ts;
-      ts.tv_sec = timeout / 1000;
-      ts.tv_nsec = (timeout % 1000) * 1000000;
-      r = kevent(fd, NULL, 0, errors, 1, timeout < 0 ? NULL : &ts);
-    } while (r == -1 && errno == EINTR);
-
-    // Don't wake up main loop if in a nested loop, so we'll keep waiting for
-    // the semaphore and uv loop will be paused.
-    if (!message_pump->pause_uv_) {
-      // Send a fake event to wake the loop up.
-      NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-      [NSApp postEvent:[NSEvent otherEventWithType:NSApplicationDefined
-                                          location:NSMakePoint(0, 0)
-                                     modifierFlags:0
-                                         timestamp:0
-                                      windowNumber:0
-                                           context:NULL
-                                           subtype:0
-                                             data1:0
-                                             data2:0]
-               atStart:NO];
-      [pool release];
+  while (true) {
+    int nfds = g_kqueue_thread_pipe_fd + 1;
+    fd_set fds;
+    FD_ZERO(&fds);
+    FD_SET(g_kqueue_thread_pipe_fd, &fds);
+    if (check_kqueue) {
+      FD_SET(g_kqueue_fd, &fds);
+      if (g_kqueue_fd + 1 > nfds) nfds = g_kqueue_fd + 1;
     }
 
-    // Wait for the main loop to deal with events.
-    g_uv_sem_wait_fn(&message_pump->ctx_);
+    EVENTLOOP_DEBUG_C((printf("Calling select: %d\n", check_kqueue)));
+    int res = select(nfds, &fds, NULL, NULL, NULL);
+    if (res <= 0) abort();  // TODO(deanm): Handle signals, etc.
+
+    if (FD_ISSET(g_kqueue_fd, &fds)) {
+      EVENTLOOP_DEBUG_C((printf("postEvent\n")));
+      message_pump->ScheduleWork();
+      check_kqueue = false;
+    }
+
+    if (FD_ISSET(g_kqueue_thread_pipe_fd, &fds)) {
+      char msg;
+      ssize_t amt = read(g_kqueue_thread_pipe_fd, &msg, 1);
+      if (amt != 1) abort();  // TODO(deanm): Handle errors.
+      if (msg == 'q') {  // quit.
+        EVENTLOOP_DEBUG_C((printf("quitting kqueue helper\n")));
+        break;
+      }
+      check_kqueue = msg == '~';  // ~ - start, ! - stop.
+    }
   }
+
+  [pool drain];
+
 }
 
 }  // namespace base
