@@ -1115,6 +1115,13 @@ void Dispatcher::OnLoaded(
       extension_registry->Insert(extension);
 
     if (extension->GetType() == Manifest::TYPE_NWJS_APP) {
+      std::string user_agent;
+      if (extension->manifest()->GetString("user-agent", &user_agent)) {
+        std::string name, version;
+        extension->manifest()->GetString("name", &name);
+        extension->manifest()->GetString("version", &version);
+        nw::SetUserAgentOverride(user_agent, name, version);
+      }
       VLOG(1) << "NW: change working dir: " << extension->path().AsUTF8Unsafe();
       base::SetCurrentDirectory(extension->path());
     }

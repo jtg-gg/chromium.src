@@ -19,6 +19,8 @@
 #include "extensions/browser/app_window/native_app_window.h"
 #include "extensions/common/extension_messages.h"
 
+#include "content/nw/src/nw_content.h"
+
 namespace extensions {
 
 AppWindowContentsImpl::AppWindowContentsImpl(AppWindow* host, content::WebContents* web_contents)
@@ -36,8 +38,12 @@ void AppWindowContentsImpl::Initialize(content::BrowserContext* context,
           context, content::SiteInstance::CreateForURL(context, url_))));
 
   Observe(web_contents_.get());
-  web_contents_->GetMutableRendererPrefs()->
-      browser_handles_all_top_level_requests = true;
+  content::RendererPreferences* render_prefs =
+      web_contents_->GetMutableRendererPrefs();
+  render_prefs->browser_handles_all_top_level_requests = true;
+  std::string user_agent;
+  if (nw::GetUserAgentFromManifest(&user_agent))
+    render_prefs->user_agent_override = user_agent;
   web_contents_->GetRenderViewHost()->SyncRendererPrefs();
 }
 
