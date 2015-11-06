@@ -504,6 +504,9 @@ bool ProcessSingletonNotificationCallback(
   if (!g_browser_process || g_browser_process->IsShuttingDown())
     return false;
 
+  if (!nw::ProcessSingletonNotificationCallbackHook(command_line, current_directory))
+    return false;
+  
   if (command_line.HasSwitch(switches::kOriginalProcessStartTime)) {
     std::string start_time_string =
         command_line.GetSwitchValueASCII(switches::kOriginalProcessStartTime);
