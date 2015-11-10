@@ -109,6 +109,7 @@
 #include "v8/include/v8.h"
 
 #include "base/files/file_util.h"
+#include "content/common/dom_storage/dom_storage_map.h"
 #include "content/nw/src/nw_content.h"
 #include "content/nw/src/nw_custom_bindings.h"
 #include "third_party/node/src/node_webkit.h"
@@ -1121,6 +1122,11 @@ void Dispatcher::OnLoaded(
         extension->manifest()->GetString("name", &name);
         extension->manifest()->GetString("version", &version);
         nw::SetUserAgentOverride(user_agent, name, version);
+
+        int dom_storage_quota_mb;
+        if (extension->manifest()->GetInteger("dom_storage_quota", &dom_storage_quota_mb)) {
+          content::DOMStorageMap::SetQuotaOverride(dom_storage_quota_mb * 1024 * 1024);
+        }
       }
       VLOG(1) << "NW: change working dir: " << extension->path().AsUTF8Unsafe();
       base::SetCurrentDirectory(extension->path());
