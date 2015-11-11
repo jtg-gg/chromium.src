@@ -64,6 +64,8 @@
 #include "components/user_manager/user_manager.h"
 #endif
 
+#include "content/nw/src/nw_content_verifier_delegate.h"
+
 using content::BrowserThread;
 
 // Statistics are logged to UMA with this string as part of histogram name. They
@@ -139,7 +141,7 @@ void ExtensionSystemImpl::Shared::Init(bool extensions_enabled) {
   ExtensionErrorReporter::Init(allow_noisy_errors);
 
   content_verifier_ = new ContentVerifier(
-      profile_, new ChromeContentVerifierDelegate(profile_));
+      profile_, new NWContentVerifierDelegate(profile_));
 
   service_worker_manager_.reset(new ServiceWorkerManager(profile_));
 
@@ -165,7 +167,7 @@ void ExtensionSystemImpl::Shared::Init(bool extensions_enabled) {
   {
     InstallVerifier::Get(profile_)->Init();
     ContentVerifierDelegate::Mode mode =
-        ChromeContentVerifierDelegate::GetDefaultMode();
+        NWContentVerifierDelegate::GetDefaultMode();
 #if defined(OS_CHROMEOS)
     mode = std::max(mode, ContentVerifierDelegate::BOOTSTRAP);
 #endif  // defined(OS_CHROMEOS)

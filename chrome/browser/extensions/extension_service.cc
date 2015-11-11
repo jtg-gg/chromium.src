@@ -1726,6 +1726,8 @@ void ExtensionService::OnExtensionInstalled(
     }
   }
 
+  disable_reasons &= ~Extension::DISABLE_CORRUPTED;
+
   // Unsupported requirements overrides the management policy.
   if (install_flags & extensions::kInstallFlagHasRequirementErrors) {
     disable_reasons |= Extension::DISABLE_UNSUPPORTED_REQUIREMENT;

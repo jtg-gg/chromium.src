@@ -632,11 +632,11 @@ MessageBundle::SubstitutionMap* LoadMessageBundleSubstitutionMapWithImports(
 }
 
 base::FilePath GetVerifiedContentsPath(const base::FilePath& extension_path) {
-  return extension_path.Append(kMetadataFolder)
+  return extension_path
       .Append(kVerifiedContentsFilename);
 }
 base::FilePath GetComputedHashesPath(const base::FilePath& extension_path) {
-  return extension_path.Append(kMetadataFolder).Append(kComputedHashesFilename);
+  return extension_path.Append(kComputedHashesFilename);
 }
 
 }  // namespace file_util
