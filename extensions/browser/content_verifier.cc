@@ -110,22 +110,23 @@ ContentVerifyJob* ContentVerifier::CreateJobFor(
   return new ContentVerifyJob(
       new ContentHashReader(extension_id, data->version, extension_root,
                             normalized_path, delegate_->GetPublicKey()),
-      base::Bind(&ContentVerifier::VerifyFailed, this, extension_id));
+      base::Bind(&ContentVerifier::VerifyFailed, this, extension_id, relative_path));
 }
 
 void ContentVerifier::VerifyFailed(const std::string& extension_id,
+                                   const base::FilePath& relative_path,
                                    ContentVerifyJob::FailureReason reason) {
   if (!content::BrowserThread::CurrentlyOn(content::BrowserThread::UI)) {
     content::BrowserThread::PostTask(
         content::BrowserThread::UI,
         FROM_HERE,
-        base::Bind(&ContentVerifier::VerifyFailed, this, extension_id, reason));
+        base::Bind(&ContentVerifier::VerifyFailed, this, extension_id, relative_path, reason));
     return;
   }
   if (shutdown_)
     return;
 
-  VLOG(1) << "VerifyFailed " << extension_id << " reason:" << reason;
+  VLOG(1) << "VerifyFailed " << extension_id << " reason:" << reason << " " << relative_path.AsUTF8Unsafe();
 
   ExtensionRegistry* registry = ExtensionRegistry::Get(context_);
   const Extension* extension =
@@ -139,7 +140,7 @@ void ContentVerifier::VerifyFailed(const std::string& extension_id,
     // request some.
     fetcher_->DoFetch(extension, true /* force */);
   } else {
-    delegate_->VerifyFailed(extension_id, reason);
+    delegate_->VerifyFailed(extension_id, relative_path, reason);
   }
 }
 
@@ -195,7 +196,7 @@ void ContentVerifier::OnExtensionUnloaded(
 void ContentVerifier::OnFetchCompleteHelper(const std::string& extension_id,
                                             bool shouldVerifyAnyPathsResult) {
   if (shouldVerifyAnyPathsResult)
-    delegate_->VerifyFailed(extension_id, ContentVerifyJob::MISSING_ALL_HASHES);
+    delegate_->VerifyFailed(extension_id, base::FilePath(), ContentVerifyJob::MISSING_ALL_HASHES);
 }
 
 void ContentVerifier::OnFetchComplete(
@@ -222,7 +223,7 @@ void ContentVerifier::OnFetchComplete(
       mode == ContentVerifierDelegate::ENFORCE_STRICT) {
     // We weren't able to get verified_contents.json or weren't able to compute
     // hashes.
-    delegate_->VerifyFailed(extension_id, ContentVerifyJob::MISSING_ALL_HASHES);
+    delegate_->VerifyFailed(extension_id, base::FilePath(), ContentVerifyJob::MISSING_ALL_HASHES);
   } else {
     content::BrowserThread::PostTaskAndReplyWithResult(
         content::BrowserThread::IO,

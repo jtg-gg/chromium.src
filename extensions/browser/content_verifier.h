@@ -59,6 +59,7 @@ class ContentVerifier : public base::RefCountedThreadSafe<ContentVerifier>,
   // Called (typically by a verification job) to indicate that verification
   // failed while reading some file in |extension_id|.
   void VerifyFailed(const std::string& extension_id,
+                    const base::FilePath& relative_path,
                     ContentVerifyJob::FailureReason reason);
 
   // ExtensionRegistryObserver interface

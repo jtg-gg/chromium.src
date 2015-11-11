@@ -160,6 +160,7 @@ std::set<base::FilePath> ChromeContentVerifierDelegate::GetBrowserImagePaths(
 
 void ChromeContentVerifierDelegate::VerifyFailed(
     const std::string& extension_id,
+    const base::FilePath& relative_path,
     ContentVerifyJob::FailureReason reason) {
   ExtensionRegistry* registry = ExtensionRegistry::Get(context_);
   const Extension* extension =
