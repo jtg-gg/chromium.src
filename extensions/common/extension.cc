@@ -475,6 +475,13 @@ bool Extension::InitExtensionID(extensions::Manifest* manifest,
     return true;
   }
 
+  if (manifest->HasKey(keys::kNWJSInternalFlag)) {
+    std::string name;
+    manifest->GetString(keys::kName, &name);
+    manifest->set_extension_id(crx_file::id_util::GenerateId(name));
+    return true;
+  }
+
   if (creation_flags & REQUIRE_KEY) {
     *error = base::ASCIIToUTF16(errors::kInvalidKey);
     return false;
