@@ -56,6 +56,8 @@
 #include "chrome/test/chromedriver/keycode_text_conversion.h"
 #endif
 
+#include "base/strings/string_number_conversions.h"
+
 namespace {
 
 const char* const kCommonSwitches[] = {
@@ -197,16 +199,21 @@ Status WaitForDevToolsAndCheckVersion(
     window_types.reset(new std::set<WebViewInfo::Type>());
   }
 
+  base::CommandLine* cmd_line = base::CommandLine::ForCurrentProcess();
+  int timeout = 60;
+  if (cmd_line->HasSwitch("launch-timeout")) {
+    std::string s_timeout = cmd_line->GetSwitchValueASCII("launch-timeout");
+    base::StringToInt(s_timeout, &timeout);
+  }
   scoped_ptr<DevToolsHttpClient> client(
       new DevToolsHttpClient(address, context_getter, socket_factory,
                              device_metrics.Pass(), window_types.Pass()));
   base::TimeTicks deadline =
-      base::TimeTicks::Now() + base::TimeDelta::FromSeconds(60);
+      base::TimeTicks::Now() + base::TimeDelta::FromSeconds(timeout);
   Status status = client->Init(deadline - base::TimeTicks::Now());
   if (status.IsError())
     return status;
 
-  base::CommandLine* cmd_line = base::CommandLine::ForCurrentProcess();
   if (cmd_line->HasSwitch("disable-build-check")) {
     LOG(WARNING) << "You are using an unsupported command-line switch: "
                     "--disable-build-check. Please don't report bugs that "
