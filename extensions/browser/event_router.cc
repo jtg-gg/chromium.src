@@ -881,12 +881,14 @@ Event::Event(events::HistogramValue histogram_value,
       user_gesture(user_gesture),
       filter_info(filter_info) {
   DCHECK(event_args);
+#if 0
   DCHECK_NE(events::UNKNOWN, histogram_value)
       << "events::UNKNOWN cannot be used as a histogram value.\n"
       << "If this is a test, use events::FOR_TEST.\n"
       << "If this is production code, it is important that you use a realistic "
       << "value so that we can accurately track event usage. "
       << "See extension_event_histogram_value.h for inspiration.";
+#endif
 }
 
 Event::~Event() {}
