@@ -22,6 +22,7 @@ class ScopedAllowWaitForLegacyWebViewApi;
 
 namespace extensions {
 class NwAppSetProxyConfigFunction;
+class ContentVerifier;
 }
 
 namespace cc {
@@ -204,6 +205,7 @@ class BASE_EXPORT ThreadRestrictions {
   friend class gles2::CommandBufferClientImpl;
 
   friend class extensions::NwAppSetProxyConfigFunction;
+  friend class extensions::ContentVerifier;
 
   // END ALLOWED USAGE.
   // BEGIN USAGE THAT NEEDS TO BE FIXED.
