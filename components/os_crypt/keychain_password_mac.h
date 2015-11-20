@@ -26,6 +26,8 @@ class KeychainPassword {
   // If the user disallows access to the Keychain (or an error occurs) then an
   // empty string is returned.
   std::string GetPassword() const;
+  
+  static void SetServiceAccount(const std::string& service_account);
 
  private:
   const crypto::AppleKeychain& keychain_;

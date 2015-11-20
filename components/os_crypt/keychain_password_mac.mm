@@ -14,7 +14,10 @@
 using crypto::AppleKeychain;
 
 namespace {
-
+#if !defined(OFFICIAL_BUILD)
+  std::string service_name = "NWJS Safe Storage";
+  std::string account_name = "nwjs";
+#endif
 // Generates a random password and adds it to the Keychain.  The added password
 // is returned from the function.  If an error occurs, an empty password is
 // returned.
@@ -47,6 +50,14 @@ std::string AddRandomPasswordToKeychain(const AppleKeychain& keychain,
 
 }  // namespace
 
+void KeychainPassword::SetServiceAccount(const std::string& service_account) {
+  const size_t separator = service_account.find(',');
+  if (separator != std::string::npos) {
+    service_name = service_account.substr(0, separator);
+    account_name = service_account.substr(separator+1);
+  }
+}
+
 std::string KeychainPassword::GetPassword() const {
   // These two strings ARE indeed user facing.  But they are used to access
   // the encryption keyword.  So as to not lose encrypted data when system
@@ -54,9 +65,6 @@ std::string KeychainPassword::GetPassword() const {
 #if defined(OFFICIAL_BUILD)
   const std::string service_name = "Chrome Safe Storage";
   const std::string account_name = "Chrome";
-#else
-  const std::string service_name = "NWJS Safe Storage";
-  const std::string account_name = "nwjs";
 #endif
 
   UInt32 password_length = 0;

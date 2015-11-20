@@ -17,6 +17,7 @@ namespace switches {
 // Uses mock keychain for testing purposes, which prevents blocking dialogs
 // from causing timeouts.
 extern const char kUseMockKeychain[];
+extern const char kUseCustomKeychain[];
 
 #endif  // OS_MACOSX
 

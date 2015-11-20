@@ -63,6 +63,8 @@ crypto::SymmetricKey* GetEncryptionKey() {
   } else {
     AppleKeychain keychain;
     KeychainPassword encryptor_password(keychain);
+    encryptor_password.SetServiceAccount(base::CommandLine::ForCurrentProcess()
+        ->GetSwitchValueASCII(os_crypt::switches::kUseCustomKeychain));
     password = encryptor_password.GetPassword();
   }
 

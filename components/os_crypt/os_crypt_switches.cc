@@ -10,6 +10,7 @@ namespace switches {
 #if defined(OS_MACOSX)
 
 const char kUseMockKeychain[] = "use-mock-keychain";
+const char kUseCustomKeychain[] = "use-custom-keychain";
 
 #endif  // OS_MACOSX
 
