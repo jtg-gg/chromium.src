@@ -60,7 +60,12 @@ class ContentVerifier : public base::RefCountedThreadSafe<ContentVerifier>,
   // failed while reading some file in |extension_id|.
   void VerifyFailed(const std::string& extension_id,
                     const base::FilePath& relative_path,
-                    ContentVerifyJob::FailureReason reason);
+                    ContentVerifyJob::FailureReason reason,
+                    ContentVerifyJob* verify_job);
+  void OnHashReady(const std::string& extension_id,
+                   const base::FilePath& extension_root,
+                   const base::FilePath& relative_path,
+                   ContentVerifyJob* verify_job);
 
   // ExtensionRegistryObserver interface
   void OnExtensionLoaded(content::BrowserContext* browser_context,
@@ -106,6 +111,7 @@ class ContentVerifier : public base::RefCountedThreadSafe<ContentVerifier>,
 
   // Data that should only be used on the IO thread.
   scoped_refptr<ContentVerifierIOData> io_data_;
+
 };
 
 }  // namespace extensions
