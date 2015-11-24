@@ -1551,10 +1551,10 @@
 
     'conditions': [
       ['nwjs_sdk!=1', {
-        'locales==': [ 'en-US', ],
+        #'locales==': [ 'en-US', ],
       }],
       ['nwjs_sdk==1', {
-        'locales==': [ 'en-US', ],
+        #'locales==': [ 'en-US', ],
       }],
       ['buildtype=="Official"', {
         # Continue to embed build meta data in Official builds, basically the
