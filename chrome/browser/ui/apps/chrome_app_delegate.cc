@@ -213,7 +213,7 @@ void ChromeAppDelegate::InitWebContents(content::WebContents* web_contents) {
       web_contents);
 
   // Kiosk app supports zooming.
-  if (chrome::IsRunningInForcedAppMode())
+  //if (chrome::IsRunningInForcedAppMode())
     ui_zoom::ZoomController::CreateForWebContents(web_contents);
 }
 
