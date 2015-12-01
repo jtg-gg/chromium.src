@@ -260,26 +260,6 @@ void ChromeAppDelegate::AddNewContents(content::BrowserContext* context,
     // NewWindowContentsDelegate, which will dispose of the contents once
     // a navigation is captured.
     new_contents->SetDelegate(new_window_contents_delegate_.get());
-#else
-    extensions::ProcessManager* process_manager = extensions::ProcessManager::Get(context);
-    const extensions::Extension* extension =
-      process_manager->GetExtensionForWebContents(web_contents_);
-    extensions::AppWindow* app_window =
-      extensions::AppWindowClient::Get()->CreateAppWindow(context, extension);
-
-    extensions::AppWindow::CreateParams params;
-    std::string js_doc_start, js_doc_end;
-    nw::CalcNewWinParams(new_contents, &params, &js_doc_start, &js_doc_end);
-    nw::SetCurrentNewWinManifest(base::string16());
-    new_contents->GetMutableRendererPrefs()->
-      nw_inject_js_doc_start = js_doc_start;
-    new_contents->GetMutableRendererPrefs()->
-      nw_inject_js_doc_end = js_doc_end;
-    new_contents->GetRenderViewHost()->SyncRendererPrefs();
-
-    app_window->Init(new_contents->GetURL(),
-                   new extensions::AppWindowContentsImpl(app_window, new_contents),
-                   params);
 #endif
     return;
   }

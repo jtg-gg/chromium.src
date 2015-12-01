@@ -188,6 +188,8 @@ class AppWindow : public content::WebContentsDelegate,
     // If true, the window will be visible on all workspaces. Defaults to false.
     bool visible_on_all_workspaces;
 
+    bool skip_load;
+
     // The API enables developers to specify content or window bounds. This
     // function combines them into a single, constrained window size.
     gfx::Rect GetInitialWindowBounds(const gfx::Insets& frame_insets) const;

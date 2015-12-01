@@ -59,6 +59,14 @@
 #include "extensions/common/extension_messages.h"
 
 #include "content/public/browser/render_frame_host.h"
+#include "content/public/common/renderer_preferences.h"
+
+#include "extensions/browser/process_manager.h"
+#include "extensions/browser/app_window/app_window_contents.h"
+
+#include "content/nw/src/nw_base.h"
+#include "content/nw/src/nw_content.h"
+
 
 using content::BrowserContext;
 using content::ConsoleMessageLevel;
@@ -170,7 +178,8 @@ AppWindow::CreateParams::CreateParams()
       resizable(true),
       focused(true),
       always_on_top(false),
-      visible_on_all_workspaces(false) {
+      visible_on_all_workspaces(false),
+      skip_load(false){
 }
 
 AppWindow::CreateParams::~CreateParams() {}
@@ -345,7 +354,8 @@ void AppWindow::Init(const GURL& url,
       base::Bind(&NativeAppWindow::Close,
                  base::Unretained(native_app_window_.get())));
 
-  app_window_contents_->LoadContents(new_params.creator_process_id);
+  if (!params.skip_load)
+    app_window_contents_->LoadContents(new_params.creator_process_id);
 
   if (base::CommandLine::ForCurrentProcess()->HasSwitch(
           extensions::switches::kEnableAppsShowOnFirstPaint)) {
@@ -391,12 +401,24 @@ void AppWindow::AddNewContents(WebContents* source,
                                bool user_gesture,
                                bool* was_blocked) {
   DCHECK(new_contents->GetBrowserContext() == browser_context_);
-  app_delegate_->AddNewContents(browser_context_,
-                                new_contents,
-                                disposition,
-                                initial_rect,
-                                user_gesture,
-                                was_blocked);
+  const extensions::Extension* extension = GetExtension();
+  extensions::AppWindow* app_window =
+      extensions::AppWindowClient::Get()->CreateAppWindow(browser_context_, extension);
+
+  extensions::AppWindow::CreateParams params;
+  std::string js_doc_start, js_doc_end;
+  nw::CalcNewWinParams(new_contents, &params, &js_doc_start, &js_doc_end);
+  nw::SetCurrentNewWinManifest(base::string16());
+  new_contents->GetMutableRendererPrefs()->
+    nw_inject_js_doc_start = js_doc_start;
+  new_contents->GetMutableRendererPrefs()->
+    nw_inject_js_doc_end = js_doc_end;
+  new_contents->GetRenderViewHost()->SyncRendererPrefs();
+
+  params.skip_load = true;
+  app_window->Init(new_contents->GetURL(),
+                   new extensions::AppWindowContentsImpl(app_window, new_contents),
+                   params);
 }
 
 bool AppWindow::PreHandleKeyboardEvent(
