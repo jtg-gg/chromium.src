@@ -320,6 +320,9 @@ namespace app.window {
     // <code>AppWindow</code> or HTML5 fullscreen APIs.
     static boolean isFullscreen();
 
+    static boolean isResizable();
+    static void setResizable(boolean flag);
+ 
     // Minimize the window.
     static void minimize();
 

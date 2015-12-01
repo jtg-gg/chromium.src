@@ -784,6 +784,8 @@ void AppWindow::NotifyRenderViewReady() {
 void AppWindow::GetSerializedState(base::DictionaryValue* properties) const {
   DCHECK(properties);
 
+  properties->SetBoolean("resizable",
+                         native_app_window_->IsResizable());
   properties->SetBoolean("fullscreen",
                          native_app_window_->IsFullscreenOrPending());
   properties->SetBoolean("minimized", native_app_window_->IsMinimized());

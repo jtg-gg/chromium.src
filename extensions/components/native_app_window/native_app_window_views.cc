@@ -55,6 +55,7 @@ void NativeAppWindowViews::Init(AppWindow* app_window,
       create_params.GetContentMinimumSize(gfx::Insets()));
   size_constraints_.set_maximum_size(
       create_params.GetContentMaximumSize(gfx::Insets()));
+  saved_size_constraints_ = size_constraints_;
   Observe(app_window_->web_contents());
 
   widget_ = new views::Widget;
@@ -375,6 +376,28 @@ void NativeAppWindowViews::OnFocus() {
 
 // NativeAppWindow implementation.
 
+void NativeAppWindowViews::SetResizable(bool flag) {
+  resizable_ = flag;
+#if defined(OS_LINUX)
+  if (!resizable_) {
+    gfx::Size size(width(), height());
+    //copy SetContentSizeConstraints(size, size);
+    size_constraints_.set_minimum_size(size);
+    size_constraints_.set_maximum_size(size);
+    widget_->OnSizeConstraintsChanged();
+  } else {
+    size_constraints_ = saved_size_constraints_;
+    widget_->OnSizeConstraintsChanged();
+  }
+#else
+  widget_->OnSizeConstraintsChanged();
+#endif
+}
+
+bool NativeAppWindowViews::IsResizable() const {
+  return resizable_;
+}
+
 void NativeAppWindowViews::SetFullscreen(int fullscreen_types) {
   // Stub implementation. See also ChromeNativeAppWindowViews.
   widget_->SetFullscreen(fullscreen_types != AppWindow::FULLSCREEN_TYPE_NONE);
@@ -467,6 +490,7 @@ void NativeAppWindowViews::SetContentSizeConstraints(
     const gfx::Size& max_size) {
   size_constraints_.set_minimum_size(min_size);
   size_constraints_.set_maximum_size(max_size);
+  saved_size_constraints_ = size_constraints_;
   widget_->OnSizeConstraintsChanged();
 }
 

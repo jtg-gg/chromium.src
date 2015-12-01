@@ -125,6 +125,8 @@ class NativeAppWindowCocoa : public extensions::NativeAppWindow,
  protected:
   // NativeAppWindow implementation.
   void SetFullscreen(int fullscreen_types) override;
+  void SetResizable(bool flag) override;
+  bool IsResizable() const override;
   bool IsFullscreenOrPending() const override;
   void UpdateWindowIcon() override;
   void UpdateWindowTitle() override;

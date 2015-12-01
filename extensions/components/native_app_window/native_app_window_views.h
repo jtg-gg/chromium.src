@@ -136,6 +136,8 @@ class NativeAppWindowViews : public extensions::NativeAppWindow,
 
   // NativeAppWindow implementation.
   void SetFullscreen(int fullscreen_types) override;
+  void SetResizable(bool flag) override;
+  bool IsResizable() const override;
   bool IsFullscreenOrPending() const override;
   void UpdateWindowIcon() override;
   void UpdateWindowTitle() override;
@@ -179,6 +181,7 @@ class NativeAppWindowViews : public extensions::NativeAppWindow,
   bool frameless_;
   bool resizable_;
   extensions::SizeConstraints size_constraints_;
+  extensions::SizeConstraints saved_size_constraints_;
 
   views::UnhandledKeyboardEventHandler unhandled_keyboard_event_handler_;
 
