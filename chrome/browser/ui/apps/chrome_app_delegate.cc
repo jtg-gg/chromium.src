@@ -48,15 +48,6 @@
 #endif  // defined(ENABLE_PRINTING)
 
 
-#include "extensions/browser/process_manager.h"
-#include "chrome/browser/ui/apps/chrome_app_window_client.h"
-#include "extensions/browser/app_window/app_window.h"
-#include "extensions/browser/app_window/app_window_contents.h"
-#include "content/public/common/renderer_preferences.h"
-
-#include "content/nw/src/nw_base.h"
-#include "content/nw/src/nw_content.h"
-
 namespace {
 
 // Time to wait for an app window to show before allowing Chrome to quit.
@@ -209,12 +200,15 @@ void ChromeAppDelegate::InitWebContents(content::WebContents* web_contents) {
   printing::PrintViewManagerBasic::CreateForWebContents(web_contents);
 #endif  // defined(ENABLE_PRINT_PREVIEW)
 #endif  // defined(ENABLE_PRINTING)
+  // Kiosk app supports zooming.
+  //if (chrome::IsRunningInForcedAppMode())
+  // ZoomController comes before common tab helpers since ChromeExtensionWebContentsObserver
+  // may want to register as a ZoomObserver with it.
+  ui_zoom::ZoomController::CreateForWebContents(web_contents);
+
   extensions::ChromeExtensionWebContentsObserver::CreateForWebContents(
       web_contents);
 
-  // Kiosk app supports zooming.
-  //if (chrome::IsRunningInForcedAppMode())
-    ui_zoom::ZoomController::CreateForWebContents(web_contents);
 }
 
 void ChromeAppDelegate::RenderViewCreated(

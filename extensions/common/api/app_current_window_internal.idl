@@ -56,6 +56,8 @@ namespace app.currentWindowInternal {
   interface Events {
     static void onClosed();
     static void onBoundsChanged();
+    static void onResized();
+    static void onMoved();
     static void onFullscreened();
     static void onMinimized();
     static void onMaximized();

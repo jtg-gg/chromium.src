@@ -455,6 +455,8 @@ namespace app.window {
   interface Events {
     // Fired when the window is resized.
     [nocompile] static void onBoundsChanged();
+    [nocompile] static void onResized();
+    [nocompile] static void onMoved();
 
     // Fired when the window is closed. Note, this should be listened to from
     // a window other than the window being closed, for example from the
