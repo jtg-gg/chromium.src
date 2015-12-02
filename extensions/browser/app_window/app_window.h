@@ -241,6 +241,8 @@ class AppWindow : public content::WebContentsDelegate,
   NativeAppWindow* GetBaseWindow();
   gfx::NativeWindow GetNativeWindow();
 
+  bool NWCanClose() const;
+
   // Returns the bounds that should be reported to the renderer.
   gfx::Rect GetClientBounds() const;
 

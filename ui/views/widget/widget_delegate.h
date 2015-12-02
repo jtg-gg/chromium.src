@@ -63,6 +63,7 @@ class VIEWS_EXPORT WidgetDelegate {
 
   // Returns true if the window can be activated.
   virtual bool CanActivate() const;
+  virtual bool NWCanClose() const;
 
   // Returns the modal type that applies to the widget. Default is
   // ui::MODAL_TYPE_NONE (not modal).

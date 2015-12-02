@@ -59,6 +59,10 @@ bool WidgetDelegate::CanActivate() const {
   return can_activate_;
 }
 
+bool WidgetDelegate::NWCanClose() const {
+  return true;
+}
+
 ui::ModalType WidgetDelegate::GetModalType() const {
   return ui::MODAL_TYPE_NONE;
 }

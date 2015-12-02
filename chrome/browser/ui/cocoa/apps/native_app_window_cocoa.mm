@@ -104,6 +104,12 @@ std::vector<gfx::Rect> CalculateNonDraggableRegions(
   titlebar_background_view_.reset([view retain]);
 }
 
+- (BOOL)windowShouldClose:(id)sender {
+  if (appWindow_ && !appWindow_->NWCanClose())
+    return NO;
+  return YES;
+}
+
 - (void)windowWillClose:(NSNotification*)notification {
   if (appWindow_)
     appWindow_->WindowWillClose();
@@ -749,6 +755,10 @@ void NativeAppWindowCocoa::WindowWillClose() {
   [window_controller_ setAppWindow:NULL];
   app_window_->OnNativeWindowChanged();
   app_window_->OnNativeClose();
+}
+
+bool NativeAppWindowCocoa::NWCanClose() {
+  return app_window_->NWCanClose();
 }
 
 void NativeAppWindowCocoa::WindowDidBecomeKey() {
