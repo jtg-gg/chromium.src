@@ -119,6 +119,9 @@ public:
         TextGranularityLast = WordGranularity,
     };
 
+    virtual void setDevtoolsJail(WebFrame*) {}
+    virtual WebFrame* getDevtoolsJail() {return NULL;}
+
     // Returns the number of live WebFrame objects, used for leak checking.
     BLINK_EXPORT static int instanceCount();
 
