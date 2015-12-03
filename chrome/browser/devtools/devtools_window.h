@@ -210,6 +210,7 @@ class DevToolsWindow : public DevToolsUIBindings::Delegate,
   // by user.
   static void OnPageCloseCanceled(content::WebContents* contents);
 
+  void Close();
  private:
   friend class DevToolsWindowTesting;
 

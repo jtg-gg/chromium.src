@@ -1136,6 +1136,10 @@ void DevToolsWindow::RenderProcessGone(bool crashed) {
   }
 }
 
+void DevToolsWindow::Close() {
+  browser_->window()->Close();
+}
+
 void DevToolsWindow::OnLoadCompleted() {
   // First seed inspected tab id for extension APIs.
   WebContents* inspected_web_contents = GetInspectedWebContents();
