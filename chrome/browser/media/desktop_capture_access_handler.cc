@@ -347,7 +347,7 @@ void DesktopCaptureAccessHandler::HandleRequest(
 
   // Audio is only supported for screen capture streams.
   bool capture_audio =
-      (media_id.type == content::DesktopMediaID::TYPE_SCREEN &&
+      (//media_id.type == content::DesktopMediaID::TYPE_SCREEN &&
        request.audio_type == content::MEDIA_DESKTOP_AUDIO_CAPTURE &&
        loopback_audio_supported);
 
