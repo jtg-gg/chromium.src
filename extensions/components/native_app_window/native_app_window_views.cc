@@ -332,7 +332,7 @@ void NativeAppWindowViews::RenderViewHostChanged(
 // views::View implementation.
 
 void NativeAppWindowViews::Layout() {
-#if defined(OS_LINUX)
+#if defined(OS_LINUX) || defined(OS_WIN)
   const extensions::Extension* extension = app_window_->GetExtension();
   if (extension && extension->is_nwjs_app()) {
     views::WidgetDelegateView::Layout();
@@ -347,8 +347,8 @@ void NativeAppWindowViews::Layout() {
 void NativeAppWindowViews::ViewHierarchyChanged(
     const ViewHierarchyChangedDetails& details) {
   if (details.is_add && details.child == this) {
-#if defined(OS_LINUX)
-    BrowserViewLayout* layout;
+#if defined(OS_LINUX) || defined(OS_WIN)
+    BrowserViewLayout* layout = NULL;
     const extensions::Extension* extension = app_window_->GetExtension();
     if (extension && extension->is_nwjs_app()) {
       layout = new BrowserViewLayout();
@@ -358,7 +358,7 @@ void NativeAppWindowViews::ViewHierarchyChanged(
     web_view_ = new views::WebView(NULL);
     AddChildView(web_view_);
     web_view_->SetWebContents(app_window_->web_contents());
-#if defined(OS_LINUX)
+#if defined(OS_LINUX) || defined(OS_WIN)
     if (extension && extension->is_nwjs_app()) {
       layout->set_web_view(web_view_);
     }
@@ -382,7 +382,7 @@ void NativeAppWindowViews::OnFocus() {
 
 void NativeAppWindowViews::SetResizable(bool flag) {
   resizable_ = flag;
-#if defined(OS_LINUX)
+#if defined(OS_LINUX) || defined(OS_WIN)
   if (!resizable_) {
     gfx::Size size(width(), height());
     //copy SetContentSizeConstraints(size, size);
