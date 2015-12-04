@@ -574,6 +574,7 @@ void DesktopMediaPickerDialogView::OnSelectionChanged() {
       source = selection->source_id();
 
     if (source.type == DesktopMediaID::TYPE_SCREEN ||
+        source.type == DesktopMediaID::TYPE_WINDOW || // force audio share for window content
         source.type == DesktopMediaID::TYPE_WEB_CONTENTS) {
       if (!audio_share_checkbox_->enabled()) {
         audio_share_checkbox_->SetEnabled(true);
