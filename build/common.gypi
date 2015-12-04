@@ -829,7 +829,7 @@
         ['OS=="android" or branding=="Chrome" or chromecast==1', {
           'proprietary_codecs%': 1,
         }, {
-          'proprietary_codecs%': 0,
+          'proprietary_codecs%': 1,
         }],
 
         # Enable autofill dialog when not on iOS.

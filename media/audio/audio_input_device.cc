@@ -334,7 +334,7 @@ void AudioInputDevice::AudioThreadCallback::Process(uint32 pending_data) {
   // the audio delay measurement.
   capture_callback_->Capture(
       audio_bus,
-      buffer->params.hardware_delay_bytes / bytes_per_ms_,  // Delay in ms
+      static_cast<int>(buffer->params.hardware_delay_bytes) / bytes_per_ms_,  // Delay in ms
       buffer->params.volume,
       buffer->params.key_pressed);
 
