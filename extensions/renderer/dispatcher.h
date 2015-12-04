@@ -124,7 +124,8 @@ class Dispatcher : public content::RenderThreadObserver,
 
   // Dispatches the event named |event_name| to all render views.
   void DispatchEvent(const std::string& extension_id,
-                     const std::string& event_name) const;
+                     const std::string& event_name,
+                     base::ListValue* event_args = NULL) const;
 
   // Shared implementation of the various MessageInvoke IPCs.
   void InvokeModuleSystemMethod(content::RenderFrame* render_frame,
