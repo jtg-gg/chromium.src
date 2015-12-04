@@ -18,6 +18,7 @@
 #include "base/strings/string_number_conversions.h"
 #include "base/synchronization/lock.h"
 #include "base/threading/thread.h"
+#include "base/threading/thread_restrictions.h"
 #include "base/timer/timer.h"
 #include "build/build_config.h"
 #include "content/browser/media/capture/desktop_capture_device_uma_types.h"
@@ -436,6 +437,7 @@ void DesktopCaptureDevice::AllocateAndStart(
 void DesktopCaptureDevice::StopAndDeAllocate() {
   if (core_) {
     thread_.task_runner()->DeleteSoon(FROM_HERE, core_.release());
+    base::ThreadRestrictions::ScopedAllowIO allow_io;
     thread_.Stop();
   }
 }

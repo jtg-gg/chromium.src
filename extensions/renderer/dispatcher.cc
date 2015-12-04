@@ -931,6 +931,7 @@ std::vector<std::pair<std::string, int> > Dispatcher::GetJsResources() {
   resources.push_back(std::make_pair("nw.App",       IDR_NWAPI_APP_JS));
   resources.push_back(std::make_pair("nw.Window",    IDR_NWAPI_WINDOW_JS));
   resources.push_back(std::make_pair("nw.Clipboard", IDR_NWAPI_CLIPBOARD_JS));
+  resources.push_back(std::make_pair("nw.MediaRecorder",IDR_NWAPI_MEDIA_RECORDER_JS));
   resources.push_back(std::make_pair("nw.Menu",      IDR_NWAPI_MENU_JS));
   resources.push_back(std::make_pair("nw.MenuItem",  IDR_NWAPI_MENUITEM_JS));
   resources.push_back(std::make_pair("nw.Screen",    IDR_NWAPI_SCREEN_JS));
@@ -998,7 +999,7 @@ void Dispatcher::RegisterNativeHandlers(ModuleSystem* module_system,
 
   // Custom bindings.
   module_system->RegisterNativeHandler(
-      "nw_natives", std::unique_ptr<NativeHandler>(new NWCustomBindings(context)));
+      "nw_natives", std::unique_ptr<NativeHandler>(new NWCustomBindings(context, dispatcher)));
   module_system->RegisterNativeHandler(
       "app_window_natives",
       std::unique_ptr<NativeHandler>(new AppWindowCustomBindings(context)));
