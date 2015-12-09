@@ -76,6 +76,11 @@ using content::WebContents;
 using web_modal::WebContentsModalDialogHost;
 using web_modal::WebContentsModalDialogManager;
 
+namespace content {
+  extern bool g_support_transparency;
+  extern bool g_force_cpu_draw;
+}
+
 namespace extensions {
 
 namespace {
@@ -326,6 +331,17 @@ void AppWindow::Init(const GURL& url,
 
   title_override_ = new_params.title;
   app_icon_ = new_params.icon;
+
+  content::g_support_transparency = !base::CommandLine::ForCurrentProcess()->HasSwitch(::switches::kDisableTransparency);
+  if (content::g_support_transparency) {
+    content::g_force_cpu_draw = base::CommandLine::ForCurrentProcess()->HasSwitch(::switches::kForceCpuDraw);
+    if (content::g_force_cpu_draw) {
+      if (!base::CommandLine::ForCurrentProcess()->HasSwitch(::switches::kDisableGpu)) {
+        content::g_force_cpu_draw = false;
+        LOG(WARNING) << "switch " << ::switches::kForceCpuDraw << " must be used with switch " << ::switches::kDisableGpu;
+      }
+    }
+  }
 
   requested_alpha_enabled_ = new_params.alpha_enabled;
 
