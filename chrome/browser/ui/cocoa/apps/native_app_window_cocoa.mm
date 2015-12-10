@@ -18,6 +18,8 @@
 #include "chrome/browser/ui/cocoa/extensions/extension_view_mac.h"
 #include "chrome/common/chrome_switches.h"
 #include "content/public/browser/native_web_keyboard_event.h"
+#include "content/public/browser/render_view_host.h"
+#include "content/public/browser/render_widget_host.h"
 #include "content/public/browser/render_widget_host_view.h"
 #include "content/public/browser/web_contents.h"
 #include "extensions/common/extension.h"
@@ -53,6 +55,11 @@ using extensions::AppWindowRegistry;
 - (void)setBottomCornerRounded:(BOOL)rounded;
 - (BOOL)_isTitleHidden;
 @end
+
+namespace content {
+  extern bool g_support_transparency;
+  extern bool g_force_cpu_draw;
+}
 
 namespace {
 
@@ -301,7 +308,7 @@ NativeAppWindowCocoa::NativeAppWindowCocoa(
   if (extension)
     name = extension->name();
   [window setTitle:base::SysUTF8ToNSString(name)];
-  [[window contentView] setWantsLayer:YES];
+  [[window contentView] setWantsLayer:!content::g_force_cpu_draw];
 
   if (base::mac::IsOSSnowLeopard() &&
       [window respondsToSelector:@selector(setBottomCornerRounded:)])
@@ -315,6 +322,12 @@ NativeAppWindowCocoa::NativeAppWindowCocoa(
 
   window_controller_.reset(
       [[NativeAppWindowController alloc] initWithWindow:window]);
+        
+  if (content::g_support_transparency && params.alpha_enabled) {
+    [window setHasShadow: NO];
+    [window setOpaque: NO];
+    [window setBackgroundColor: [NSColor clearColor]];
+  }
 
   if (has_frame_ && has_frame_color_) {
     TitlebarBackgroundView* view =
@@ -698,6 +711,12 @@ bool NativeAppWindowCocoa::IsAlwaysOnTop() const {
 void NativeAppWindowCocoa::RenderViewCreated(content::RenderViewHost* rvh) {
   if (IsActive())
     WebContents()->RestoreFocus();
+  if (content::g_support_transparency &&
+      app_window_->requested_alpha_enabled() && CanHaveAlphaEnabled()) {
+    content::RenderWidgetHostView* view = rvh->GetWidget()->GetView();
+    DCHECK(view);
+    view->SetBackgroundColor(SK_ColorTRANSPARENT);
+  }
 }
 
 bool NativeAppWindowCocoa::IsFrameless() const {
@@ -736,7 +755,7 @@ gfx::Insets NativeAppWindowCocoa::GetFrameInsets() const {
 }
 
 bool NativeAppWindowCocoa::CanHaveAlphaEnabled() const {
-  return false;
+  return content::g_support_transparency ? [window() isOpaque] == NO : false;
 }
 
 gfx::NativeView NativeAppWindowCocoa::GetHostView() const {

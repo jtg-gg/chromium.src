@@ -39,6 +39,9 @@
 namespace app_window = extensions::api::app_window;
 namespace Create = app_window::Create;
 
+namespace content {
+  extern bool g_support_transparency;
+}
 namespace extensions {
 
 namespace app_window_constants {
@@ -309,6 +312,8 @@ bool AppWindowCreateFunction::RunAsync() {
 #else
       // Transparency is only supported on Aura.
       // Fallback to creating an opaque window (by ignoring alphaEnabled).
+      if (content::g_support_transparency)
+        create_params.alpha_enabled = *options->alpha_enabled;
 #endif
     }
 
