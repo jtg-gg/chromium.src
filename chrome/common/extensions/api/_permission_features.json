@@ -531,7 +531,7 @@
   "launcherSearchProvider": {
     "channel": "stable",
     "extension_types": ["extension", "platform_app"],
-    "platform": ["chromeos"],
+    "platforms": ["chromeos"],
     "whitelist": [
       "A948368FC53BE437A55FEB414106E207925482F5"  // File Manager
     ]
@@ -554,6 +554,7 @@
   "logPrivate": {
     "channel": "stable",
     "extension_types": ["extension", "platform_app"],
+    "platforms": ["chromeos"],
     "whitelist": [
       "ddammdhioacbehjngdmkjcjbnfginlla",          // Test
       "1C93BD3CF875F4A73C0B2A163BB8FBDA8B8B3D80",  // http://crbug.com/293683
@@ -569,6 +570,7 @@
   },
   "webcamPrivate": {
     "channel": "stable",
+    "platforms": ["chromeos"],
     "extension_types": ["extension", "platform_app"]
   },
   "management": [
@@ -862,6 +864,7 @@
   "rtcPrivate": {
     "channel": "stable",
     "extension_types": ["extension", "legacy_packaged_app"],
+    "platforms": ["chromeos"],
     "whitelist": [
       "53041A2FA309EECED01FFC751E7399186E860B2C",  // Google Talk prod
       "A74A4D44C7CFCD8844830E6140C8D763E12DD8F3",  // Google Talk beta
@@ -960,6 +963,7 @@
   "usersPrivate": {
     "channel": "trunk",
     "extension_types": ["extension", "platform_app"],
+    "platforms": ["chromeos"],
     "location": "component"
   },
   "wallpaper": {
