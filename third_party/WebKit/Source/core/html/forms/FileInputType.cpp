@@ -188,7 +188,11 @@ bool FileInputType::getTypeSpecificValue(String& value)
     // decided to try to parse the value by looking for backslashes
     // (because that's what Windows file paths use). To be compatible
     // with that code, we make up a fake path for the file.
-    value = "C:\\fakepath\\" + m_fileList->item(0)->name();
+    //value = "C:\\fakepath\\" + m_fileList->item(0)->name();
+    unsigned numFiles = m_fileList->length();
+    value = m_fileList->item(0)->path();
+    for (unsigned i = 1; i < numFiles; ++i)
+      value.append(String(";") + m_fileList->item(i)->path());
     return true;
 }
 
