@@ -47,6 +47,11 @@
 #endif  // defined(ENABLE_PRINT_PREVIEW)
 #endif  // defined(ENABLE_PRINTING)
 
+#include "chrome/browser/browser_process.h"
+#include "chrome/browser/ui/autofill/chrome_autofill_client.h"
+#include "components/autofill/content/browser/content_autofill_driver_factory.h"
+#include "components/autofill/core/browser/autofill_manager.h"
+
 
 namespace {
 
@@ -208,7 +213,12 @@ void ChromeAppDelegate::InitWebContents(content::WebContents* web_contents) {
 
   extensions::ChromeExtensionWebContentsObserver::CreateForWebContents(
       web_contents);
-
+  autofill::ChromeAutofillClient::CreateForWebContents(web_contents);
+  autofill::ContentAutofillDriverFactory::CreateForWebContentsAndDelegate(
+      web_contents,
+      autofill::ChromeAutofillClient::FromWebContents(web_contents),
+      g_browser_process->GetApplicationLocale(),
+      autofill::AutofillManager::ENABLE_AUTOFILL_DOWNLOAD_MANAGER);
 }
 
 void ChromeAppDelegate::RenderViewCreated(
