@@ -219,6 +219,7 @@ IPC_STRUCT_TRAITS_BEGIN(content::FileChooserParams)
   IPC_STRUCT_TRAITS_MEMBER(capture)
 #endif
   IPC_STRUCT_TRAITS_MEMBER(requestor)
+  IPC_STRUCT_TRAITS_MEMBER(initial_path)
 IPC_STRUCT_TRAITS_END()
 
 IPC_STRUCT_TRAITS_BEGIN(content::RendererPreferences)

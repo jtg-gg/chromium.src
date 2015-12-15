@@ -225,6 +225,9 @@ public:
 
     String defaultToolTip() const;
 
+    const AtomicString& nwworkingdir() const;
+    void setNwworkingdir(const AtomicString& value);
+
     static const int maximumLength;
 
     unsigned height() const;
