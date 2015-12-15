@@ -51,7 +51,7 @@
 namespace {
 
 // Time to wait for an app window to show before allowing Chrome to quit.
-int kAppWindowFirstShowTimeoutSeconds = 10;
+//int kAppWindowFirstShowTimeoutSeconds = 10;
 
 bool disable_external_open_for_testing_ = false;
 
@@ -335,6 +335,7 @@ void ChromeAppDelegate::SetTerminatingCallback(const base::Closure& callback) {
 
 void ChromeAppDelegate::OnHide() {
   is_hidden_ = true;
+#if 0
   if (has_been_shown_) {
     keep_alive_.reset();
     return;
@@ -347,12 +348,15 @@ void ChromeAppDelegate::OnHide() {
       base::Bind(&ChromeAppDelegate::RelinquishKeepAliveAfterTimeout,
                  weak_factory_.GetWeakPtr()),
       base::TimeDelta::FromSeconds(kAppWindowFirstShowTimeoutSeconds));
+#endif
 }
 
 void ChromeAppDelegate::OnShow() {
   has_been_shown_ = true;
   is_hidden_ = false;
+#if 0
   keep_alive_.reset(new ScopedKeepAlive);
+#endif
 }
 
 void ChromeAppDelegate::Observe(int type,

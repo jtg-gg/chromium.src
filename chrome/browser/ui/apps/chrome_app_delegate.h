@@ -68,7 +68,6 @@ class ChromeAppDelegate : public extensions::AppDelegate,
   void SetTerminatingCallback(const base::Closure& callback) override;
   void OnHide() override;
   void OnShow() override;
-
   // content::NotificationObserver:
   void Observe(int type,
                const content::NotificationSource& source,
