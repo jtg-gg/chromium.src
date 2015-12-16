@@ -275,7 +275,7 @@ unsigned LocalDOMWindow::pendingUnloadEventListeners() const
 
 bool LocalDOMWindow::allowPopUp(LocalFrame& firstFrame)
 {
-    if (UserGestureIndicator::processingUserGesture())
+  if (UserGestureIndicator::processingUserGesture() || firstFrame.isNodeJS())
         return true;
 
     Settings* settings = firstFrame.settings();

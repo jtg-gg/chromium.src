@@ -133,8 +133,9 @@ void FileInputType::handleDOMActivateEvent(Event* event)
 {
     if (element().isDisabledFormControl())
         return;
-
-    if (!UserGestureIndicator::processingUserGesture())
+    
+    HTMLInputElement& input = element();
+    if (!UserGestureIndicator::processingUserGesture() && !input.document().frame()->isNodeJS())
         return;
 
     if (ChromeClient* chromeClient = this->chromeClient()) {

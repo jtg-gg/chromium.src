@@ -119,6 +119,10 @@ public:
         TextGranularityLast = WordGranularity,
     };
 
+    virtual void setNodeJS(bool) {}
+    virtual bool isNodeJS() const {return false;}
+    virtual bool isNwDisabledChildFrame() const {return false;}
+
     virtual void setDevtoolsJail(WebFrame*) {}
     virtual WebFrame* getDevtoolsJail() {return NULL;}
 

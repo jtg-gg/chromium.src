@@ -327,6 +327,10 @@ public:
 
     void setInputEventsTransformForEmulation(const IntSize&, float);
 
+    void setNodeJS(bool node) { frame()->setNodeJS(node); }
+    bool isNodeJS() const { return frame()->isNodeJS(); }
+    bool isNwDisabledChildFrame() const { return frame()->isNwDisabledChildFrame(); }
+
     void setDevtoolsJail(WebFrame* iframe) {
       frame()->setDevtoolsJail(iframe ? static_cast<const WebLocalFrameImpl*>(iframe)->frame() : NULL);
     }
