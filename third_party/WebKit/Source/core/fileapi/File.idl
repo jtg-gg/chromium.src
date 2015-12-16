@@ -31,6 +31,7 @@
     Constructor(sequence<(Blob or DOMString or ArrayBufferView or ArrayBuffer)> fileBits, DOMString fileName, optional FilePropertyBag options),
     RaisesException=Constructor,
     Exposed=(Window,Worker),
+    Constructor(DOMString path, DOMString name),
 ] interface File : Blob {
     readonly attribute DOMString name;
     readonly attribute long long lastModified;
