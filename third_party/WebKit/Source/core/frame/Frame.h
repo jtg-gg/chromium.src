@@ -65,6 +65,7 @@ public:
     void setNodeJS(bool node) { m_nodejs = node; }
     bool isNodeJS() const { return m_nodejs; }
     bool isNwDisabledChildFrame() const;
+    bool isNwFakeTop() const;
 
     virtual ~Frame();
 

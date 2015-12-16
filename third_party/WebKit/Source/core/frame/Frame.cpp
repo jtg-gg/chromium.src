@@ -343,4 +343,15 @@ void Frame::setDevtoolsJail(Frame* iframe)
         m_devtoolsJail->m_devJailOwner = NULL;
 }
 
+bool Frame::isNwFakeTop() const
+{
+    if (m_owner) {
+        if (m_owner->isLocal())
+            if (toHTMLFrameOwnerElement(m_owner)->fastHasAttribute(nwfaketopAttr))
+                return true;
+    }
+    return false;
+}
+
+
 } // namespace blink
