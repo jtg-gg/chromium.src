@@ -82,6 +82,7 @@ struct WebFileChooserParams {
     WebURL requestor;
 
     WebString initialPath;
+    bool extractDirectory;
 
     WebFileChooserParams()
         : multiSelect(false)
@@ -89,6 +90,7 @@ struct WebFileChooserParams {
         , saveAs(false)
         , useMediaCapture(false)
         , needLocalPath(true)
+        , extractDirectory(true)
     {
     }
 };

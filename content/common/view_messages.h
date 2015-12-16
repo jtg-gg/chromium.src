@@ -220,6 +220,7 @@ IPC_STRUCT_TRAITS_BEGIN(content::FileChooserParams)
 #endif
   IPC_STRUCT_TRAITS_MEMBER(requestor)
   IPC_STRUCT_TRAITS_MEMBER(initial_path)
+IPC_STRUCT_TRAITS_MEMBER(extract_directory)
 IPC_STRUCT_TRAITS_END()
 
 IPC_STRUCT_TRAITS_BEGIN(content::RendererPreferences)

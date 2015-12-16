@@ -148,6 +148,9 @@ void FileInputType::handleDOMActivateEvent(Event* event)
         settings.selectedFiles = m_fileList->pathsForUserVisibleFiles();
         settings.useMediaCapture = RuntimeEnabledFeatures::mediaCaptureEnabled() && input.fastHasAttribute(captureAttr);
         settings.initialPath = input.nwworkingdir();
+        settings.directoryChooser = input.fastHasAttribute(nwdirectoryAttr);
+        settings.saveAs = input.fastHasAttribute(nwsaveasAttr);
+        settings.initialValue = input.nwsaveas();
         chromeClient->openFileChooser(input.document().frame(), newFileChooser(settings));
     }
     event->setDefaultHandled();

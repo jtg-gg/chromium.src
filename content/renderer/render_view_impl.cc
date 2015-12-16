@@ -1764,7 +1764,8 @@ bool RenderViewImpl::runFileChooser(
   ipc_params.capture = params.useMediaCapture;
 #endif
   ipc_params.requestor = params.requestor;
-  ipc_params.initial_path = base::FilePath::FromUTF16Unsafe(params.initialPath);  
+  ipc_params.initial_path = base::FilePath::FromUTF16Unsafe(params.initialPath);
+  ipc_params.extract_directory = params.extractDirectory;
 
   return ScheduleFileChooser(ipc_params, chooser_completion);
 }

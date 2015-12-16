@@ -62,6 +62,7 @@ struct CONTENT_EXPORT FileChooserParams {
   GURL requestor;
 
   base::FilePath initial_path;
+  bool extract_directory;
 };
 
 }  // namespace content
