@@ -20,6 +20,8 @@
 #include "chrome/browser/devtools/devtools_window.h"
 #endif
 
+#include "ui/gfx/screen.h"
+
 using extensions::AppWindow;
 
 namespace {
@@ -156,10 +158,23 @@ void ChromeNativeAppWindowViews::InitializeDefaultWindow(
     bool position_specified =
         window_bounds.x() != BoundsSpecification::kUnspecifiedPosition &&
         window_bounds.y() != BoundsSpecification::kUnspecifiedPosition;
+    position_specified |= create_params.position == AppWindow::POS_MOUSE;
     if (!position_specified)
       widget()->CenterWindow(window_bounds.size());
-    else
+    else if (create_params.position == AppWindow::POS_MOUSE) {
+      gfx::Point cursor_pos(gfx::Screen::GetNativeScreen()->GetCursorScreenPoint());
+      window_bounds.set_origin(cursor_pos);
       widget()->SetBounds(window_bounds);
+    }else
+      widget()->SetBounds(window_bounds);
+  } else {
+    if (create_params.position == AppWindow::POS_CENTER)
+      widget()->CenterWindow(gfx::Size(640, 480));
+    else if (create_params.position == extensions::AppWindow::POS_MOUSE) {
+      gfx::Point cursor_pos(gfx::Screen::GetNativeScreen()->GetCursorScreenPoint());
+      gfx::Rect bounds(cursor_pos, gfx::Size(640, 480));
+      widget()->SetBounds(bounds);
+    }
   }
 
 #if defined(OS_CHROMEOS)

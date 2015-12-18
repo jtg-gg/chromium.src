@@ -135,6 +135,8 @@ namespace app.window {
   // State of a window: normal, fullscreen, maximized, minimized.
   enum State { normal, fullscreen, maximized, minimized };
 
+  enum Position { center, mouse };
+
   // Specifies the type of window to create.
   enum WindowType { 
     // Default window type.
@@ -278,6 +280,10 @@ namespace app.window {
     // If true, and supported by the platform, the window will be visible on all
     // workspaces.
     boolean? visibleOnAllWorkspaces;
+
+    boolean? kiosk;
+
+    Position? position;
   };
 
   // Called in the creating window (parent) before the load event is called in

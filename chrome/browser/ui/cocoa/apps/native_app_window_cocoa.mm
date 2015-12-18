@@ -26,6 +26,8 @@
 #import "ui/gfx/mac/nswindow_frame_controls.h"
 #include "ui/gfx/skia_util.h"
 
+#include "ui/gfx/screen.h"
+
 // NOTE: State Before Update.
 //
 // Internal state, such as |is_maximized_|, must be set before the window
@@ -331,7 +333,12 @@ NativeAppWindowCocoa::NativeAppWindowCocoa(
 
   // We can now compute the precise window bounds and constraints.
   gfx::Insets insets = GetFrameInsets();
-  SetBounds(params.GetInitialWindowBounds(insets));
+  gfx::Rect bounds = params.GetInitialWindowBounds(insets);
+  if (params.position == AppWindow::POS_MOUSE) {
+      gfx::Point cursor_pos(gfx::Screen::GetNativeScreen()->GetCursorScreenPoint());
+      bounds.set_origin(cursor_pos);
+  }
+  SetBounds(bounds);
   SetContentSizeConstraints(params.GetContentMinimumSize(insets),
                             params.GetContentMaximumSize(insets));
 

@@ -104,6 +104,12 @@ class AppWindow : public content::WebContentsDelegate,
     FRAME_NONE,    // Frameless window.
   };
 
+  enum Position {
+    POS_NONE,
+    POS_CENTER,
+    POS_MOUSE,
+  };
+
   enum FullscreenType {
     // Not fullscreen.
     FULLSCREEN_TYPE_NONE = 0,
@@ -189,6 +195,8 @@ class AppWindow : public content::WebContentsDelegate,
     bool visible_on_all_workspaces;
 
     bool skip_load;
+
+    Position position;
 
     // The API enables developers to specify content or window bounds. This
     // function combines them into a single, constrained window size.
