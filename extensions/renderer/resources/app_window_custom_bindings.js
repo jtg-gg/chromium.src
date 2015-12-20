@@ -22,6 +22,13 @@ var kSetSizeConstraintsFunction = 'setSizeConstraints';
 var Bounds = function(boundsKey) {
   privates(this).boundsKey_ = boundsKey;
 };
+
+var try_hidden = function (view) {
+  if (view.chrome.app.window)
+    return view;
+  return privates(view);
+};
+
 Object.defineProperty(Bounds.prototype, 'left', {
   get: function() {
     return appWindowData[privates(this).boundsKey_].left;
@@ -135,13 +142,13 @@ appWindow.registerCustomHook(function(bindingsAPI) {
       // Not creating a new window, but activating an existing one, so trigger
       // callback with existing window and don't do anything else.
       if (callback)
-        callback(view.chrome.app.window.current());
+        callback(try_hidden(view).chrome.app.window.current());
       return;
     }
 
     // Initialize appWindowData in the newly created JS context
     if (view.chrome.app) {
-      view.chrome.app.window.initializeAppWindow(windowParams);
+      try_hidden(view).chrome.app.window.initializeAppWindow(windowParams);
     } else {
       var sandbox_window_message = 'Creating sandboxed window, it doesn\'t ' +
           'have access to the chrome.app API.';
@@ -164,7 +171,7 @@ appWindow.registerCustomHook(function(bindingsAPI) {
               windowParams.frameId,
               function(success) {
                 if (success) {
-                  callback(view.chrome.app.window.current());
+                  callback(try_hidden(view).chrome.app.window.current());
                 } else {
                   callback(undefined);
                 }
@@ -187,7 +194,7 @@ appWindow.registerCustomHook(function(bindingsAPI) {
   apiFunctions.setHandleRequest('getAll', function() {
     var views = runtimeNatives.GetExtensionViews(-1, 'APP_WINDOW');
     return $Array.map(views, function(win) {
-      return win.chrome.app.window.current();
+      return try_hidden(win).chrome.app.window.current();
     });
   });
 

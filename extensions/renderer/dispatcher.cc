@@ -147,16 +147,35 @@ void CrashOnException(const v8::TryCatch& trycatch) {
 //
 // Note that this isn't necessarily an object, since webpages can write, for
 // example, "window.chrome = true".
-v8::Local<v8::Value> GetOrCreateChrome(ScriptContext* context, const char* name = nullptr) {
+v8::Local<v8::Value> GetOrCreateChrome(ScriptContext* context, bool hidden, const char* name = nullptr) {
   v8::Local<v8::String> chrome_string(
        v8::String::NewFromUtf8(context->isolate(), name ? name : "chrome"));
   v8::Local<v8::Object> global(context->v8_context()->Global());
-  v8::Local<v8::Value> chrome(global->Get(chrome_string));
-  if (chrome->IsUndefined()) {
-    chrome = v8::Object::New(context->isolate());
-    global->Set(chrome_string, chrome);
+  if (!hidden) {
+    v8::Local<v8::Value> chrome(global->Get(chrome_string));
+    if (chrome->IsUndefined()) {
+      chrome = v8::Object::New(context->isolate());
+      global->Set(chrome_string, chrome);
+    }
+    return chrome;
+  } else { // hidden
+    // MUST MATCH Private() in module_system.cc
+    v8::Local<v8::Value> privates;
+    if (!context->module_system()->GetPrivate(global, "privates", &privates) || !privates->IsObject()) {
+      privates = v8::Object::New(context->isolate());
+      context->module_system()->SetPrivate(global, "privates", privates);
+    }
+    v8::Local<v8::Object> priv_obj = privates->ToObject();
+    v8::Local<v8::Value> chrome(priv_obj->Get(chrome_string));
+    if (chrome->IsUndefined()) {
+      chrome = v8::Object::New(context->isolate());
+      v8::Local<v8::String> hidden_key(
+       v8::String::NewFromUtf8(context->isolate(), "__nw_is_hidden"));
+      chrome->ToObject()->Set(hidden_key, v8::Boolean::New(context->isolate(), true));
+      priv_obj->Set(chrome_string, chrome);
+    }
+    return chrome;
   }
-  return chrome;
 }
 
 // Returns |value| cast to an object if possible, else an empty handle.
@@ -198,7 +217,7 @@ class ChromeNativeHandler : public ObjectBackedNativeHandler {
   }
 
   void GetChrome(const v8::FunctionCallbackInfo<v8::Value>& args) {
-    args.GetReturnValue().Set(GetOrCreateChrome(context()));
+    args.GetReturnValue().Set(GetOrCreateChrome(context(), false));
   }
 };
 
@@ -289,7 +308,7 @@ void Dispatcher::DidCreateScriptContext(
   // lazily evalulate to Event from event_bindings.js. For extensions only
   // though, not all webpages!
   if (context->extension()) {
-    v8::Local<v8::Object> chrome = AsObjectOrEmpty(GetOrCreateChrome(context));
+    v8::Local<v8::Object> chrome = AsObjectOrEmpty(GetOrCreateChrome(context, false));
     if (!chrome.IsEmpty())
       module_system->SetLazyField(chrome, "Event", kEventBindings, "Event");
 
@@ -1400,6 +1419,11 @@ void Dispatcher::UpdateBindingsForContext(ScriptContext* context) {
       // All of the same permission checks will still apply.
       if (context->GetAvailability("app").is_available())
         RegisterBinding("app", context);
+      if (!context->GetAvailability("app.window").is_available()) {
+        RegisterBinding("app.window", context, true);
+        RegisterBinding("nw.Window", context, true);
+        RegisterBinding("runtime", context, true);
+      }
       if (context->GetAvailability("webstore").is_available())
         RegisterBinding("webstore", context);
       if (context->GetAvailability("dashboardPrivate").is_available())
@@ -1456,10 +1480,11 @@ void Dispatcher::UpdateBindingsForContext(ScriptContext* context) {
 }
 
 void Dispatcher::RegisterBinding(const std::string& api_name,
-                                 ScriptContext* context) {
+                                 ScriptContext* context,
+                                 bool hidden) {
   std::string bind_name;
   v8::Local<v8::Object> bind_object =
-      GetOrCreateBindObjectIfAvailable(api_name, &bind_name, context);
+    GetOrCreateBindObjectIfAvailable(api_name, &bind_name, context, hidden);
 
   // Empty if the bind object failed to be created, probably because the
   // extension overrode chrome with a non-object, e.g. window.chrome = true.
@@ -1599,7 +1624,8 @@ v8::Local<v8::Object> Dispatcher::GetOrCreateObject(
 v8::Local<v8::Object> Dispatcher::GetOrCreateBindObjectIfAvailable(
     const std::string& api_name,
     std::string* bind_name,
-    ScriptContext* context) {
+    ScriptContext* context,
+    bool hidden) {
   std::vector<std::string> split = base::SplitString(
       api_name, ".", base::TRIM_WHITESPACE, base::SPLIT_WANT_ALL);
 
@@ -1628,7 +1654,7 @@ v8::Local<v8::Object> Dispatcher::GetOrCreateBindObjectIfAvailable(
   }
   for (size_t i = start; i < split.size() - 1; ++i) {
     ancestor_name += (i ? "." : "") + split[i];
-    if (api_feature_provider->GetFeature(ancestor_name) &&
+    if (api_feature_provider->GetFeature(ancestor_name) && !hidden &&
         context->GetAvailability(ancestor_name).is_available() &&
         !context->GetAvailability(api_name).is_available()) {
       only_ancestor_available = true;
@@ -1636,7 +1662,7 @@ v8::Local<v8::Object> Dispatcher::GetOrCreateBindObjectIfAvailable(
     }
 
     if (bind_object.IsEmpty()) {
-      bind_object = AsObjectOrEmpty(GetOrCreateChrome(context, prefix));
+      bind_object = AsObjectOrEmpty(GetOrCreateChrome(context, hidden, prefix));
       if (bind_object.IsEmpty())
         return v8::Local<v8::Object>();
     }
@@ -1649,7 +1675,7 @@ v8::Local<v8::Object> Dispatcher::GetOrCreateBindObjectIfAvailable(
   if (bind_name)
     *bind_name = split.back();
 
-  return bind_object.IsEmpty() ? AsObjectOrEmpty(GetOrCreateChrome(context, prefix))
+  return bind_object.IsEmpty() ? AsObjectOrEmpty(GetOrCreateChrome(context, hidden, prefix))
                                : bind_object;
 }
 

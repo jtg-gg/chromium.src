@@ -24,11 +24,18 @@ function safeCallbackApply(name, request, callback, args) {
   }
 }
 
+var try_hidden = function (view) {
+  if (view.chrome.runtime)
+    return view;
+  return privates(view);
+};
+
 // Callback handling.
 function handleResponse(requestId, name, success, responseList, error) {
   // The chrome objects we will set lastError on. Really we should only be
   // setting this on the callback's chrome object, but set on ours too since
   // it's conceivable that something relies on that.
+  var chrome = try_hidden(window).chrome;
   var callerChrome = chrome;
 
   try {
@@ -39,7 +46,7 @@ function handleResponse(requestId, name, success, responseList, error) {
     // though chances are it's the same as ours (it will be different when
     // calling API methods on other contexts).
     if (request.callback)
-      callerChrome = natives.GetGlobal(request.callback).chrome;
+      callerChrome = try_hidden(natives.GetGlobal(request.callback)).chrome;
 
     lastError.clear(chrome);
     if (callerChrome !== chrome)
