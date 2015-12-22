@@ -1,6 +1,7 @@
 //console.log("NWJS/DEFAULT.JS");
 var manifest = chrome.runtime.getManifest();
 var options = {'id': '.main'};
+var title = null;
 if (manifest.window) {
   options.innerBounds = {};
   if (manifest.window.frame === false)
@@ -35,5 +36,8 @@ if (manifest.window) {
     options.kiosk = true;
   if (manifest.window.position)
     options.position = manifest.window.position;
+  if (manifest.window.title)
+    options.title = manifest.window.title;
 }
-chrome.app.window.create(manifest.main, options);
+chrome.app.window.create(manifest.main, options, function(win) {
+});

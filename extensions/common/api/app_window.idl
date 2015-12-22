@@ -284,6 +284,7 @@ namespace app.window {
     boolean? kiosk;
 
     Position? position;
+    DOMString? title;
   };
 
   // Called in the creating window (parent) before the load event is called in

@@ -313,6 +313,8 @@ void AppWindow::Init(const GURL& url,
   if (new_params.state == ui::SHOW_STATE_FULLSCREEN)
     new_params.always_on_top = false;
 
+  title_override_ = new_params.title;
+
   requested_alpha_enabled_ = new_params.alpha_enabled;
 
   is_ime_window_ = params.is_ime_window;
@@ -599,9 +601,11 @@ gfx::Rect AppWindow::GetClientBounds() const {
 }
 
 base::string16 AppWindow::GetTitle() const {
+  base::string16 override = base::UTF8ToUTF16(title_override_);
+
   const Extension* extension = GetExtension();
   if (!extension)
-    return base::string16();
+    return override;
 
   // WebContents::GetTitle() will return the page's URL if there's no <title>
   // specified. However, we'd prefer to show the name of the extension in that
@@ -610,12 +614,14 @@ base::string16 AppWindow::GetTitle() const {
   content::NavigationEntry* entry = web_contents() ?
       web_contents()->GetController().GetLastCommittedEntry() : nullptr;
   if (!entry || entry->GetTitle().empty()) {
-    title = base::UTF8ToUTF16(extension->name());
+    title = override.empty() ? base::UTF8ToUTF16(extension->name()) : override;
   } else {
     title = web_contents()->GetTitle();
   }
   base::RemoveChars(title, base::ASCIIToUTF16("\n"), &title);
-  return title;
+  if (!title.empty())
+    return title;
+  return override;
 }
 
 void AppWindow::SetAppIconUrl(const GURL& url) {

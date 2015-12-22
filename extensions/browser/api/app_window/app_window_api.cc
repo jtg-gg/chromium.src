@@ -158,6 +158,9 @@ bool AppWindowCreateFunction::RunAsync() {
   AppWindow::CreateParams create_params;
   app_window::CreateWindowOptions* options = params->options.get();
   if (options) {
+    if (options->title.get())
+      create_params.title = *options->title;
+
     if (options->id.get()) {
       // TODO(mek): use URL if no id specified?
       // Limit length of id to 256 characters.

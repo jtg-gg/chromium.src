@@ -198,6 +198,8 @@ class AppWindow : public content::WebContentsDelegate,
 
     Position position;
 
+    std::string title;
+
     // The API enables developers to specify content or window bounds. This
     // function combines them into a single, constrained window size.
     gfx::Rect GetInitialWindowBounds(const gfx::Insets& frame_insets) const;
@@ -244,7 +246,9 @@ class AppWindow : public content::WebContentsDelegate,
   const GURL& app_icon_url() const { return app_icon_url_; }
   const GURL& initial_url() const { return initial_url_; }
   bool is_hidden() const { return is_hidden_; }
-
+  const std::string& title_override() const { return title_override_; }
+  void set_title_override(const std::string& title) { title_override_ = title; }
+  
   const Extension* GetExtension() const;
   NativeAppWindow* GetBaseWindow();
   gfx::NativeWindow GetNativeWindow();
@@ -511,6 +515,8 @@ class AppWindow : public content::WebContentsDelegate,
   // The browser context with which this window is associated. AppWindow does
   // not own this object.
   content::BrowserContext* browser_context_;
+
+  std::string title_override_;
 
   const std::string extension_id_;
 
