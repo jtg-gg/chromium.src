@@ -455,6 +455,7 @@ bool AppWindow::PreHandleKeyboardEvent(
 void AppWindow::HandleKeyboardEvent(
     WebContents* source,
     const content::NativeWebKeyboardEvent& event) {
+#if 0
   // If the window is currently fullscreen and not forced, ESC should leave
   // fullscreen.  If this code is being called for ESC, that means that the
   // KeyEvent's default behavior was not prevented by the content.
@@ -463,7 +464,7 @@ void AppWindow::HandleKeyboardEvent(
     Restore();
     return;
   }
-
+#endif
   native_app_window_->HandleKeyboardEvent(event);
 }
 
