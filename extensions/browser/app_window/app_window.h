@@ -193,8 +193,9 @@ class AppWindow : public content::WebContentsDelegate,
 
     // If true, the window will be visible on all workspaces. Defaults to false.
     bool visible_on_all_workspaces;
-
     bool skip_load;
+
+    bool show_in_taskbar;
 
     Position position;
 
@@ -319,6 +320,8 @@ class AppWindow : public content::WebContentsDelegate,
   void Maximize();
   void Minimize();
   void Restore();
+
+  void SetShowInTaskbar(bool);
 
   // Transitions to OS fullscreen. See FULLSCREEN_TYPE_OS for more details.
   void OSFullscreen();

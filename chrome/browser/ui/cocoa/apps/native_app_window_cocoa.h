@@ -75,6 +75,7 @@ class NativeAppWindowCocoa : public extensions::NativeAppWindow,
   void SetBounds(const gfx::Rect& bounds) override;
   void FlashFrame(bool flash) override;
   bool IsAlwaysOnTop() const override;
+  void SetShowInTaskbar(bool show) override;
 
   // Called when the window is about to be closed.
   void WindowWillClose();

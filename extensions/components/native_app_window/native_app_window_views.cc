@@ -24,6 +24,20 @@
 #include "content/nw/src/browser/browser_view_layout.h"
 #include "content/nw/src/nw_content.h"
 
+#if defined(OS_WIN)
+#include <shobjidl.h>
+#include <dwmapi.h>
+
+#include "base/win/windows_version.h"
+#include "ui/base/win/hidden_window.h"
+#include "ui/gfx/canvas.h"
+#include "ui/gfx/icon_util.h"
+#include "ui/gfx/font_list.h"
+#include "ui/gfx/platform_font.h"
+#include "ui/gfx/win/dpi.h"
+#include "ui/views/win/hwnd_util.h"
+#endif
+
 using nw::BrowserViewLayout;
 using extensions::AppWindow;
 using extensions::Extension;
@@ -450,6 +464,43 @@ bool NativeAppWindowViews::IsFrameless() const {
 
 bool NativeAppWindowViews::HasFrameColor() const {
   return false;
+}
+
+void NativeAppWindowViews::SetShowInTaskbar(bool show) {
+#if defined(OS_WIN)
+  views::Widget* widget = widget_->GetTopLevelWidget();
+
+  if (show == false && base::win::GetVersion() < base::win::VERSION_VISTA) {
+    // Change the owner of native window. Only needed on Windows XP.
+    ::SetWindowLong(views::HWNDForWidget(widget),
+                    GWLP_HWNDPARENT,
+                    (LONG)ui::GetHiddenWindow());
+  }
+
+  base::win::ScopedComPtr<ITaskbarList> taskbar;
+  HRESULT result = taskbar.CreateInstance(CLSID_TaskbarList, NULL,
+                                          CLSCTX_INPROC_SERVER);
+  if (FAILED(result)) {
+    VLOG(1) << "Failed creating a TaskbarList object: " << result;
+    return;
+  }
+
+  result = taskbar->HrInit();
+  if (FAILED(result)) {
+    LOG(ERROR) << "Failed initializing an ITaskbarList interface.";
+    return;
+  }
+
+  if (show)
+    result = taskbar->AddTab(views::HWNDForWidget(widget));
+  else
+    result = taskbar->DeleteTab(views::HWNDForWidget(widget));
+
+  if (FAILED(result)) {
+    LOG(ERROR) << "Failed to change the show in taskbar attribute";
+    return;
+  }
+#endif
 }
 
 SkColor NativeAppWindowViews::ActiveFrameColor() const {

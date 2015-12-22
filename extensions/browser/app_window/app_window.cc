@@ -181,7 +181,8 @@ AppWindow::CreateParams::CreateParams()
       focused(true),
       always_on_top(false),
       visible_on_all_workspaces(false),
-      skip_load(false){
+      skip_load(false),
+      show_in_taskbar(true) {
 }
 
 AppWindow::CreateParams::~CreateParams() {}
@@ -358,6 +359,9 @@ void AppWindow::Init(const GURL& url,
     else if (new_params.state == ui::SHOW_STATE_MINIMIZED)
       Minimize();
   }
+
+  if (!new_params.show_in_taskbar)
+    SetShowInTaskbar(false);
 
   OnNativeWindowChanged();
 
@@ -720,6 +724,10 @@ void AppWindow::Restore() {
   } else {
     GetBaseWindow()->Restore();
   }
+}
+
+void AppWindow::SetShowInTaskbar(bool show) {
+  GetBaseWindow()->SetShowInTaskbar(show);
 }
 
 void AppWindow::OSFullscreen() {

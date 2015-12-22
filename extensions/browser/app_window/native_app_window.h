@@ -77,6 +77,8 @@ class NativeAppWindow : public ui::BaseWindow,
   virtual void ShowWithApp() = 0;
   virtual void HideWithApp() = 0;
 
+  virtual void SetShowInTaskbar(bool) = 0;
+
   // Returns the minimum size constraints of the content.
   virtual gfx::Size GetContentMinimumSize() const = 0;
 

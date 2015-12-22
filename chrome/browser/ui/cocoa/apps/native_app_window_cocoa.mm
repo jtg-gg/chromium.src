@@ -27,6 +27,7 @@
 #include "ui/gfx/skia_util.h"
 
 #include "ui/gfx/screen.h"
+#include "content/nw/src/nw_content_mac.h"
 
 // NOTE: State Before Update.
 //
@@ -413,6 +414,10 @@ bool NativeAppWindowCocoa::IsMinimized() const {
 
 bool NativeAppWindowCocoa::IsFullscreen() const {
   return is_fullscreen_;
+}
+
+void NativeAppWindowCocoa::SetShowInTaskbar(bool show) {
+  NWSetNSWindowShowInTaskbar(this, show);
 }
 
 void NativeAppWindowCocoa::SetFullscreen(int fullscreen_types) {

@@ -337,6 +337,10 @@ bool AppWindowCreateFunction::RunAsync() {
           *options->visible_on_all_workspaces.get();
     }
 
+    if (options->show_in_taskbar.get()) {
+      create_params.show_in_taskbar = *options->show_in_taskbar.get();
+    }
+
     if (options->type != app_window::WINDOW_TYPE_PANEL) {
       switch (options->state) {
         case app_window::STATE_NONE:
