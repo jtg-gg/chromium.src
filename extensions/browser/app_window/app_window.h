@@ -200,6 +200,8 @@ class AppWindow : public content::WebContentsDelegate,
 
     std::string title;
 
+    gfx::Image icon;
+
     // The API enables developers to specify content or window bounds. This
     // function combines them into a single, constrained window size.
     gfx::Rect GetInitialWindowBounds(const gfx::Insets& frame_insets) const;

@@ -314,6 +314,7 @@ void AppWindow::Init(const GURL& url,
     new_params.always_on_top = false;
 
   title_override_ = new_params.title;
+  app_icon_ = new_params.icon;
 
   requested_alpha_enabled_ = new_params.alpha_enabled;
 

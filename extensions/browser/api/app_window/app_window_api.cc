@@ -33,6 +33,9 @@
 #include "ui/gfx/geometry/rect.h"
 #include "url/gurl.h"
 
+#include "content/nw/src/nw_base.h"
+#include "content/nw/src/nw_content.h"
+
 namespace app_window = extensions::api::app_window;
 namespace Create = app_window::Create;
 
@@ -160,6 +163,17 @@ bool AppWindowCreateFunction::RunAsync() {
   if (options) {
     if (options->title.get())
       create_params.title = *options->title;
+
+    if (options->icon.get()) {
+      base::ThreadRestrictions::ScopedAllowIO allow_io;
+      gfx::Image app_icon;
+      nw::Package* package = nw::package();
+      if (nw::GetPackageImage(package,
+                              base::FilePath::FromUTF8Unsafe(*options->icon),
+                              &app_icon)) {
+        create_params.icon = app_icon;
+      }
+    }
 
     if (options->id.get()) {
       // TODO(mek): use URL if no id specified?

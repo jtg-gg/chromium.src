@@ -285,6 +285,7 @@ namespace app.window {
 
     Position? position;
     DOMString? title;
+    DOMString? icon;
   };
 
   // Called in the creating window (parent) before the load event is called in
