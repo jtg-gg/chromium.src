@@ -67,6 +67,7 @@
 
 #include "content/nw/src/nw_base.h"
 #include "content/nw/src/nw_content.h"
+#include "content/nw/src/common/shell_switches.h"
 
 
 using content::BrowserContext;
@@ -287,6 +288,15 @@ void AppWindow::Init(const GURL& url,
   // Initialize the render interface and web contents
   app_window_contents_.reset(app_window_contents);
   app_window_contents_->Initialize(browser_context(), url);
+
+  nw::Package* package = nw::package();
+  std::string js_doc_start, js_doc_end;
+  if (package->root()->GetString(::switches::kmInjectJSDocStart, &js_doc_start))
+    web_contents()->GetMutableRendererPrefs()->nw_inject_js_doc_start = js_doc_start;
+  if (package->root()->GetString(::switches::kmInjectJSDocEnd, &js_doc_end))
+    web_contents()->GetMutableRendererPrefs()->nw_inject_js_doc_end = js_doc_end;
+  if (!js_doc_start.empty() || !js_doc_end.empty())
+    web_contents()->GetRenderViewHost()->SyncRendererPrefs();
 
   initial_url_ = url;
 
