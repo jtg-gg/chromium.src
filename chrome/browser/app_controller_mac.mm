@@ -99,6 +99,8 @@
 #include "ui/base/l10n/l10n_util.h"
 #include "ui/base/l10n/l10n_util_mac.h"
 
+#include "content/nw/src/nw_content.h"
+
 using apps::AppShimHandler;
 using apps::ExtensionAppShimHandler;
 using base::UserMetricsAction;
@@ -1177,6 +1179,8 @@ class AppControllerProfileObserver : public ProfileInfoCacheObserver {
 // browser windows.
 - (BOOL)applicationShouldHandleReopen:(NSApplication*)theApplication
                     hasVisibleWindows:(BOOL)hasVisibleWindows {
+  return nw::ApplicationShouldHandleReopenHook(hasVisibleWindows) ? YES : NO;
+#if 0
   // If the browser is currently trying to quit, don't do anything and return NO
   // to prevent AppKit from doing anything.
   // TODO(rohitrao): Remove this code when http://crbug.com/40861 is resolved.
@@ -1267,6 +1271,7 @@ class AppControllerProfileObserver : public ProfileInfoCacheObserver {
   // We've handled the reopen event, so return NO to tell AppKit not
   // to do anything.
   return NO;
+#endif
 }
 
 - (void)initMenuState {
