@@ -637,6 +637,7 @@ void ExtensionService::ReloadExtensionImpl(
     // BeingUpgraded is set back to false when the extension is added.
     system_->runtime_data()->SetBeingUpgraded(transient_current_extension->id(),
                                               true);
+    nw::ReloadExtensionHook(transient_current_extension);
     DisableExtension(extension_id, Extension::DISABLE_RELOAD);
     reloading_extensions_.insert(extension_id);
   } else {
