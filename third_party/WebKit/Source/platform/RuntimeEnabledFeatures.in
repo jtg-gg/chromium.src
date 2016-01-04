@@ -102,7 +102,7 @@ Media status=stable
 MediaCapture
 MediaConstraints status=test
 MediaDevices status=stable
-MediaRecorder status=experimental
+MediaRecorder status=stable
 MediaSession
 MediaSource status=stable
 MediaSourceExperimental depends_on=MediaSource, status=experimental
