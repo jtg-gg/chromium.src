@@ -288,7 +288,7 @@ void AppWindow::Init(const GURL& url,
                      const CreateParams& params) {
   // Initialize the render interface and web contents
   app_window_contents_.reset(app_window_contents);
-  app_window_contents_->Initialize(browser_context(), url);
+  app_window_contents_->Initialize(browser_context(), url, GetExtension());
 
   nw::Package* package = nw::package();
   std::string js_doc_start, js_doc_end;

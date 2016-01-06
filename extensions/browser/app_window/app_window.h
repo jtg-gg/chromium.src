@@ -58,7 +58,8 @@ class AppWindowContents {
 
   // Called to initialize the WebContents, before the app window is created.
   virtual void Initialize(content::BrowserContext* context,
-                          const GURL& url) = 0;
+                          const GURL& url,
+                          const Extension* extension) = 0;
 
   // Called to load the contents, after the app window is created.
   virtual void LoadContents(int32 creator_process_id) = 0;

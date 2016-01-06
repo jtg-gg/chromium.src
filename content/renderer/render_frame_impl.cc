@@ -4470,6 +4470,7 @@ WebNavigationPolicy RenderFrameImpl::decidePolicyForNavigation(
 
   // If the browser is interested, then give it a chance to look at the request.
   if (is_content_initiated && IsTopLevelNavigation(frame_) &&
+      !base::EqualsASCII(base::StringPiece16(info.urlRequest.httpMethod()), "POST") &&
       render_view_->renderer_preferences_
           .browser_handles_all_top_level_requests) {
     OpenURL(url, referrer, info.defaultPolicy, info.replacesCurrentHistoryItem);

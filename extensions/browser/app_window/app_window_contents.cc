@@ -29,7 +29,8 @@ AppWindowContentsImpl::AppWindowContentsImpl(AppWindow* host, content::WebConten
 AppWindowContentsImpl::~AppWindowContentsImpl() {}
 
 void AppWindowContentsImpl::Initialize(content::BrowserContext* context,
-                                       const GURL& url) {
+                                       const GURL& url,
+                                       const Extension* extension) {
   url_ = url;
 
   if (!web_contents_)

@@ -31,7 +31,7 @@ class AppWindowContentsImpl : public AppWindowContents,
   ~AppWindowContentsImpl() override;
 
   // AppWindowContents
-  void Initialize(content::BrowserContext* context, const GURL& url) override;
+  void Initialize(content::BrowserContext* context, const GURL& url, const Extension* extension) override;
   void LoadContents(int32 creator_process_id) override;
   void NativeWindowChanged(NativeAppWindow* native_app_window) override;
   void NativeWindowClosed() override;
