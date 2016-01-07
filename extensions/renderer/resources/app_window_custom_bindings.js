@@ -184,8 +184,6 @@ appWindow.registerCustomHook(function(bindingsAPI) {
 
   apiFunctions.setHandleRequest('current', function() {
     if (!currentAppWindow) {
-      console.error('The JavaScript context calling ' +
-                    'chrome.app.window.current() has no associated AppWindow.');
       return null;
     }
     return currentAppWindow;
