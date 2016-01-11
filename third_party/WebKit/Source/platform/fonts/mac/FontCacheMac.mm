@@ -118,6 +118,14 @@ PassRefPtr<SimpleFontData> FontCache::fallbackFontForCharacter(const FontDescrip
     NSFont *substituteFont = [NSFont findFontLike:nsFont forString:string withRange:NSMakeRange(0, codeUnitsLength) inLanguage:nil];
     [string release];
 
+    if (![[substituteFont fontName] isEqual:@"AppleColorEmoji"]) {
+        NSFont *emojiFont = [NSFont fontWithName:@"Apple Color Emoji" size:nsFont.pointSize];
+        CGGlyph glyph[2];
+        if(CTFontGetGlyphsForCharacters(toCTFontRef(emojiFont), (UniChar*)&codeUnits, glyph, codeUnitsLength)) {
+            substituteFont = emojiFont;
+        }
+    }
+
     // FIXME: Remove this SPI usage: http://crbug.com/255122
     if (!substituteFont && codeUnitsLength == 1)
         substituteFont = [NSFont findFontLike:nsFont forCharacter:codeUnits[0] inLanguage:nil];

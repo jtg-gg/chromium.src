@@ -140,6 +140,8 @@ private:
                             hasAnyScript = true;
                             continue;
                         }
+                        if (ch >= 0x1F3FB && ch <= 0x1F3FF) //isEmojiModifier
+                            continue;
                     }
                     return end;
                 }
@@ -154,6 +156,8 @@ private:
             if (!m_textRun.is8Bit()) {
                 UChar32 nextChar;
                 U16_GET(m_textRun.characters16(), 0, i, length, nextChar);
+                if (nextChar >= 0x1F3FB && nextChar <= 0x1F3FF) //isEmojiModifier
+                    continue;
                 if (Character::isCJKIdeographOrSymbol(nextChar))
                     return i;
             }
