@@ -41,7 +41,8 @@ void AppWindowContentsImpl::Initialize(content::BrowserContext* context,
   Observe(web_contents_.get());
   content::RendererPreferences* render_prefs =
       web_contents_->GetMutableRendererPrefs();
-  render_prefs->browser_handles_all_top_level_requests = true;
+  if (!extension || !extension->is_nwjs_app())
+    render_prefs->browser_handles_all_top_level_requests = true;
   std::string user_agent;
   if (nw::GetUserAgentFromManifest(&user_agent))
     render_prefs->user_agent_override = user_agent;
