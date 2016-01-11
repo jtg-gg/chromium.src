@@ -165,7 +165,9 @@ bool ScriptRunIterator::consume(unsigned& limit, UScriptCode& script)
         default:
             break;
         }
-        if (!mergeSets()) {
+        // this is needed to fix bug where emoji with modifier is drawn as 2 glyph when the glyph before that is a latin character
+        const bool isEmojiModifier = ch >= 0x1F3FB && ch <= 0x1F3FF;
+        if (!mergeSets() && !isEmojiModifier) {
             limit = pos;
             script = resolveCurrentScript();
             fixupStack(script);

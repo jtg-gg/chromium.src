@@ -108,8 +108,9 @@ static void normalizeCharacters(const TextRun& run, unsigned length, UChar* dest
             character = spaceCharacter;
         else if (Character::treatAsZeroWidthSpaceInComplexScript(character))
             character = zeroWidthSpaceCharacter;
-        else if (Character::isModifier(character))
-            character = zeroWidthSpaceCharacter;
+        //else if (Character::isModifier(character))
+        //    character = zeroWidthSpaceCharacter;
+        // these lines are commented because they are causing emoji with modifier not rendered properly
 
         U16_APPEND(destination, *destinationLength, length, character, error);
         ASSERT_UNUSED(error, !error);
