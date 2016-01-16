@@ -2072,16 +2072,23 @@ void ExtensionService::RegisterContentSettings(
 
 void ExtensionService::TrackTerminatedExtension(
     const std::string& extension_id) {
+  bool to_quit = false;
   extensions_being_terminated_.erase(extension_id);
 
   const Extension* extension = GetInstalledExtension(extension_id);
   if (!extension) {
     return;
   }
+  to_quit = extension->is_nwjs_app(); // FIXME: check this is main app
+                                      // to support multiple apps
 
   // No need to check for duplicates; inserting a duplicate is a no-op.
   registry_->AddTerminated(make_scoped_refptr(extension));
   UnloadExtension(extension->id(), UnloadedExtensionInfo::REASON_TERMINATE);
+  if (to_quit)
+    base::MessageLoop::current()->PostTask(
+      FROM_HERE,
+      Bind(&base::MessageLoop::QuitWhenIdle, Unretained(base::MessageLoop::current())));
 }
 
 void ExtensionService::TerminateExtension(const std::string& extension_id) {
