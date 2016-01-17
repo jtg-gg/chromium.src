@@ -218,7 +218,7 @@ std::vector<gfx::Rect> CalculateNonDraggableRegions(
 // Similar to ChromeBrowserWindow, don't draw the title, but allow it to be seen
 // in menus, Expose, etc.
 - (BOOL)_isTitleHidden {
-  return YES;
+  return NO;
 }
 
 @end
