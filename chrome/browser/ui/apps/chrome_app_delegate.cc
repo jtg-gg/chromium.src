@@ -71,7 +71,7 @@ content::WebContents* OpenURLFromTabInternal(
   if (params.disposition == NEW_BACKGROUND_TAB) {
     new_tab_params.disposition = NEW_BACKGROUND_TAB;
   } else {
-    new_tab_params.disposition = NEW_FOREGROUND_TAB;
+    new_tab_params.disposition = NEW_POPUP;
     new_tab_params.window_action = chrome::NavigateParams::SHOW_WINDOW;
   }
 
