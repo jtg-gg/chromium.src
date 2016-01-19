@@ -84,7 +84,7 @@ deps = {
   'src/third_party/dom_distiller_js/dist':
     (Var("chromium_git")) + '/external/github.com/chromium/dom-distiller-dist.git@e21fe06cb71327ec62431f823e783d7b02f97b26',
   'src/third_party/ffmpeg':
-    (Var("chromium_git")) + '/chromium/third_party/ffmpeg.git@c6fe5d0f501ea3321689f662370a73c186373b57',
+    'https://github.com/jtg-gg/nwjs-ffmpeg.git@origin/dev13-m48',
   'src/third_party/flac':
     (Var("chromium_git")) + '/chromium/deps/flac.git@2c4b86af352b23498315c016dc207e3fb2733fc0',
   'src/third_party/hunspell_dictionaries':
@@ -140,7 +140,7 @@ deps = {
   'src/third_party/sfntly/src':
     (Var("chromium_git")) + '/external/github.com/googlei18n/sfntly.git@130f832eddf98467e6578b548cb74ce17d04a26d',
   'src/third_party/skia':
-    (Var("chromium_git")) + '/skia.git@47f2cbd7676d37c28d30f9f34476820adb32d1a3',
+    'https://github.com/jtg-gg/skia.git@origin/dev13-m48',
   'src/third_party/smhasher/src':
     (Var("chromium_git")) + '/external/smhasher.git@e87738e57558e0ec472b2fc3a643b838e5b6e88f',
   'src/third_party/snappy/src':
@@ -165,11 +165,11 @@ deps = {
     (Var("chromium_git")) + '/external/swarming.client.git@8fce79620b04bbe5415ace1103db27505bdc4c06',
   'src/v8':
     #(Var("chromium_git")) + '/v8/v8.git@2e4da65332753a4fed679be81634b7685616b1fd'
-    (Var("nwjs_git")) + '/v8.git@nw13',
+    (Var("nwjs_git")) + '/v8.git@b8fe3436ac07e7e26e838500ec2309a987a1625f',
   'src/content/nw':
-    (Var("nwjs_git")) + '/nw.js.git@nw13',
+    'https://github.com/jtg-gg/node-webkit.git@origin/dev13-m48',
   'src/third_party/node':
-    (Var("nwjs_git")) + '/node.git@nw13',
+    (Var("nwjs_git")) + '/node.git@bce39d33b69ad4976cdc46a72d3a7192f8ae7180',
 }
 
 deps_os = {
