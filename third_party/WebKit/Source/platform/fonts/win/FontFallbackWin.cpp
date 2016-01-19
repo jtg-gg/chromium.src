@@ -423,6 +423,7 @@ const UChar* getFontBasedOnUnicodeBlock(int ucs4, SkFontMgr* fontManager)
     case UBLOCK_ALCHEMICAL_SYMBOLS:
     case UBLOCK_RUNIC:
     case UBLOCK_DINGBATS:
+        return emojiFont;
     case UBLOCK_GOTHIC:
         return symbolFont;
     case UBLOCK_ARROWS:
