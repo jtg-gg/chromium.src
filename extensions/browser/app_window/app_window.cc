@@ -296,11 +296,13 @@ void AppWindow::Init(const GURL& url,
   app_window_contents_->Initialize(browser_context(), url, GetExtension());
 
   nw::Package* package = nw::package();
-  std::string js_doc_start, js_doc_end;
-  if (package->root()->GetString(::switches::kmInjectJSDocStart, &js_doc_start))
-    web_contents()->GetMutableRendererPrefs()->nw_inject_js_doc_start = js_doc_start;
-  if (package->root()->GetString(::switches::kmInjectJSDocEnd, &js_doc_end))
-    web_contents()->GetMutableRendererPrefs()->nw_inject_js_doc_end = js_doc_end;
+  std::string js_doc_start(params.inject_js_start), js_doc_end(params.inject_js_end);
+  if (js_doc_start.empty())
+    package->root()->GetString(::switches::kmInjectJSDocStart, &js_doc_start);
+  web_contents()->GetMutableRendererPrefs()->nw_inject_js_doc_start = js_doc_start;
+  if (js_doc_end.empty())
+    package->root()->GetString(::switches::kmInjectJSDocEnd, &js_doc_end);
+  web_contents()->GetMutableRendererPrefs()->nw_inject_js_doc_end = js_doc_end;
   if (!js_doc_start.empty() || !js_doc_end.empty())
     web_contents()->GetRenderViewHost()->SyncRendererPrefs();
 

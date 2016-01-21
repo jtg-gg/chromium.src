@@ -287,6 +287,8 @@ namespace app.window {
     DOMString? title;
     DOMString? icon;
     boolean? show_in_taskbar;
+    DOMString? inject_js_start;
+    DOMString? inject_js_end;
   };
 
   // Called in the creating window (parent) before the load event is called in

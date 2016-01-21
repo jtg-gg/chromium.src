@@ -346,6 +346,14 @@ bool AppWindowCreateFunction::RunAsync() {
       create_params.show_in_taskbar = *options->show_in_taskbar.get();
     }
 
+    if (options->inject_js_start.get()) {
+      create_params.inject_js_start =
+          *options->inject_js_start.get();
+    }
+    if (options->inject_js_end.get()) {
+      create_params.inject_js_end =
+          *options->inject_js_end.get();
+    }
     if (options->type != app_window::WINDOW_TYPE_PANEL) {
       switch (options->state) {
         case app_window::STATE_NONE:

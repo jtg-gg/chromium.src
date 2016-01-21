@@ -202,6 +202,8 @@ class AppWindow : public content::WebContentsDelegate,
 
     std::string title;
 
+    std::string inject_js_start, inject_js_end;
+
     gfx::Image icon;
 
     // The API enables developers to specify content or window bounds. This
