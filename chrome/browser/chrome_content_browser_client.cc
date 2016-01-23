@@ -276,6 +276,7 @@
 #endif
 
 #include "content/nw/src/common/shell_switches.h"
+#include "content/nw/src/nw_content.h"
 
 using base::FileDescriptor;
 using blink::WebWindowFeatures;
@@ -2327,6 +2328,8 @@ void ChromeContentBrowserClient::OverrideWebkitPrefs(
 
   for (size_t i = 0; i < extra_parts_.size(); ++i)
     extra_parts_[i]->OverrideWebkitPrefs(rvh, web_prefs);
+
+  nw::OverrideWebkitPrefsHook(rvh, web_prefs);
 }
 
 void ChromeContentBrowserClient::BrowserURLHandlerCreated(

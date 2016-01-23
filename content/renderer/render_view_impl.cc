@@ -1067,6 +1067,7 @@ void RenderView::ApplyWebPreferences(const WebPreferences& prefs,
       prefs.default_minimum_page_scale_factor,
       prefs.default_maximum_page_scale_factor);
 
+  settings->setDoubleTapToZoomEnabled(prefs.double_tap_to_zoom_enabled);
 #if defined(OS_ANDROID)
   settings->setAllowCustomScrollbarInMainFrame(false);
   settings->setTextAutosizingEnabled(prefs.text_autosizing_enabled);
@@ -1075,7 +1076,6 @@ void RenderView::ApplyWebPreferences(const WebPreferences& prefs,
   settings->setFullscreenSupported(prefs.fullscreen_supported);
   web_view->setIgnoreViewportTagScaleLimits(prefs.force_enable_zoom);
   settings->setAutoZoomFocusedNodeToLegibleScale(true);
-  settings->setDoubleTapToZoomEnabled(prefs.double_tap_to_zoom_enabled);
   settings->setMediaControlsOverlayPlayButtonEnabled(true);
   settings->setMediaPlaybackRequiresUserGesture(
       prefs.user_gesture_required_for_media_playback);
@@ -1128,7 +1128,7 @@ void RenderView::ApplyWebPreferences(const WebPreferences& prefs,
   settings->setShowContextMenuOnMouseUp(prefs.context_menu_on_mouse_up);
 
 #if defined(OS_MACOSX)
-  settings->setDoubleTapToZoomEnabled(true);
+  //settings->setDoubleTapToZoomEnabled(true);
   web_view->setMaximumLegibleScale(prefs.default_maximum_page_scale_factor);
 #endif
 }
