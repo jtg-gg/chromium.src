@@ -85,6 +85,7 @@ extern GetNodeEnvFn g_get_node_env_fn;
 extern GetCurrentEnvironmentFn g_get_current_env_fn;
 extern EmitExitFn g_emit_exit_fn;
 extern RunAtExitFn g_run_at_exit_fn;
+extern VoidHookFn g_promise_reject_callback_fn;
 
 #if defined(OS_MACOSX)
 extern VoidHookFn g_msg_pump_dtor_osx_fn, g_uv_sem_post_fn, g_uv_sem_wait_fn;
@@ -146,7 +147,8 @@ int RendererMain(const MainFunctionParams& parameters) {
     { "g_msg_pump_need_work", &g_msg_pump_need_work_fn },
     { "g_msg_pump_did_work", &g_msg_pump_did_work_fn },
     { "g_msg_pump_pre_loop", &g_msg_pump_pre_loop_fn },
-    { "g_msg_pump_clean_ctx", &g_msg_pump_clean_ctx_fn }
+    { "g_msg_pump_clean_ctx", &g_msg_pump_clean_ctx_fn },
+    { "g_promise_reject_callback", &g_promise_reject_callback_fn}
   };
   if (nwjs) {
     base::NativeLibraryLoadError error;
