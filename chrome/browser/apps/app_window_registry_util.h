@@ -21,7 +21,7 @@ class AppWindowRegistryUtil {
   // Returns true if the number of visible app windows registered across all
   // browser contexts is non-zero. |window_type_mask| is a bitwise OR filter of
   // AppWindow::WindowType, or 0 for any window type.
-  static bool IsAppWindowVisibleInAnyProfile(int window_type_mask);
+  static bool IsAppWindowVisibleInAnyProfile(int window_type_mask, bool check_visible = true);
 
   // Close all app windows in all profiles.
   static bool CloseAllAppWindows();
