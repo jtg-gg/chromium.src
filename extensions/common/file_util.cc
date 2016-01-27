@@ -297,6 +297,7 @@ bool ValidateExtension(const Extension* extension,
   // Check children of extension root to see if any of them start with _ and is
   // not on the reserved list. We only warn, and do not block the loading of the
   // extension.
+#if 0
   std::string warning;
   if (!CheckForIllegalFilenames(extension->path(), &warning))
     warnings->push_back(InstallWarning(warning));
@@ -328,6 +329,7 @@ bool ValidateExtension(const Extension* extension,
     }
     // Only warn; don't block loading the extension.
   }
+#endif
   return true;
 }
 
