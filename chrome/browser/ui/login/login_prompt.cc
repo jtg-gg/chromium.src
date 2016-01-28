@@ -143,7 +143,7 @@ void ShowLoginPrompt(const GURL& request_url,
       return;
     }
 #endif
-    handler->CancelAuth();
+    handler->BuildViewWithoutPasswordManager(explanation);
     return;
   }
 
