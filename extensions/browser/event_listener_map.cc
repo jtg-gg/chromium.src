@@ -137,22 +137,29 @@ bool EventListenerMap::HasListenerForEvent(const std::string& event_name) {
 bool EventListenerMap::HasListenerForExtension(
     const std::string& extension_id,
     const std::string& event_name,
-    int instance_id) {
+    int instance_id,
+    std::string* out_extension_id) {
   ListenerMap::iterator it = listeners_.find(event_name);
   if (it == listeners_.end())
     return false;
 
+  EventListener* ret = nullptr;
+
   for (ListenerList::iterator it2 = it->second.begin();
        it2 != it->second.end(); it2++) {
-    if ((*it2)->extension_id() == extension_id) {
+    if ((*it2)->extension_id() == extension_id || (*it2)->extension_id().empty()) {
       int id = -1;
       if (instance_id < 0)
-        return true;
-      if ((*it2)->filter()->GetInteger("instanceId", &id) && id == instance_id)
-        return true;
+        ret = it2->get();
+      if ((*it2)->filter() && (*it2)->filter()->GetInteger("instanceId", &id) && id == instance_id)
+        ret = it2->get();
     }
   }
-  return false;
+  if (!ret)
+    return false;
+  if (out_extension_id)
+    *out_extension_id = ret->extension_id();
+  return true;
 }
 
 bool EventListenerMap::HasListener(const EventListener* listener) {

@@ -551,13 +551,16 @@ bool AppWindow::NWCanClose() const {
     return true;
   content::RenderFrameHost* rfh = web_contents()->GetMainFrame();
   EventRouter* event_router = EventRouter::Get(browser_context());
+  std::string listener_extension_id;
   bool listening_to_close = event_router->
-    ExtensionHasEventListener(extension->id(), "nw.Window.onClose", rfh->GetRenderViewHost()->GetRoutingID());
+    ExtensionHasEventListener(extension->id(), "nw.Window.onClose",
+                              rfh->GetRenderViewHost()->GetRoutingID(),
+                              &listener_extension_id);
                                 
   if (listening_to_close) {
     base::ListValue args;
     rfh->Send(new ExtensionMsg_MessageInvoke(
-      rfh->GetRoutingID(), extension_id(), "nw.Window",
+      rfh->GetRoutingID(), listener_extension_id, "nw.Window",
       "onClose", args, false));
     return false;
   }

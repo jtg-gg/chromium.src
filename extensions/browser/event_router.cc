@@ -365,8 +365,9 @@ bool EventRouter::HasEventListener(const std::string& event_name) {
 
 bool EventRouter::ExtensionHasEventListener(const std::string& extension_id,
                                             const std::string& event_name,
-                                            int instance_id) {
-  return listeners_.HasListenerForExtension(extension_id, event_name, instance_id);
+                                            int instance_id,
+                                            std::string* out_extension_id) {
+  return listeners_.HasListenerForExtension(extension_id, event_name, instance_id, out_extension_id);
 }
 
 bool EventRouter::HasEventListenerImpl(const ListenerMap& listener_map,

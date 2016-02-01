@@ -145,7 +145,8 @@ class EventListenerMap {
   // |extension_id|.
   bool HasListenerForExtension(const std::string& extension_id,
                                const std::string& event_name,
-                               int instance_id = -1);
+                               int instance_id = -1,
+                               std::string* out_extension_id = nullptr);
 
   // Returns true if this map contains an EventListener that .Equals()
   // |listener|.
