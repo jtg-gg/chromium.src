@@ -167,6 +167,7 @@ class VIEWS_BRIDGE_MAC_EXPORT BridgedNativeWidgetImpl
 
   views_bridge_mac::DragDropClient* drag_drop_client();
   bool is_translucent_window() const { return is_translucent_window_; }
+  bool force_enable_drag_region() const { return force_enable_drag_region_; }
 
   // The parent widget specified in Widget::InitParams::parent. If non-null, the
   // parent will close children before the parent closes, and children will be
@@ -316,6 +317,7 @@ class VIEWS_BRIDGE_MAC_EXPORT BridgedNativeWidgetImpl
   std::unique_ptr<CocoaWindowMoveLoop> window_move_loop_;
   ui::ModalType modal_type_ = ui::MODAL_TYPE_NONE;
   bool is_translucent_window_ = false;
+  bool force_enable_drag_region_ = false;
   bool widget_is_top_level_ = false;
   bool position_window_in_screen_coords_ = false;
 

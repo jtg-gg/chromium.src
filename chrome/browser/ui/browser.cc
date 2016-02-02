@@ -418,6 +418,7 @@ Browser* Browser::Create(const CreateParams& params) {
 Browser::Browser(const CreateParams& params)
     : nw_menu_(nullptr), extension_registry_observer_(this),
       frameless_(params.frameless),
+      force_enable_drag_region_(params.force_enable_drag_region),
       alpha_enabled_(params.alpha_enabled),
       type_(params.type),
       profile_(params.profile),
