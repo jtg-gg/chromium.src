@@ -219,7 +219,7 @@ void ChromeNativeAppWindowViewsAuraAsh::ShowContextMenuForView(
 views::NonClientFrameView*
 ChromeNativeAppWindowViewsAuraAsh::CreateNonClientFrameView(
     views::Widget* widget) {
-  if (IsFrameless())
+  if (IsFrameless() || this->widget()->force_enable_drag_region())
     return CreateNonStandardAppFrame();
 
   if (features::IsUsingWindowService())

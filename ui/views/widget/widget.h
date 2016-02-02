@@ -244,6 +244,7 @@ class VIEWS_EXPORT Widget : public internal::NativeWidgetDelegate,
     // rendered, and that the client area should be equivalent to the window
     // area. Only used on some platforms (Windows and Linux).
     bool remove_standard_frame;
+    bool force_enable_drag_region;
     // Only used by ShellWindow on Windows. Specifies that the default icon of
     // packaged app should be the system default icon.
     bool use_system_default_icon;
@@ -776,6 +777,7 @@ class VIEWS_EXPORT Widget : public internal::NativeWidgetDelegate,
 
   // Called when the delegate's CanResize or CanMaximize changes.
   void OnSizeConstraintsChanged();
+  bool force_enable_drag_region() const { return force_enable_drag_region_; }
 
   // Notification that our owner is closing.
   // NOTE: this is not invoked for aura as it's currently not needed there.
@@ -991,6 +993,8 @@ class VIEWS_EXPORT Widget : public internal::NativeWidgetDelegate,
   // True when window movement via mouse interaction with the frame should be
   // disabled.
   bool movement_disabled_;
+
+  bool force_enable_drag_region_;
 
   ScopedObserver<ui::NativeTheme, ui::NativeThemeObserver> observer_manager_;
 
