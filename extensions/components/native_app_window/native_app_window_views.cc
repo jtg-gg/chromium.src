@@ -445,7 +445,7 @@ void NativeAppWindowViews::UpdateWindowTitle() {
 void NativeAppWindowViews::UpdateDraggableRegions(
     const std::vector<extensions::DraggableRegion>& regions) {
   // Draggable region is not supported for non-frameless window.
-  if (!frameless_)
+  if (!frameless_ && !widget_->force_enable_drag_region())
     return;
 
   draggable_region_.reset(AppWindow::RawDraggableRegionsToSkRegion(regions));
