@@ -134,6 +134,7 @@ Widget::InitParams::InitParams(Type type)
       mirror_origin_in_rtl(false),
       shadow_type(SHADOW_TYPE_DEFAULT),
       remove_standard_frame(false),
+      force_enable_drag_region(false),
       use_system_default_icon(false),
       show_state(ui::SHOW_STATE_DEFAULT),
       parent(nullptr),
@@ -304,6 +305,7 @@ bool Widget::RequiresNonClientView(InitParams::Type type) {
 void Widget::Init(const InitParams& in_params) {
   TRACE_EVENT0("views", "Widget::Init");
   InitParams params = in_params;
+  force_enable_drag_region_ = params.force_enable_drag_region;
 
   // If an internal name was not provided the class name of the contents view
   // is a reasonable default.

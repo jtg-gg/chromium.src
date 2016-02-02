@@ -580,6 +580,7 @@ jumbo_component("views") {
     ]
     ldflags = [ "/DELAYLOAD:user32.dll" ]
     deps += [
+      "//content/public/common:static_features",
       "//third_party/iaccessible2",
       "//third_party/wtl",
     ]
