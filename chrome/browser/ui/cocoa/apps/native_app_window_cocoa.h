@@ -197,6 +197,7 @@ public:
 private:
 
   bool has_frame_;
+  const bool force_enable_drag_region_;
 
   // Whether this window last became hidden due to a request to hide the entire
   // app, e.g. via the dock menu or Cmd+H. This is set by Hide/ShowWithApp.
