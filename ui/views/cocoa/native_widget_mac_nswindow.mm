@@ -6,6 +6,7 @@
 
 #include "base/mac/foundation_util.h"
 #import "base/mac/sdk_forward_declarations.h"
+#include "ui/base/hit_test.h"
 #import "ui/base/cocoa/user_interface_item_command_handler.h"
 #import "ui/base/cocoa/window_size_constants.h"
 #import "ui/views/cocoa/bridged_native_widget.h"
@@ -334,4 +335,25 @@
                     : [super accessibilityAttributeValue:attribute];
 }
 
+// override the performZoom, to intercept zoom on double click
+- (void)performZoom:(id)sender {
+  NSEvent* event = [self currentEvent];
+  // check if double click
+  if (event && event.type == NSLeftMouseUp && event.clickCount == 2) {
+    NSPoint point = [event locationInWindow];
+    NSView* view = [self contentView];
+    views::Widget* widget = [self viewsWidget];
+
+    gfx::Point flippedPoint(point.x, NSHeight(view.superview.bounds) - point.y);
+    if(widget->force_enable_drag_region()) {
+      flippedPoint = gfx::Point(point.x,NSHeight(view.bounds) - point.y);
+    }
+  
+    // disable the zoom if double click is done inside dragregion aka HTCAPTION
+    int component = widget->GetNonClientComponent(flippedPoint);
+    if (component == HTCAPTION)
+      return;
+  }
+  [super performZoom:sender];
+}
 @end

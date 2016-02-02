@@ -217,7 +217,7 @@ ChromeNativeAppWindowViewsAuraAsh::CreateNonClientFrameView(
     views::Widget* widget) {
   observed_window_.Add(GetNativeWindow());
 
-  if (IsFrameless())
+  if (IsFrameless() || this->widget()->force_enable_drag_region())
     return CreateNonStandardAppFrame();
 
   if (features::IsUsingWindowService())
