@@ -285,6 +285,7 @@ NativeAppWindowCocoa::NativeAppWindowCocoa(
     const AppWindow::CreateParams& params)
     : app_window_(app_window),
       has_frame_(params.frame == AppWindow::FRAME_CHROME),
+      force_enable_drag_region_(params.force_enable_drag_region),
       is_hidden_with_app_(false),
       is_maximized_(false),
       is_fullscreen_(false),
@@ -387,6 +388,10 @@ void NativeAppWindowCocoa::InstallView() {
       [[window() standardWindowButton:NSWindowZoomButton] setEnabled:NO];
     if (!shows_resize_controls_)
       [window() setShowsResizeIndicator:NO];
+    if (force_enable_drag_region_) {
+      [view setMouseDownCanMoveWindow:YES];
+      UpdateDraggableRegionViews();
+    }
   } else {
     // TODO(jeremya): find a cleaner way to send this information to the
     // WebContentsViewCocoa view.
@@ -619,7 +624,7 @@ void NativeAppWindowCocoa::UpdateShape(std::unique_ptr<ShapeRects> rects) {
 void NativeAppWindowCocoa::UpdateDraggableRegions(
     const std::vector<extensions::DraggableRegion>& regions) {
   // Draggable region is not supported for non-frameless window.
-  if (has_frame_)
+  if (has_frame_ && !force_enable_drag_region_)
     return;
 
   draggable_regions_ = regions;
@@ -650,7 +655,7 @@ void NativeAppWindowCocoa::HandleKeyboardEvent(
 }
 
 void NativeAppWindowCocoa::UpdateDraggableRegionViews() {
-  if (has_frame_)
+  if (has_frame_ && !force_enable_drag_region_)
     return;
 
   // All ControlRegionViews should be added as children of the WebContentsView,
