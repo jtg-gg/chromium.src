@@ -574,6 +574,7 @@ ExtensionFunction::ResponseAction WindowsCreateFunction::Run() {
   bool hidden = false;
   bool new_instance = false;
   bool frameless = false;
+  bool force_enable_drag_region = false;
   bool transparent = false;
   bool always_on_top = false;
   bool all_visible = false;
@@ -649,6 +650,8 @@ ExtensionFunction::ResponseAction WindowsCreateFunction::Run() {
       new_instance = *create_data->new_instance;
     if (create_data->frameless)
       frameless = *create_data->frameless;
+    if (create_data->force_enable_drag_region)
+      force_enable_drag_region = *create_data->force_enable_drag_region;
     if (create_data->alpha_enabled)
       transparent = *create_data->alpha_enabled;
     if (create_data->always_on_top)
@@ -678,6 +681,7 @@ ExtensionFunction::ResponseAction WindowsCreateFunction::Run() {
         user_gesture());
   }
   create_params.frameless = frameless;
+  create_params.force_enable_drag_region = force_enable_drag_region;
   create_params.alpha_enabled = transparent;
   create_params.always_on_top = always_on_top;
   create_params.all_visible = all_visible;
