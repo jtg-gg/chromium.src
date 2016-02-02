@@ -381,6 +381,9 @@ ExtensionFunction::ResponseAction AppWindowCreateFunction::Run() {
     if (options->new_instance.get()) {
       create_params.new_instance = *options->new_instance.get();
     }
+
+    if (options->force_enable_drag_region.get())
+      create_params.force_enable_drag_region = *options->force_enable_drag_region.get();
     
     if (options->inject_js_start.get()) {
       create_params.inject_js_start =
