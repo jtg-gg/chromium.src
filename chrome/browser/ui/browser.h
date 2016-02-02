@@ -179,6 +179,7 @@ class Browser : public TabStripModelObserver,
     static CreateParams CreateForDevTools(Profile* profile);
 
     bool frameless = false;
+    bool force_enable_drag_region = false;
     bool alpha_enabled = false;
     bool always_on_top = false;
     bool all_visible = false;
@@ -277,6 +278,7 @@ class Browser : public TabStripModelObserver,
   const std::string& app_name() const { return app_name_; }
   bool is_trusted_source() const { return is_trusted_source_; }
   bool is_frameless() const { return frameless_; }
+  bool force_enable_drag_region() const { return force_enable_drag_region_; }
   bool is_transparent() const {
     return alpha_enabled_;
   }
@@ -938,6 +940,7 @@ class Browser : public TabStripModelObserver,
   PrefChangeRegistrar profile_pref_registrar_;
 
   bool frameless_;
+  bool force_enable_drag_region_;
   bool alpha_enabled_;
   // This Browser's type.
   const Type type_;

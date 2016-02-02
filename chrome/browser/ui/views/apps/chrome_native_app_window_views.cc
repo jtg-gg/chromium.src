@@ -125,6 +125,7 @@ void ChromeNativeAppWindowViews::InitializeDefaultWindow(
   views::Widget::InitParams init_params(views::Widget::InitParams::TYPE_WINDOW);
   init_params.delegate = this;
   init_params.remove_standard_frame = ShouldRemoveStandardFrame();
+  init_params.force_enable_drag_region = create_params.force_enable_drag_region;
   init_params.use_system_default_icon = true;
   if (create_params.alpha_enabled) {
     init_params.opacity = views::Widget::InitParams::TRANSLUCENT_WINDOW;
@@ -301,7 +302,7 @@ gfx::ImageSkia ChromeNativeAppWindowViews::GetWindowIcon() {
 
 views::NonClientFrameView* ChromeNativeAppWindowViews::CreateNonClientFrameView(
     views::Widget* widget) {
-  return (IsFrameless() || has_frame_color_) ?
+  return (IsFrameless() || has_frame_color_ || this->widget()->force_enable_drag_region()) ?
       CreateNonStandardAppFrame() : CreateStandardDesktopAppFrame();
 }
 

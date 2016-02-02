@@ -31,6 +31,7 @@
 #include "ui/gfx/path.h"
 #import "ui/gfx/path_mac.h"
 #include "ui/gfx/scoped_ns_graphics_context_save_gstate_mac.h"
+#include "ui/views/widget/native_widget_mac.h"
 #include "ui/views_bridge_mac/bridged_native_widget_host_helper.h"
 #import "ui/views_bridge_mac/bridged_native_widget_impl.h"
 #import "ui/views_bridge_mac/drag_drop_client.h"
@@ -393,6 +394,9 @@ ui::TextEditCommand GetTextEditCommandForMenuAction(SEL action) {
 // instantly draggable without asking (tracked at https://crbug.com/830962).
 - (NSView*)hitTest:(NSPoint)point {
   gfx::Point flippedPoint(point.x, NSHeight(self.superview.bounds) - point.y);
+  if (views::Widget::GetWidgetForNativeView(self)->force_enable_drag_region()) {
+    flippedPoint = gfx::Point(point.x,NSHeight(self.bounds) - point.y);
+  }
   bool isDraggableBackground = false;
   bridge_->host()->GetIsDraggableBackgroundAt(flippedPoint,
                                               &isDraggableBackground);

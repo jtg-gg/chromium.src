@@ -491,7 +491,7 @@ bool BrowserView::NWCanClose(bool user_force) const {
 void BrowserView::UpdateDraggableRegions(
     const std::vector<extensions::DraggableRegion>& regions) {
   // Draggable region is not supported for non-frameless window.
-  if (!browser_->is_frameless())
+  if (!browser_->is_frameless() && !browser_->force_enable_drag_region())
     return;
 
   draggable_region_.reset(RawDraggableRegionsToSkRegion(regions));
@@ -506,6 +506,8 @@ bool BrowserView::ShouldDescendIntoChildForEventHandling(
   if (!web_contents)
     return true;
   if (child->Contains(web_contents->GetNativeView())) {
+    if (browser_->force_enable_drag_region())
+      return true;
     // App window should claim mouse events that fall within the draggable
     // region.
     return !draggable_region_.get() ||

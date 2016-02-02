@@ -288,6 +288,13 @@ int GlassBrowserFrameView::NonClientHitTest(const gfx::Point& point) {
   if (!bounds().Contains(point))
     return HTNOWHERE;
 
+  if (browser_view()->browser()->force_enable_drag_region()) {
+    SkRegion* draggable_region = browser_view()->GetDraggableRegion();
+    if (draggable_region && draggable_region->contains(point.x(), point.y() - TitlebarHeight(false))) {
+      return HTCAPTION;
+    }
+  }
+
   if (hosted_app_button_container_) {
     // TODO(alancutter): Assign hit test components to all children and refactor
     // this entire function call to just be GetHitTestComponent(this, point).
