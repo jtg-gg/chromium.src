@@ -307,6 +307,7 @@ namespace app.window {
     DOMString? icon;
     boolean? show_in_taskbar;
     boolean? new_instance;
+    boolean? force_enable_drag_region;
     DOMString? inject_js_start;
     DOMString? inject_js_end;
   };

@@ -32,6 +32,8 @@ if (manifest.window) {
     options.alwaysOnTop = true;
   if (manifest.window['visible_on_all_workspaces'] === true)
     options.visibleOnAllWorkspaces = true;
+  if (manifest.window.force_enable_drag_region)
+    options.force_enable_drag_region = true;
   if (manifest.window.transparent)
     options.alphaEnabled = true;
   if (manifest.window.kiosk === true)
