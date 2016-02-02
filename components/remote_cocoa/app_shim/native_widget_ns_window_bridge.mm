@@ -435,6 +435,7 @@ void NativeWidgetNSWindowBridge::InitWindow(
     mojom::NativeWidgetNSWindowInitParamsPtr params) {
   modal_type_ = params->modal_type;
   is_translucent_window_ = params->is_translucent;
+  force_enable_drag_region_ = params->force_enable_drag_region;
   widget_is_top_level_ = params->widget_is_top_level;
   position_window_in_screen_coords_ = params->position_window_in_screen_coords;
 

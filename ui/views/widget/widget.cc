@@ -296,6 +296,7 @@ bool Widget::RequiresNonClientView(InitParams::Type type) {
 
 void Widget::Init(InitParams params) {
   TRACE_EVENT0("views", "Widget::Init");
+  force_enable_drag_region_ = params.force_enable_drag_region;
 
   // If an internal name was not provided the class name of the contents view
   // is a reasonable default.
