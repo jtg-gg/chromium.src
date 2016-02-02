@@ -217,6 +217,8 @@ class AppWindow : public content::WebContentsDelegate,
     Position position;
 
     std::string title;
+    
+    bool force_enable_drag_region;
 
     std::string inject_js_start, inject_js_end;
 
