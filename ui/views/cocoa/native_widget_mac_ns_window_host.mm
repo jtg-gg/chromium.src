@@ -434,6 +434,7 @@ void NativeWidgetMacNSWindowHost::InitWindow(const Widget::InitParams& params) {
     window_params->modal_type = widget->widget_delegate()->GetModalType();
     window_params->is_translucent =
         params.opacity == Widget::InitParams::TRANSLUCENT_WINDOW;
+    window_params->force_enable_drag_region = widget->force_enable_drag_region();
     window_params->widget_is_top_level = widget->is_top_level();
     window_params->position_window_in_screen_coords =
         PositionWindowInScreenCoordinates(widget, widget_type_);
