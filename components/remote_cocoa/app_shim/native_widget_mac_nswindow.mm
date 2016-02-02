@@ -13,6 +13,8 @@
 #include "components/remote_cocoa/common/native_widget_ns_window_host.mojom.h"
 #import "ui/base/cocoa/user_interface_item_command_handler.h"
 #import "ui/base/cocoa/window_size_constants.h"
+#include "ui/base/hit_test.h"
+
 
 @interface NSWindow (Private)
 + (Class)frameViewClassForStyleMask:(NSWindowStyleMask)windowStyle;
@@ -372,6 +374,28 @@
   // from NSWindow's behavior can easily break VoiceOver integration.
   NSString* viewsValue = self.rootAccessibilityObject.accessibilityTitle;
   return viewsValue ? viewsValue : [super accessibilityTitle];
+}
+
+// override the performZoom, to intercept zoom on double click
+- (void)performZoom:(id)sender {
+  NSEvent* event = [self currentEvent];
+  // check if double click
+  if (event && event.type == NSLeftMouseUp && event.clickCount == 2) {
+    NSPoint point = [event locationInWindow];
+    NSView* view = [self contentView];
+    gfx::Point flippedPoint(point.x, NSHeight(view.superview.bounds) - point.y);
+    if(bridge_->force_enable_drag_region()) {
+      flippedPoint = gfx::Point(point.x,NSHeight(view.bounds) - point.y);
+    }
+
+    // disable the zoom if double click is done inside dragregion aka HTCAPTION
+    bool isDraggableBackground = false;
+    bridge_->host()->GetIsDraggableBackgroundAt(flippedPoint,
+                                                    &isDraggableBackground);
+    if (isDraggableBackground)
+      return;
+  }
+  [super performZoom:sender];
 }
 
 @end
