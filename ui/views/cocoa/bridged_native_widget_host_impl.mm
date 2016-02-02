@@ -418,6 +418,7 @@ void BridgedNativeWidgetHostImpl::InitWindow(const Widget::InitParams& params) {
     bridge_params->modal_type = widget->widget_delegate()->GetModalType();
     bridge_params->is_translucent =
         params.opacity == Widget::InitParams::TRANSLUCENT_WINDOW;
+    bridge_params->force_enable_drag_region = widget->force_enable_drag_region();
     bridge_params->widget_is_top_level = widget->is_top_level();
     bridge_params->position_window_in_screen_coords =
         PositionWindowInScreenCoordinates(widget, widget_type_);

@@ -24,6 +24,7 @@
 #include "base/trace_event/trace_event.h"
 #include "base/win/scoped_gdi_object.h"
 #include "base/win/windows_version.h"
+#include "content/public/common/content_features.h"
 #include "third_party/skia/include/core/SkPath.h"
 #include "ui/accessibility/accessibility_switches.h"
 #include "ui/accessibility/platform/ax_fragment_root_win.h"
@@ -56,6 +57,7 @@
 #include "ui/gfx/win/rendering_window_manager.h"
 #include "ui/native_theme/native_theme_win.h"
 #include "ui/views/views_delegate.h"
+#include "ui/views/widget/desktop_aura/desktop_window_tree_host_win.h"
 #include "ui/views/widget/widget_hwnd_utils.h"
 #include "ui/views/win/fullscreen_handler.h"
 #include "ui/views/win/hwnd_message_handler_delegate.h"
@@ -2540,6 +2542,18 @@ void HWNDMessageHandler::OnSysCommand(UINT notification_code,
     return;
   }
 
+  // window has frame, ignore the maximize and restore command if executed at HTCAPTION aka Drag Region
+  aura::Window* window = DesktopWindowTreeHostWin::GetContentWindowForHWND(hwnd());
+  if (!base::FeatureList::IsEnabled(::features::kNWNewWin) && 
+      views::Widget::GetWidgetForNativeWindow(window)->force_enable_drag_region() &&
+      ((notification_code & sc_mask) == SC_MAXIMIZE ||
+       (notification_code & sc_mask) == SC_RESTORE)) {
+    POINT temp = { point.x(), point.y() };
+    MapWindowPoints(HWND_DESKTOP, hwnd(), &temp, 1);
+    if (delegate_->GetNonClientComponent(gfx::Point(temp)) == HTCAPTION)
+      return;
+  }
+
   if (delegate_->HandleCommand(notification_code))
     return;
 
@@ -2969,7 +2983,18 @@ LRESULT HWNDMessageHandler::HandleMouseEventInternal(UINT message,
   // There are cases where the code handling the message destroys the window,
   // so use the weak ptr to check if destruction occured or not.
   base::WeakPtr<HWNDMessageHandler> ref(msg_handler_weak_factory_.GetWeakPtr());
-  bool handled = delegate_->HandleMouseEvent(&event);
+  bool handled = false;
+
+  aura::Window* window = DesktopWindowTreeHostWin::GetContentWindowForHWND(hwnd());
+  if (views::Widget::GetWidgetForNativeWindow(window)->force_enable_drag_region()) {
+    handled = HandleMouseInputForCaption(message, w_param, l_param);
+  }
+
+  if (!ref.get())
+    return 0;
+
+  if (!handled)
+    handled = delegate_->HandleMouseEvent(&event);
 
   if (!ref.get())
     return 0;

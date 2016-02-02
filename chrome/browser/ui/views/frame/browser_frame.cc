@@ -83,6 +83,7 @@ void BrowserFrame::InitBrowserFrame() {
   params.name = "BrowserFrame";
   if (frameless_)
     params.remove_standard_frame = true;
+  params.force_enable_drag_region = browser_view_->browser()->force_enable_drag_region();
   if (browser_view_->browser()->is_transparent())
     params.opacity = views::Widget::InitParams::TRANSLUCENT_WINDOW;
   if (browser_view_->browser()->initial_ontop())

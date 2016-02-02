@@ -587,6 +587,9 @@ jumbo_component("views") {
       "//third_party/iaccessible2",
       "//third_party/wtl",
     ]
+    if (is_component_build) {
+      deps += ["//content/public/common:static_features"]
+    }
   }
 
   if (use_ozone) {
