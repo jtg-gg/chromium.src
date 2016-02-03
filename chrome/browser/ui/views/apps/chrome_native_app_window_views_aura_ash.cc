@@ -300,7 +300,7 @@ ChromeNativeAppWindowViewsAuraAsh::CreateNonClientFrameView(
       ->SetDelegate(std::unique_ptr<ash::wm::WindowStateDelegate>(
           new NativeAppWindowStateDelegate(app_window(), this)));
 
-  if (IsFrameless())
+  if (IsFrameless() || IsForceEnableDragRegion())
     return CreateNonStandardAppFrame();
 
   if (!features::IsAshInBrowserProcess())
