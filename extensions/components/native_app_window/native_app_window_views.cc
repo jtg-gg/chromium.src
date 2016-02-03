@@ -56,6 +56,7 @@ NativeAppWindowViews::NativeAppWindowViews()
       web_view_(NULL),
       widget_(NULL),
       frameless_(false),
+      force_enable_drag_region_(false),
       resizable_(false) {
 }
 
@@ -63,6 +64,7 @@ void NativeAppWindowViews::Init(AppWindow* app_window,
                                 const AppWindow::CreateParams& create_params) {
   app_window_ = app_window;
   frameless_ = create_params.frame == AppWindow::FRAME_NONE;
+  force_enable_drag_region_ = create_params.force_enable_drag_region;
   resizable_ = create_params.resizable;
   size_constraints_.set_minimum_size(
       create_params.GetContentMinimumSize(gfx::Insets()));
@@ -445,7 +447,7 @@ void NativeAppWindowViews::UpdateWindowTitle() {
 void NativeAppWindowViews::UpdateDraggableRegions(
     const std::vector<extensions::DraggableRegion>& regions) {
   // Draggable region is not supported for non-frameless window.
-  if (!frameless_)
+  if (!frameless_ && !force_enable_drag_region_)
     return;
 
   draggable_region_.reset(AppWindow::RawDraggableRegionsToSkRegion(regions));
@@ -468,6 +470,10 @@ void NativeAppWindowViews::HandleKeyboardEvent(
 
 bool NativeAppWindowViews::IsFrameless() const {
   return frameless_;
+}
+
+bool NativeAppWindowViews::IsForceEnableDragRegion() const {
+  return force_enable_drag_region_;
 }
 
 bool NativeAppWindowViews::HasFrameColor() const {

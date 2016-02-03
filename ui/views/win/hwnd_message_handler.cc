@@ -2420,6 +2420,16 @@ void HWNDMessageHandler::OnSysCommand(UINT notification_code,
     return;
   }
 
+  // window has frame, ignore the maximize and restore command if executed at HTCAPTION aka Drag Region
+  if (delegate_->HasFrame() &&
+    ((notification_code & sc_mask) == SC_MAXIMIZE ||
+    (notification_code & sc_mask) == SC_RESTORE)) {
+      POINT temp = { point.x(), point.y() };
+      MapWindowPoints(HWND_DESKTOP, hwnd(), &temp, 1);
+        if (delegate_->GetNonClientComponent(gfx::Point(temp)) == HTCAPTION)
+          return;
+  }
+
   // If the delegate can't handle it, the system implementation will be called.
   if (!delegate_->HandleCommand(notification_code)) {
     // If the window is being resized by dragging the borders of the window
