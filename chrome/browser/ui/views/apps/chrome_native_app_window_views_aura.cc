@@ -324,7 +324,7 @@ ChromeNativeAppWindowViewsAura::CreateNonClientFrameView(
         ->SetDelegate(scoped_ptr<ash::wm::WindowStateDelegate>(
             new NativeAppWindowStateDelegate(app_window(), this)));
 
-    if (IsFrameless())
+    if (IsFrameless() || IsForceEnableDragRegion())
       return CreateNonStandardAppFrame();
 
     if (app_window()->window_type_is_panel()) {
