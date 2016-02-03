@@ -335,7 +335,7 @@ gfx::ImageSkia ChromeNativeAppWindowViews::GetWindowIcon() {
 
 views::NonClientFrameView* ChromeNativeAppWindowViews::CreateNonClientFrameView(
     views::Widget* widget) {
-  return (IsFrameless() || has_frame_color_) ?
+  return (IsFrameless() || has_frame_color_ || IsForceEnableDragRegion()) ?
       CreateNonStandardAppFrame() : CreateStandardDesktopAppFrame();
 }
 
