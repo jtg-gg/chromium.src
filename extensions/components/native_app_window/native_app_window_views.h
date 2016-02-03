@@ -140,6 +140,7 @@ class NativeAppWindowViews : public extensions::NativeAppWindow,
   void HandleKeyboardEvent(
       const content::NativeWebKeyboardEvent& event) override;
   bool IsFrameless() const override;
+  bool IsForceEnableDragRegion() const;
   bool HasFrameColor() const override;
   SkColor ActiveFrameColor() const override;
   SkColor InactiveFrameColor() const override;
@@ -173,6 +174,7 @@ class NativeAppWindowViews : public extensions::NativeAppWindow,
   std::unique_ptr<SkRegion> draggable_region_;
 
   bool frameless_;
+  bool force_enable_drag_region_;
   bool resizable_;
   extensions::SizeConstraints size_constraints_;
   extensions::SizeConstraints saved_size_constraints_;
