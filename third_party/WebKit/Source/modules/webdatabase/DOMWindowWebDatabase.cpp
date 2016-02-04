@@ -38,7 +38,7 @@
 
 namespace blink {
 
-Database* DOMWindowWebDatabase::openDatabase(DOMWindow& windowArg, const String& name, const String& version, const String& displayName, unsigned long estimatedSize, DatabaseCallback* creationCallback, ExceptionState& exceptionState)
+Database* DOMWindowWebDatabase::openDatabase(DOMWindow& windowArg, const String& name, const String& version, const String& displayName, unsigned long estimatedSize, const String& immediateCommand, DatabaseCallback* creationCallback, ExceptionState& exceptionState)
 {
     LocalDOMWindow& window = toLocalDOMWindow(windowArg);
     if (!window.isCurrentlyDisplayedInFrame())
@@ -49,7 +49,7 @@ Database* DOMWindowWebDatabase::openDatabase(DOMWindow& windowArg, const String&
     DatabaseError error = DatabaseError::None;
     if (RuntimeEnabledFeatures::databaseEnabled() && window.document()->securityOrigin()->canAccessDatabase()) {
         String errorMessage;
-        database = dbManager.openDatabase(window.document(), name, version, displayName, estimatedSize, creationCallback, error, errorMessage);
+        database = dbManager.openDatabase(window.document(), name, version, displayName, estimatedSize, immediateCommand, creationCallback, error, errorMessage);
         ASSERT(database || error != DatabaseError::None);
         if (error != DatabaseError::None)
             DatabaseManager::throwExceptionForDatabaseError(error, errorMessage, exceptionState);
@@ -58,6 +58,10 @@ Database* DOMWindowWebDatabase::openDatabase(DOMWindow& windowArg, const String&
     }
 
     return database;
+}
+
+Database* DOMWindowWebDatabase::openDatabase(DOMWindow& windowArg, const String& name, const String& version, const String& displayName, unsigned long estimatedSize, ExceptionState& exceptionState) {
+    return openDatabase(windowArg, name, version, displayName, estimatedSize, "", NULL, exceptionState);
 }
 
 } // namespace blink
