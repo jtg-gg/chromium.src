@@ -88,6 +88,7 @@ void DatabaseTask::run() {
 Database::DatabaseOpenTask::DatabaseOpenTask(Database* database,
                                              bool setVersionInNewDatabase,
                                              WaitableEvent* completeEvent,
+                                             const String& immediateCommand,
                                              DatabaseError& error,
                                              String& errorMessage,
                                              bool& success)
@@ -95,6 +96,7 @@ Database::DatabaseOpenTask::DatabaseOpenTask(Database* database,
       m_setVersionInNewDatabase(setVersionInNewDatabase),
       m_error(error),
       m_errorMessage(errorMessage),
+      m_immediateCommand(immediateCommand),
       m_success(success) {
   DCHECK(completeEvent);  // A task with output parameters is supposed to be
                           // synchronous.
@@ -102,7 +104,7 @@ Database::DatabaseOpenTask::DatabaseOpenTask(Database* database,
 
 void Database::DatabaseOpenTask::doPerformTask() {
   String errorMessage;
-  m_success = database()->performOpenAndVerify(m_setVersionInNewDatabase,
+  m_success = database()->performOpenAndVerify(m_setVersionInNewDatabase, m_immediateCommand,
                                                m_error, errorMessage);
   if (!m_success)
     m_errorMessage = errorMessage.isolatedCopy();
