@@ -52,7 +52,22 @@ class DOMWindowWebDatabase {
                                 const String& version,
                                 const String& display_name,
                                 unsigned estimated_size,
+                                const String& immediateCommand,
                                 V8DatabaseCallback* creation_callback,
+                                ExceptionState&);
+  static Database* openDatabase(LocalDOMWindow&,
+                                const String& name,
+                                const String& version,
+                                const String& display_name,
+                                unsigned estimated_size,
+                                V8DatabaseCallback* creation_callback,
+                                ExceptionState&);
+  static Database* openDatabase(LocalDOMWindow&,
+                                const String& name,
+                                const String& version,
+                                const String& display_name,
+                                unsigned estimated_size,
+                                const String& immediateCommand,
                                 ExceptionState&);
 };
 
