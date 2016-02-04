@@ -71,6 +71,7 @@ class DatabaseManager {
                          const String& expected_version,
                          const String& display_name,
                          unsigned estimated_size,
+                         const String& immediateCommand,
                          DatabaseCallback*,
                          DatabaseError&,
                          String& error_message);
@@ -95,6 +96,7 @@ class DatabaseManager {
                                  const String& expected_version,
                                  const String& display_name,
                                  unsigned estimated_size,
+                                 const String& immediateCommand,
                                  DatabaseCallback*,
                                  bool set_version_in_new_database,
                                  DatabaseError&,
