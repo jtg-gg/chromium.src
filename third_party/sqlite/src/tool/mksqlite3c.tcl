@@ -90,6 +90,8 @@ if {$addstatic} {
 # text of the file in-line.  The file only needs to be included once.
 #
 foreach hdr {
+   crypto.h
+   sqlcipher.h
    btree.h
    btreeInt.h
    fts3.h
@@ -273,8 +275,15 @@ proc copy_file {filename} {
 # used subroutines first in order to help the compiler find
 # inlining opportunities.
 #
+
 foreach file {
    sqliteInt.h
+
+   crypto.c
+   crypto_impl.c
+   crypto_libtomcrypt.c
+   crypto_openssl.c
+   crypto_cc.c
 
    global.c
    ctime.c
@@ -376,6 +385,7 @@ foreach file {
 
    rtree.c
    icu.c
+
    fts3_icu.c
    sqlite3rbu.c
    dbstat.c
