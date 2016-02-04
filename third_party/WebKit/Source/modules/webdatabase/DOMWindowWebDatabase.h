@@ -46,7 +46,15 @@ class DOMWindowWebDatabase {
                                 const String& version,
                                 const String& displayName,
                                 unsigned estimatedSize,
+                                const String& immediateCommand,
                                 DatabaseCallback* creationCallback,
+                                ExceptionState&);
+
+  static Database* openDatabase(DOMWindow&,
+                                const String& name,
+                                const String& version,
+                                const String& displayName,
+                                unsigned estimatedSize,
                                 ExceptionState&);
 };
 
