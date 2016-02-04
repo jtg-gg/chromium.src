@@ -43,6 +43,7 @@ Database* DOMWindowWebDatabase::openDatabase(
     const String& version,
     const String& display_name,
     unsigned estimated_size,
+    const String& immediateCommand,
     DatabaseCallback* creation_callback,
     ExceptionState& exception_state) {
   if (!window.IsCurrentlyDisplayedInFrame())
@@ -55,7 +56,7 @@ Database* DOMWindowWebDatabase::openDatabase(
       window.document()->GetSecurityOrigin()->CanAccessDatabase()) {
     String error_message;
     database = db_manager.OpenDatabase(window.document(), name, version,
-                                       display_name, estimated_size,
+                                       display_name, estimated_size, immediateCommand,
                                        creation_callback, error, error_message);
     DCHECK(database || error != DatabaseError::kNone);
     if (error != DatabaseError::kNone)
@@ -67,6 +68,10 @@ Database* DOMWindowWebDatabase::openDatabase(
   }
 
   return database;
+}
+
+Database* DOMWindowWebDatabase::openDatabase(LocalDOMWindow& windowArg, const String& name, const String& version, const String& displayName, unsigned estimatedSize, ExceptionState& exceptionState) {
+    return openDatabase(windowArg, name, version, displayName, estimatedSize, "", NULL, exceptionState);
 }
 
 }  // namespace blink
