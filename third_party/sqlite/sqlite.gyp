@@ -50,6 +50,8 @@
       # syntax working but execution failing.  Review:
       #   src/src/parse.py
       #   src/tool/mkkeywordhash.c
+      'SQLITE_HAS_CODEC=1',
+      'SQLITE_TEMP_STORE=2',
     ],
   },
   'targets': [
@@ -127,6 +129,7 @@
           'dependencies': [
             '../icu/icu.gyp:icui18n',
             '../icu/icu.gyp:icuuc',
+            '../boringssl/boringssl.gyp:boringssl',
           ],
           'msvs_disabled_warnings': [
             4244, 4267,
@@ -210,7 +213,7 @@
     },
   ],
   'conditions': [
-    ['os_posix == 1 and OS != "mac" and OS != "ios" and OS != "android" and not use_system_sqlite', {
+    ['os_posix == 1 and OS != "ios" and OS != "android" and not use_system_sqlite', {
       'targets': [
         {
           'target_name': 'sqlite_shell',
@@ -269,5 +272,21 @@
         },
       ],
     }],
+    ['OS == "win" and not use_system_sqlite', {
+      'targets': [
+        {
+          'target_name': 'sqlite_shell',
+          'type': 'executable',
+          'dependencies': [
+            '../icu/icu.gyp:icuuc',
+            'sqlite',
+          ],
+          'sources': [
+            'src/src/shell.c',
+            'src/src/shell_icu_win.c',
+          ],
+        },
+      ],
+    },],
   ],
 }
