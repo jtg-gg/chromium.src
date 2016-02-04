@@ -142,6 +142,7 @@ Database* DatabaseManager::openDatabaseInternal(ExecutionContext* context,
                                                 const String& expectedVersion,
                                                 const String& displayName,
                                                 unsigned estimatedSize,
+                                                const String& immediateCommand,
                                                 bool setVersionInNewDatabase,
                                                 DatabaseError& error,
                                                 String& errorMessage) {
@@ -152,7 +153,7 @@ Database* DatabaseManager::openDatabaseInternal(ExecutionContext* context,
           backendContext, name, displayName, estimatedSize, error)) {
     Database* backend = new Database(backendContext, name, expectedVersion,
                                      displayName, estimatedSize);
-    if (backend->openAndVerifyVersion(setVersionInNewDatabase, error,
+    if (backend->openAndVerifyVersion(setVersionInNewDatabase, immediateCommand, error,
                                       errorMessage))
       return backend;
   }
@@ -178,6 +179,7 @@ Database* DatabaseManager::openDatabase(ExecutionContext* context,
                                         const String& expectedVersion,
                                         const String& displayName,
                                         unsigned estimatedSize,
+                                        const String& immediateCommand,
                                         DatabaseCallback* creationCallback,
                                         DatabaseError& error,
                                         String& errorMessage) {
@@ -185,7 +187,7 @@ Database* DatabaseManager::openDatabase(ExecutionContext* context,
 
   bool setVersionInNewDatabase = !creationCallback;
   Database* database = openDatabaseInternal(
-      context, name, expectedVersion, displayName, estimatedSize,
+      context, name, expectedVersion, displayName, estimatedSize, immediateCommand,
       setVersionInNewDatabase, error, errorMessage);
   if (!database)
     return nullptr;
