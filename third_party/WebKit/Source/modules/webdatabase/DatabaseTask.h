@@ -75,11 +75,12 @@ class Database::DatabaseOpenTask final : public DatabaseTask {
   static std::unique_ptr<DatabaseOpenTask> create(Database* db,
                                                   bool setVersionInNewDatabase,
                                                   WaitableEvent* completeEvent,
+                                                  const String& immediateCommand,
                                                   DatabaseError& error,
                                                   String& errorMessage,
                                                   bool& success) {
     return wrapUnique(new DatabaseOpenTask(db, setVersionInNewDatabase,
-                                           completeEvent, error, errorMessage,
+                                           completeEvent, immediateCommand, error, errorMessage,
                                            success));
   }
 
@@ -87,6 +88,7 @@ class Database::DatabaseOpenTask final : public DatabaseTask {
   DatabaseOpenTask(Database*,
                    bool setVersionInNewDatabase,
                    WaitableEvent*,
+                   const String&,
                    DatabaseError&,
                    String& errorMessage,
                    bool& success);
@@ -99,6 +101,7 @@ class Database::DatabaseOpenTask final : public DatabaseTask {
   bool m_setVersionInNewDatabase;
   DatabaseError& m_error;
   String& m_errorMessage;
+  const String& m_immediateCommand;
   bool& m_success;
 };
 
