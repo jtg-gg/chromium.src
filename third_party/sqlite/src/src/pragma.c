@@ -308,6 +308,11 @@ void sqlite3Pragma(
   Db *pDb;                     /* The specific database being pragmaed */
   Vdbe *v = sqlite3GetVdbe(pParse);  /* Prepared statement */
   const struct sPragmaNames *pPragma;
+/* BEGIN SQLCIPHER */
+#ifdef SQLITE_HAS_CODEC
+  extern int sqlcipher_codec_pragma(sqlite3*, int, Parse *, const char *, const char *);
+#endif
+/* END SQLCIPHER */
 
   if( v==0 ) return;
   sqlite3VdbeRunOnlyOnce(v);
@@ -373,8 +378,18 @@ void sqlite3Pragma(
     }
     pParse->nErr++;
     pParse->rc = rc;
+
     goto pragma_out;
   }
+
+/* BEGIN SQLCIPHER */
+#ifdef SQLITE_HAS_CODEC
+  if(sqlcipher_codec_pragma(db, iDb, pParse, zLeft, zRight)) { 
+    /* sqlcipher_codec_pragma executes internal */
+    goto pragma_out;
+  }
+#endif
+/* END SQLCIPHER */  
 
   /* Locate the pragma in the lookup table */
   lwr = 0;
