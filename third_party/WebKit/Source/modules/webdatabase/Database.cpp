@@ -291,6 +291,7 @@ DEFINE_TRACE_WRAPPERS(Database) {
 }
 
 bool Database::OpenAndVerifyVersion(bool set_version_in_new_database,
+                                    const String& immediateCommand,
                                     DatabaseError& error,
                                     String& error_message) {
   WaitableEvent event;
@@ -300,7 +301,7 @@ bool Database::OpenAndVerifyVersion(bool set_version_in_new_database,
   DatabaseTracker::Tracker().PrepareToOpenDatabase(this);
   bool success = false;
   std::unique_ptr<DatabaseOpenTask> task = DatabaseOpenTask::Create(
-      this, set_version_in_new_database, &event, error, error_message, success);
+      this, set_version_in_new_database, &event, immediateCommand, error, error_message, success);
   GetDatabaseContext()->GetDatabaseThread()->ScheduleTask(std::move(task));
   event.Wait();
   if (creation_callback_) {
@@ -466,6 +467,7 @@ class DoneCreatingDatabaseOnExitCaller {
 };
 
 bool Database::PerformOpenAndVerify(bool should_set_version_in_new_database,
+                                    const String& immediateCommand,
                                     DatabaseError& error,
                                     String& error_message) {
   double call_start_time = WTF::MonotonicallyIncreasingTime();
@@ -487,6 +489,22 @@ bool Database::PerformOpenAndVerify(bool should_set_version_in_new_database,
                                        sqlite_database_.LastErrorMsg());
     return false;
   }
+
+    if (immediateCommand.length()) {
+        Vector<String> result;
+        immediateCommand.Split(";", result);
+        for (auto i = result.begin(); i != result.end(); i++){
+            sqlite_database_.ExecuteCommand(*i);
+        }
+    }
+  
+    /*m_sqliteDatabase.executeCommand("SELECT count(*) FROM sqlite_master;");
+    if(m_sqliteDatabase.lastError()) {
+        errorMessage = formatErrorMessage("unable to open database", m_sqliteDatabase.lastError(), m_sqliteDatabase.lastErrorMsg());
+        m_sqliteDatabase.close();
+        return false;
+    }*/
+
   if (!sqlite_database_.TurnOnIncrementalAutoVacuum())
     DLOG(ERROR) << "Unable to turn on incremental auto-vacuum ("
                 << sqlite_database_.LastError() << " "
