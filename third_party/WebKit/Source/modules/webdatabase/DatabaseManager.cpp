@@ -138,6 +138,7 @@ Database* DatabaseManager::OpenDatabaseInternal(
     const String& expected_version,
     const String& display_name,
     unsigned estimated_size,
+    const String& immediateCommand,
     DatabaseCallback* creation_callback,
     bool set_version_in_new_database,
     DatabaseError& error,
@@ -150,7 +151,7 @@ Database* DatabaseManager::OpenDatabaseInternal(
     Database* backend =
         new Database(backend_context, name, expected_version, display_name,
                      estimated_size, creation_callback);
-    if (backend->OpenAndVerifyVersion(set_version_in_new_database, error,
+    if (backend->OpenAndVerifyVersion(set_version_in_new_database, immediateCommand, error,
                                       error_message))
       return backend;
   }
@@ -176,6 +177,7 @@ Database* DatabaseManager::OpenDatabase(ExecutionContext* context,
                                         const String& expected_version,
                                         const String& display_name,
                                         unsigned estimated_size,
+                                        const String& immediateCommand,
                                         DatabaseCallback* creation_callback,
                                         DatabaseError& error,
                                         String& error_message) {
@@ -183,7 +185,7 @@ Database* DatabaseManager::OpenDatabase(ExecutionContext* context,
 
   bool set_version_in_new_database = !creation_callback;
   Database* database = OpenDatabaseInternal(
-      context, name, expected_version, display_name, estimated_size,
+      context, name, expected_version, display_name, estimated_size, immediateCommand,
       creation_callback, set_version_in_new_database, error, error_message);
   if (!database)
     return nullptr;
