@@ -60,6 +60,7 @@ class Database final : public GarbageCollectedFinalized<Database>,
   DECLARE_TRACE_WRAPPERS();
 
   bool OpenAndVerifyVersion(bool set_version_in_new_database,
+                            const String& immediateCommand,
                             DatabaseError&,
                             String& error_message);
   void Close();
@@ -133,6 +134,7 @@ class Database final : public GarbageCollectedFinalized<Database>,
            unsigned estimated_size,
            DatabaseCallback* creation_callback);
   bool PerformOpenAndVerify(bool set_version_in_new_database,
+                            const String& immediateCommand,
                             DatabaseError&,
                             String& error_message);
   void RunCreationCallback();
