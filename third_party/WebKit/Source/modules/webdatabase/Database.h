@@ -57,6 +57,7 @@ class Database final : public GarbageCollectedFinalized<Database>,
   DECLARE_TRACE();
 
   bool OpenAndVerifyVersion(bool set_version_in_new_database,
+                            const String& immediateCommand,
                             DatabaseError&,
                             String& error_message);
   void Close();
@@ -129,6 +130,7 @@ class Database final : public GarbageCollectedFinalized<Database>,
            const String& display_name,
            unsigned estimated_size);
   bool PerformOpenAndVerify(bool set_version_in_new_database,
+                            const String& immediateCommand,
                             DatabaseError&,
                             String& error_message);
 
