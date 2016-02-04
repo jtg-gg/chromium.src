@@ -32,5 +32,5 @@ callback DatabaseCallback = boolean (Database database);
     ImplementedAs=DOMWindowWebDatabase,
     RuntimeEnabled=Database
 ] partial interface Window {
-    [MeasureAs=OpenWebDatabase, LogActivity, RaisesException] Database openDatabase(DOMString name, DOMString version, DOMString displayName, unsigned long estimatedSize, optional DatabaseCallback creationCallback);
+    [MeasureAs=OpenWebDatabase, LogActivity, RaisesException] Database openDatabase(DOMString name, DOMString version, DOMString displayName, unsigned long estimatedSize, optional DOMString immediateCommand, optional DatabaseCallback creationCallback);
 };
