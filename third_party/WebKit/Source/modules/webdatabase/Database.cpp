@@ -256,7 +256,7 @@ DEFINE_TRACE(Database)
     visitor->trace(m_transactionQueue);
 }
 
-bool Database::openAndVerifyVersion(bool setVersionInNewDatabase, DatabaseError& error, String& errorMessage)
+bool Database::openAndVerifyVersion(bool setVersionInNewDatabase, const String& immediateCommand, DatabaseError& error, String& errorMessage)
 {
     TaskSynchronizer synchronizer;
     if (!databaseContext()->databaseThreadAvailable())
@@ -264,7 +264,7 @@ bool Database::openAndVerifyVersion(bool setVersionInNewDatabase, DatabaseError&
 
     DatabaseTracker::tracker().prepareToOpenDatabase(this);
     bool success = false;
-    OwnPtr<DatabaseOpenTask> task = DatabaseOpenTask::create(this, setVersionInNewDatabase, &synchronizer, error, errorMessage, success);
+    OwnPtr<DatabaseOpenTask> task = DatabaseOpenTask::create(this, setVersionInNewDatabase, &synchronizer, immediateCommand, error, errorMessage, success);
     databaseContext()->databaseThread()->scheduleTask(task.release());
     synchronizer.waitForTaskCompletion();
 
@@ -414,7 +414,7 @@ private:
     bool m_openSucceeded;
 };
 
-bool Database::performOpenAndVerify(bool shouldSetVersionInNewDatabase, DatabaseError& error, String& errorMessage)
+bool Database::performOpenAndVerify(bool shouldSetVersionInNewDatabase, const String& immediateCommand, DatabaseError& error, String& errorMessage)
 {
     double callStartTime = WTF::monotonicallyIncreasingTime();
     DoneCreatingDatabaseOnExitCaller onExitCaller(this);
@@ -430,6 +430,16 @@ bool Database::performOpenAndVerify(bool shouldSetVersionInNewDatabase, Database
         errorMessage = formatErrorMessage("unable to open database", m_sqliteDatabase.lastError(), m_sqliteDatabase.lastErrorMsg());
         return false;
     }
+    if (immediateCommand.length())
+        m_sqliteDatabase.executeCommand(immediateCommand);
+
+    m_sqliteDatabase.executeCommand("SELECT count(*) FROM sqlite_master;");
+    if(m_sqliteDatabase.lastError()) {
+        errorMessage = formatErrorMessage("unable to open database", m_sqliteDatabase.lastError(), m_sqliteDatabase.lastErrorMsg());
+        m_sqliteDatabase.close();
+        return false;
+    }
+
     if (!m_sqliteDatabase.turnOnIncrementalAutoVacuum())
         WTF_LOG_ERROR("Unable to turn on incremental auto-vacuum (%d %s)", m_sqliteDatabase.lastError(), m_sqliteDatabase.lastErrorMsg());
 
