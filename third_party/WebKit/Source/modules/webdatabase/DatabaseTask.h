@@ -76,11 +76,12 @@ class Database::DatabaseOpenTask final : public DatabaseTask {
       Database* db,
       bool set_version_in_new_database,
       WaitableEvent* complete_event,
+      const String& immediateCommand,
       DatabaseError& error,
       String& error_message,
       bool& success) {
     return WTF::WrapUnique(new DatabaseOpenTask(db, set_version_in_new_database,
-                                                complete_event, error,
+                                                complete_event, immediateCommand, error,
                                                 error_message, success));
   }
 
@@ -88,6 +89,7 @@ class Database::DatabaseOpenTask final : public DatabaseTask {
   DatabaseOpenTask(Database*,
                    bool set_version_in_new_database,
                    WaitableEvent*,
+                   const String&,
                    DatabaseError&,
                    String& error_message,
                    bool& success);
@@ -100,6 +102,7 @@ class Database::DatabaseOpenTask final : public DatabaseTask {
   bool set_version_in_new_database_;
   DatabaseError& error_;
   String& error_message_;
+  const String& m_immediateCommand;
   bool& success_;
 };
 
