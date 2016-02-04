@@ -70,13 +70,13 @@ private:
 
 class Database::DatabaseOpenTask final : public DatabaseTask {
 public:
-    static std::unique_ptr<DatabaseOpenTask> create(Database* db, bool setVersionInNewDatabase, TaskSynchronizer* synchronizer, DatabaseError& error, String& errorMessage, bool& success)
+    static std::unique_ptr<DatabaseOpenTask> create(Database* db, bool setVersionInNewDatabase, TaskSynchronizer* synchronizer, const String& immediateCommand, DatabaseError& error, String& errorMessage, bool& success)
     {
-        return wrapUnique(new DatabaseOpenTask(db, setVersionInNewDatabase, synchronizer, error, errorMessage, success));
+        return wrapUnique(new DatabaseOpenTask(db, setVersionInNewDatabase, synchronizer, immediateCommand, error, errorMessage, success));
     }
 
 private:
-    DatabaseOpenTask(Database*, bool setVersionInNewDatabase, TaskSynchronizer*, DatabaseError&, String& errorMessage, bool& success);
+    DatabaseOpenTask(Database*, bool setVersionInNewDatabase, TaskSynchronizer*, const String& immediateCommand, DatabaseError&, String& errorMessage, bool& success);
 
     void doPerformTask() override;
 #if DCHECK_IS_ON()
@@ -86,6 +86,7 @@ private:
     bool m_setVersionInNewDatabase;
     DatabaseError& m_error;
     String& m_errorMessage;
+    const String& m_immediateCommand;
     bool& m_success;
 };
 
