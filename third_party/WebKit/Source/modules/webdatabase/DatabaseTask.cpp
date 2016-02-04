@@ -88,6 +88,7 @@ void DatabaseTask::Run() {
 Database::DatabaseOpenTask::DatabaseOpenTask(Database* database,
                                              bool set_version_in_new_database,
                                              WaitableEvent* complete_event,
+                                             const String& immediateCommand,
                                              DatabaseError& error,
                                              String& error_message,
                                              bool& success)
@@ -95,6 +96,7 @@ Database::DatabaseOpenTask::DatabaseOpenTask(Database* database,
       set_version_in_new_database_(set_version_in_new_database),
       error_(error),
       error_message_(error_message),
+      m_immediateCommand(immediateCommand),
       success_(success) {
   DCHECK(complete_event);  // A task with output parameters is supposed to be
                            // synchronous.
@@ -102,7 +104,7 @@ Database::DatabaseOpenTask::DatabaseOpenTask(Database* database,
 
 void Database::DatabaseOpenTask::DoPerformTask() {
   String error_message;
-  success_ = GetDatabase()->PerformOpenAndVerify(set_version_in_new_database_,
+  success_ = GetDatabase()->PerformOpenAndVerify(set_version_in_new_database_, m_immediateCommand.IsolatedCopy(),
                                                  error_, error_message);
   if (!success_)
     error_message_ = error_message.IsolatedCopy();
