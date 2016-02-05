@@ -197,6 +197,7 @@ class AppWindow : public content::WebContentsDelegate,
     bool skip_load;
 
     bool show_in_taskbar;
+    bool new_instance;
 
     Position position;
 

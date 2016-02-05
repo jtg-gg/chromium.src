@@ -287,6 +287,7 @@ namespace app.window {
     DOMString? title;
     DOMString? icon;
     boolean? show_in_taskbar;
+    boolean? new_instance;
     DOMString? inject_js_start;
     DOMString? inject_js_end;
   };

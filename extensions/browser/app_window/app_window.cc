@@ -187,7 +187,8 @@ AppWindow::CreateParams::CreateParams()
       always_on_top(false),
       visible_on_all_workspaces(false),
       skip_load(false),
-      show_in_taskbar(true) {
+      show_in_taskbar(true),
+      new_instance(false) {
 }
 
 AppWindow::CreateParams::~CreateParams() {}

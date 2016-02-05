@@ -346,6 +346,10 @@ bool AppWindowCreateFunction::RunAsync() {
       create_params.show_in_taskbar = *options->show_in_taskbar.get();
     }
 
+    if (options->new_instance.get()) {
+      create_params.new_instance = *options->new_instance.get();
+    }
+    
     if (options->inject_js_start.get()) {
       create_params.inject_js_start =
           *options->inject_js_start.get();
@@ -387,9 +391,15 @@ bool AppWindowCreateFunction::RunAsync() {
   create_params.creator_process_id =
       render_frame_host()->GetProcess()->GetID();
 
+  if (create_params.new_instance)
+    nw::SetPinningRenderer(false);
+
   AppWindow* app_window =
       AppWindowClient::Get()->CreateAppWindow(browser_context(), extension());
   app_window->Init(url, new AppWindowContentsImpl(app_window), create_params);
+
+  if (create_params.new_instance)
+    nw::SetPinningRenderer(true);
 
   if (ExtensionsBrowserClient::Get()->IsRunningInForcedAppMode() &&
       !app_window->is_ime_window()) {

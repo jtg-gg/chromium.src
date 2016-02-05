@@ -1165,7 +1165,10 @@ bool ChromeContentBrowserClient::ShouldTryToUseExistingProcessHost(
   if (url.SchemeIs(extensions::kExtensionScheme) && url.host() == extension_misc::kPdfExtensionId)
     return false;
 
-  return true;
+  if (nw::PinningRenderer())
+    return true;
+  else
+    return false;
 #if 0
   // It has to be a valid URL for us to check for an extension.
   if (!url.is_valid())
