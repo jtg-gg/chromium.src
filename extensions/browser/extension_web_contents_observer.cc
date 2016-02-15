@@ -91,6 +91,8 @@ void ExtensionWebContentsObserver::RenderViewCreated(
   if (type == Manifest::TYPE_NWJS_APP) {
       content::ChildProcessSecurityPolicy::GetInstance()->GrantScheme(
           render_view_host->GetProcess()->GetID(), url::kFileScheme);
+      content::ChildProcessSecurityPolicy::GetInstance()->GrantAll(
+          render_view_host->GetProcess()->GetID());
   }
   // Tells the new view that it's hosted in an extension process.
   //
