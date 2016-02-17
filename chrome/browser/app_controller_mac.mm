@@ -683,7 +683,11 @@ class AppControllerProfileObserver : public ProfileInfoCacheObserver {
 
 - (void)openStartupUrls {
   DCHECK(startupComplete_);
-  [self openUrlsReplacingNTP:startupUrls_];
+  if (startupUrls_.size()) {
+    base::CommandLine::ForCurrentProcess()->AppendArg(startupUrls_[0].spec());
+    base::CommandLine::ForCurrentProcess()->FixOrigArgv4Finder(startupUrls_[0].spec());
+  }
+  //[self openUrlsReplacingNTP:startupUrls_];
   startupUrls_.clear();
 }
 
@@ -1381,6 +1385,9 @@ class AppControllerProfileObserver : public ProfileInfoCacheObserver {
     return;
   }
 
+  nw::OSXOpenURLsHook(urls);
+
+#if 0
   Browser* browser = chrome::GetLastActiveBrowser();
   // if no browser window exists then create one with no tabs to be filled in
   if (!browser) {
@@ -1394,6 +1401,7 @@ class AppControllerProfileObserver : public ProfileInfoCacheObserver {
       chrome::startup::IS_FIRST_RUN : chrome::startup::IS_NOT_FIRST_RUN;
   StartupBrowserCreatorImpl launch(base::FilePath(), dummy, first_run);
   launch.OpenURLsInBrowser(browser, false, urls, browser->host_desktop_type());
+#endif
 }
 
 - (void)getUrl:(NSAppleEventDescriptor*)event
