@@ -268,8 +268,8 @@ def main():
   # this check other than on Mac. GN does not use static libraries as heavily,
   # so over time this restriction will mostly go away anyway, even on Mac.
   # https://code.google.com/p/gyp/issues/detail?id=384
-  if sys.platform != 'darwin':
-    args.append('--no-duplicate-basename-check')
+  #if sys.platform != 'darwin':
+  args.append('--no-duplicate-basename-check')
 
   # We explicitly don't support the make gyp generator (crbug.com/348686). Be
   # nice and fail here, rather than choking in gyp.
