@@ -1050,6 +1050,18 @@
         ]
       },
       {
+	"name": "showDevTools",
+	"type": "function",
+	"description": "Open or close devtools for this webview.",
+	"parameters": [
+          {
+            "type": "boolean",
+            "name": "show",
+            "description" : "show or close."
+          }
+        ]
+      },
+      {
         "name": "terminate",
         "type": "function",
         "description": "Forcibly kills the guest web page's renderer process. This may affect multiple <code>webview</code> tags in the current app if they share the same process, but it will not affect <code>webview</code> tags in other apps.",

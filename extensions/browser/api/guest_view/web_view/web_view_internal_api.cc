@@ -702,6 +702,22 @@ bool WebViewInternalLoadDataWithBaseUrlFunction::RunAsyncSafe(
   return successful;
 }
 
+WebViewInternalShowDevToolsFunction::WebViewInternalShowDevToolsFunction() {
+}
+
+WebViewInternalShowDevToolsFunction::~WebViewInternalShowDevToolsFunction() {
+}
+
+bool WebViewInternalShowDevToolsFunction::RunAsyncSafe(WebViewGuest* guest) {
+  scoped_ptr<web_view_internal::ShowDevTools::Params> params(
+      web_view_internal::ShowDevTools::Params::Create(*args_));
+  EXTENSION_FUNCTION_VALIDATE(params.get());
+
+  guest->ShowDevTools(params->show);
+  SendResponse(true);
+  return true;
+}
+
 WebViewInternalGoFunction::WebViewInternalGoFunction() {
 }
 

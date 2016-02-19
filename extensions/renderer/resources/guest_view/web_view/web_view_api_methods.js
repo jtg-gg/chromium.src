@@ -78,6 +78,7 @@ var WEB_VIEW_API_METHODS = [
   // of the data URL.
   'loadDataWithBaseUrl',
 
+  'showDevTools',
   // Prints the contents of the webview.
   'print',
 
@@ -166,6 +167,13 @@ WebViewImpl.prototype.loadDataWithBaseUrl = function(
                   chrome.runtime.lastError.message);
         }
       });
+};
+
+WebViewImpl.prototype.showDevTools = function(show) {
+  if (!this.guest.getId()) {
+    return;
+  }
+  WebViewInternal.showDevTools(this.guest.getId(), show);
 };
 
 WebViewImpl.prototype.print = function() {

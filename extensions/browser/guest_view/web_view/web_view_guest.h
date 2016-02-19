@@ -74,6 +74,7 @@ class WebViewGuest : public guest_view::GuestView<WebViewGuest>,
       int embedder_process_id,
       int web_view_instance_id);
 
+  void ShowDevTools(bool show);
   // Get the current zoom.
   double GetZoom() const;
 

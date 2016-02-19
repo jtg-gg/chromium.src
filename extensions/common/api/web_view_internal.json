@@ -510,6 +510,23 @@
         ]
       },
       {
+	"name": "showDevTools",
+	"type": "function",
+	"description": "Open or close devtools for this webview.",
+	"parameters": [
+          {
+            "type": "integer",
+            "name": "instanceId",
+            "description": "The instance ID of the guest <webview> process."
+          },
+          {
+            "type": "boolean",
+            "name": "show",
+            "description" : "show or close."
+          }
+        ]
+      },
+      {
         "name": "go",
         "type": "function",
         "parameters": [

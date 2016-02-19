@@ -306,7 +306,9 @@ class DevToolsWindow : public DevToolsUIBindings::Delegate,
   void SetIsDocked(bool is_docked) override;
   void OpenInNewTab(const std::string& url) override;
   void SetWhitelistedShortcuts(const std::string& message) override;
+ public:
   void InspectedContentsClosing() override;
+ private:
   void OnLoadCompleted() override;
   InfoBarService* GetInfoBarService() override;
   void RenderProcessGone(bool crashed) override;

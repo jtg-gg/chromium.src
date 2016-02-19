@@ -4,6 +4,8 @@
 
 #include "extensions/browser/guest_view/web_view/web_view_guest.h"
 
+#include "content/nw/src/nw_content.h"
+
 #include "base/message_loop/message_loop.h"
 #include "base/strings/stringprintf.h"
 #include "base/strings/utf_string_conversions.h"
@@ -1473,6 +1475,10 @@ void WebViewGuest::OnFullscreenPermissionDecided(
     const std::string& user_input) {
   last_fullscreen_permission_was_allowed_by_embedder_ = allowed;
   SetFullscreenState(allowed);
+}
+
+void WebViewGuest::ShowDevTools(bool show) {
+  nw::ShowDevtools(show, web_contents()->GetMainFrame());
 }
 
 bool WebViewGuest::GuestMadeEmbedderFullscreen() const {
