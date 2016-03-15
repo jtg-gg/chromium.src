@@ -15,6 +15,8 @@ vars = {
     'https://android.googlesource.com/platform/external/deqp',
   'freetype_android_revision':
     'a512b0fe7a8d9db0e5aa9c0a4db1e92cb861722d',
+  'nwjs_git':
+    'https://github.com/nwjs',
   'google_toolbox_for_mac_revision':
     '401878398253074c515c03cb3a3f8bb0cc8da6e9',
   'googlecode_url':
@@ -164,7 +166,12 @@ deps = {
   'src/tools/swarming_client':
     (Var("chromium_git")) + '/external/swarming.client.git@a72f46e42dba1335e8001499b4621acad2d26728',
   'src/v8':
-    (Var("chromium_git")) + '/v8/v8.git@6d1800d93df8327d891cb61895dc0cf61603edb5'
+    #(Var("chromium_git")) + '/v8/v8.git@6d1800d93df8327d891cb61895dc0cf61603edb5'
+    (Var("nwjs_git")) + '/v8.git@origin/nw13',
+  'src/content/nw':
+    (Var("nwjs_git")) + '/nw.js.git@origin/nw13',
+  'src/third_party/node':
+    (Var("nwjs_git")) + '/node.git@origin/nw13',
 }
 
 deps_os = {
@@ -686,6 +693,17 @@ hooks = [
       '.',
     'name':
       'remove_stale_pyc_files'
+  },
+  {
+    'action': [
+      'python',
+      'src/content/nw/tools/patcher.py',
+      '--patch-config', 'src/content/nw/patch/patch.cfg'
+    ],
+    'pattern':
+      '.',
+    'name':
+      'nw_patch'
   },
   {
     'action': [

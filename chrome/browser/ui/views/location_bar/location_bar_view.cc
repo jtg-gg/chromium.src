@@ -1009,6 +1009,7 @@ bool LocationBarView::RefreshSaveCreditCardIconView() {
 }
 
 void LocationBarView::RefreshTranslateIcon() {
+#if 0
   WebContents* web_contents = GetWebContents();
   if (!web_contents)
     return;
@@ -1019,6 +1020,7 @@ void LocationBarView::RefreshTranslateIcon() {
   translate_icon_view_->SetVisible(enabled);
   if (!enabled)
     TranslateBubbleView::CloseBubble();
+#endif
 }
 
 bool LocationBarView::RefreshManagePasswordsIconView() {

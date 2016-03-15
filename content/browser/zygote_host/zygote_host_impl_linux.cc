@@ -15,6 +15,8 @@
 #include "sandbox/linux/services/credentials.h"
 #include "sandbox/linux/suid/common/sandbox.h"
 
+#include "content/nw/src/common/shell_switches.h"
+
 namespace content {
 
 // static
