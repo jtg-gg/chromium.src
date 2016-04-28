@@ -192,7 +192,7 @@
     },
   ],
   'conditions': [
-    ['os_posix == 1 and OS != "mac" and OS != "ios" and OS != "android" and not use_system_sqlite', {
+    ['os_posix == 1 and OS != "ios" and OS != "android" and not use_system_sqlite', {
       'targets': [
         {
           'target_name': 'sqlite_shell',
@@ -206,6 +206,15 @@
             'src/src/shell_icu_linux.c',
             # Include a dummy c++ file to force linking of libstdc++.
             'build_as_cpp.cc',
+          ],
+          'conditions': [
+            ['OS == "mac"', {
+              'link_settings': {
+                'libraries': [
+                  '$(SDKROOT)/System/Library/Frameworks/CoreServices.framework',
+                ],
+              },
+            }],
           ],
         },
       ],
