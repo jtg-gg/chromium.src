@@ -90,7 +90,7 @@ deps = {
   'src/third_party/ffmpeg':
     'https://github.com/jtg-gg/nwjs-ffmpeg.git@origin/dev15-m51',
   'src/third_party/ffmpeg/libx264/x264_src':
-    'http://git.videolan.org/git/x264.git@a0cd7d38acb6c31973228ab207e18344920e0aa3',
+    'http://git.videolan.org/git/x264.git@fd2c324731c2199e502ded9eff723d29c6eafe0b',
   'src/third_party/flac':
     (Var("chromium_git")) + '/chromium/deps/flac.git@2c4b86af352b23498315c016dc207e3fb2733fc0',
   'src/third_party/hunspell_dictionaries':
