@@ -585,6 +585,8 @@ if (is_win || (is_linux && !is_component_build)) {
       # verify_chrome_framework_order depends on :chrome_framework and, for
       # non-component builds, will ensure the export symbol table is correct.
       ":verify_chrome_framework_order",
+      ":fix_link_framework",
+      ":copy_osx_dylib",
     ]
   }
 
@@ -779,6 +781,54 @@ if (is_win || (is_linux && !is_component_build)) {
   } else {
     group("keystone_registration_framework") {
     }
+  }
+
+  # Copy OSX dylibs.
+  copy("copy_osx_dylib") {
+    sources = [
+      "$root_out_dir/libffmpeg.dylib",
+    ]
+
+    if (is_debug) {
+      sources += ["$root_out_dir/../Debug/libnode.dylib"]
+    } else {
+      sources += ["$root_out_dir/../Release/libnode.dylib"]
+    }
+
+    outputs = [
+      "$root_out_dir/$chrome_framework_name.framework/{{source_file_part}}",
+    ]
+    deps = ["//third_party/ffmpeg:ffmpeg"]
+
+  }
+
+  action("fix_link_framework") {
+    testonly = false
+    script = "//build/config/mac/xcrun.py"
+    inputs = [
+      "$root_out_dir/$chrome_framework_name.framework/$chrome_framework_name",
+    ]
+
+    stamp_file = "$target_out_dir/xcrun_$target_name.stamp"
+    outputs = [
+      stamp_file,
+    ]
+
+    # TODO(rsesek): Figure out something like GYP's postbuilds to allow
+    # install_name_tool to operate in-place <https://crbug.com/607292>.
+    args = [
+             "--stamp",
+             rebase_path(stamp_file, root_build_dir),
+
+             # xcrun arguments:
+             "install_name_tool",
+             "-change",
+             "./libffmpeg.dylib",
+             "@loader_path/libffmpeg.dylib",
+           ] + rebase_path(inputs, root_build_dir)
+    public_deps = [
+      ":chrome_framework",
+    ]
   }
 
   tweak_info_plist("chrome_framework_plist") {
