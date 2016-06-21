@@ -748,7 +748,7 @@ hooks = [
     'action': [
       'python',
       'src/build/gyp_chromium',
-      '--running-as-hook'
+	  'src/third_party/node/node.gyp'
     ],
     'pattern':
       '.',
