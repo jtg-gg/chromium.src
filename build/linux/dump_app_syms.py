@@ -25,5 +25,8 @@ if not os.path.isfile(outfile) or \
   with open(outfile, 'w') as outfileobj:
     subprocess.check_call([dumpsyms, infile], stdout=outfileobj)
 
+if strip_binary == '1':
+  strip_binary = 'strip'
+
 if strip_binary != '0':
-  subprocess.check_call(['strip', infile])
+  subprocess.check_call([strip_binary, infile])
