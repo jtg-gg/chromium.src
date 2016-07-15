@@ -24,6 +24,9 @@ enum class FrameType {
 
 using TestFrame = std::pair<FrameType, scoped_refptr<media::VideoFrame>>;
 
+static const int kStandardWidth = 320;
+static const int kStandardHeight = 240;
+
 class FakeWebMediaPlayerDelegate
     : public media::WebMediaPlayerDelegate,
       public base::SupportsWeakPtr<FakeWebMediaPlayerDelegate> {
@@ -128,7 +131,9 @@ class MockVideoFrameProvider : public VideoFrameProvider {
   void Pause() override;
 
   // Methods for test use
-  void QueueFrames(const std::vector<int>& timestamps_or_frame_type);
+  void QueueFrames(const std::vector<int>& timestamps_or_frame_type,
+                   int double_size_index = -1,
+                   media::VideoRotation rotation = media::VIDEO_ROTATION_0);
   bool Started() { return started_; }
   bool Paused() { return paused_; }
 
@@ -184,7 +189,9 @@ void MockVideoFrameProvider::AddFrame(
 }
 
 void MockVideoFrameProvider::QueueFrames(
-    const std::vector<int>& timestamp_or_frame_type) {
+    const std::vector<int>& timestamp_or_frame_type, 
+    int double_size_index,
+    media::VideoRotation rotation) {
   for (const int token : timestamp_or_frame_type) {
     if (token < static_cast<int>(FrameType::MIN_TYPE)) {
       CHECK(false) << "Unrecognized frame type: " << token;
@@ -202,6 +209,8 @@ void MockVideoFrameProvider::QueueFrames(
           media::PIXEL_FORMAT_YV12, natural_size, gfx::Rect(natural_size),
           natural_size, base::TimeDelta::FromMilliseconds(token));
 
+      frame->metadata()->SetRotation(media::VideoFrameMetadata::ROTATION,
+                                     rotation);
       frame->metadata()->SetTimeTicks(
           media::VideoFrameMetadata::Key::REFERENCE_TIME,
           base::TimeTicks::Now() + base::TimeDelta::FromMilliseconds(token));
@@ -406,6 +415,7 @@ class WebMediaPlayerMSTest : public testing::Test,
   MOCK_METHOD1(DoNetworkStateChanged,
                void(blink::WebMediaPlayer::NetworkState));
   MOCK_METHOD1(DoReadyStateChanged, void(blink::WebMediaPlayer::ReadyState));
+  MOCK_METHOD1(CheckSizeChanged, void(gfx::Size));
 
   base::MessageLoop message_loop_;
   MockRenderFactory* render_factory_;
@@ -534,6 +544,9 @@ TEST_F(WebMediaPlayerMSTest, Playing_Normal) {
                          blink::WebMediaPlayer::ReadyStateHaveEnoughData));
   message_loop_controller_.RunAndWaitForStatus(
       media::PipelineStatus::PIPELINE_OK);
+  const blink::WebSize& natural_size = player_.naturalSize();
+  EXPECT_EQ(kStandardWidth, natural_size.width);
+  EXPECT_EQ(kStandardHeight, natural_size.height);
   testing::Mock::VerifyAndClearExpectations(this);
 
   EXPECT_CALL(*this, DoSetWebLayer(false));
@@ -643,6 +656,35 @@ TEST_F(WebMediaPlayerMSTest, PlayThenPauseThenPlay) {
       media::PipelineStatus::PIPELINE_OK);
   after_frame = compositor_->GetCurrentFrame();
   EXPECT_NE(prev_frame->timestamp(), after_frame->timestamp());
+  testing::Mock::VerifyAndClearExpectations(this);
+
+  EXPECT_CALL(*this, DoSetWebLayer(false));
+  EXPECT_CALL(*this, DoStopRendering());
+}
+
+// During this test, we check that when we send rotated video frames, it applies
+// to player's natural size.
+TEST_F(WebMediaPlayerMSTest, RotatedVideoFrame) {
+  MockVideoFrameProvider* provider = LoadAndGetFrameProvider(true);
+
+  static int tokens[] = {0, 33, 66};
+  std::vector<int> timestamps(tokens, tokens + sizeof(tokens) / sizeof(int));
+  provider->QueueFrames(timestamps, 17, media::VIDEO_ROTATION_90);
+
+  EXPECT_CALL(*this, DoSetWebLayer(true));
+  EXPECT_CALL(*this, DoStartRendering());
+  EXPECT_CALL(*this, DoReadyStateChanged(
+                         blink::WebMediaPlayer::ReadyStateHaveMetadata));
+  EXPECT_CALL(*this, DoReadyStateChanged(
+                         blink::WebMediaPlayer::ReadyStateHaveEnoughData));
+  EXPECT_CALL(*this,
+              CheckSizeChanged(gfx::Size(kStandardWidth, kStandardHeight)));
+  message_loop_controller_.RunAndWaitForStatus(
+      media::PipelineStatus::PIPELINE_OK);
+  const blink::WebSize& natural_size = player_.naturalSize();
+  // Check that height and width are flipped.
+  EXPECT_EQ(kStandardHeight, natural_size.width);
+  EXPECT_EQ(kStandardWidth, natural_size.height);
   testing::Mock::VerifyAndClearExpectations(this);
 
   EXPECT_CALL(*this, DoSetWebLayer(false));

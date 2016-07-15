@@ -25,6 +25,7 @@
 #include "gpu/blink/webgraphicscontext3d_impl.h"
 #include "media/base/media_log.h"
 #include "media/base/video_frame.h"
+#include "media/base/video_rotation.h"
 #include "third_party/WebKit/public/platform/WebMediaPlayerClient.h"
 #include "third_party/WebKit/public/platform/WebRect.h"
 #include "third_party/WebKit/public/platform/WebSize.h"
@@ -54,6 +55,7 @@ WebMediaPlayerMS::WebMediaPlayerMS(
       paused_(true),
       render_frame_suspended_(false),
       received_first_frame_(false),
+      video_rotation_(media::VIDEO_ROTATION_0),
       media_log_(media_log),
       renderer_factory_(std::move(factory)),
       media_task_runner_(media_task_runner),
@@ -258,6 +260,11 @@ bool WebMediaPlayerMS::hasAudio() const {
 
 blink::WebSize WebMediaPlayerMS::naturalSize() const {
   DCHECK(thread_checker_.CalledOnValidThread());
+  if (video_rotation_ == media::VIDEO_ROTATION_90 ||
+      video_rotation_ == media::VideoRotation::VIDEO_ROTATION_270) {
+    const gfx::Size& current_size = compositor_->GetCurrentSize();
+    return blink::WebSize(current_size.height(), current_size.width());
+  }
   return blink::WebSize(compositor_->GetCurrentSize());
 }
 
@@ -334,7 +341,7 @@ void WebMediaPlayerMS::paint(blink::WebCanvas* canvas,
   }
   const gfx::RectF dest_rect(rect.x, rect.y, rect.width, rect.height);
   video_renderer_.Paint(frame, canvas, dest_rect, alpha, mode,
-                        media::VIDEO_ROTATION_0, context_3d);
+                        video_rotation_, context_3d);
 }
 
 bool WebMediaPlayerMS::hasSingleSecurityOrigin() const {
@@ -478,9 +485,12 @@ void WebMediaPlayerMS::OnFrameAvailable(
     SetReadyState(WebMediaPlayer::ReadyStateHaveEnoughData);
 
     if (video_frame_provider_.get()) {
+      ignore_result(frame->metadata()->GetRotation(
+          media::VideoFrameMetadata::ROTATION, &video_rotation_));
+
       video_weblayer_.reset(new cc_blink::WebLayerImpl(
           cc::VideoLayer::Create(cc_blink::WebLayerImpl::LayerSettings(),
-                                 compositor_.get(), media::VIDEO_ROTATION_0)));
+                                 compositor_.get(), video_rotation_)));
       video_weblayer_->layer()->SetContentsOpaque(true);
       video_weblayer_->SetContentsOpaqueIsFixed(true);
       get_client()->setWebLayer(video_weblayer_.get());
