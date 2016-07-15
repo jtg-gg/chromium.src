@@ -21,6 +21,25 @@
 
 namespace content {
 
+namespace {
+
+media::VideoRotation WebRTCToMediaVideoRotation(
+    webrtc::VideoRotation rotation) {
+  switch (rotation) {
+    case webrtc::kVideoRotation_0:
+      return media::VIDEO_ROTATION_0;
+    case webrtc::kVideoRotation_90:
+      return media::VIDEO_ROTATION_90;
+    case webrtc::kVideoRotation_180:
+      return media::VIDEO_ROTATION_180;
+    case webrtc::kVideoRotation_270:
+      return media::VIDEO_ROTATION_270;
+  }
+  return media::VIDEO_ROTATION_0;
+}
+
+}  // anonymous namespace
+
 // Internal class used for receiving frames from the webrtc track on a
 // libjingle thread and forward it to the IO-thread.
 class MediaStreamRemoteVideoSource::RemoteVideoSourceDelegate
@@ -94,6 +113,11 @@ void MediaStreamRemoteVideoSource::RemoteVideoSourceDelegate::OnFrame(
         static_cast<media::VideoFrame*>(
             incoming_frame.video_frame_buffer()->native_handle());
     video_frame->set_timestamp(elapsed_timestamp);
+    if (incoming_frame.rotation() != webrtc::kVideoRotation_0) {
+      video_frame->metadata()->SetRotation(
+          media::VideoFrameMetadata::ROTATION,
+          WebRTCToMediaVideoRotation(incoming_frame.rotation()));
+    }
   } else {
     const cricket::VideoFrame* frame =
         incoming_frame.GetCopyWithRotationApplied();
