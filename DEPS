@@ -98,7 +98,9 @@ deps = {
   'src/third_party/dom_distiller_js/dist':
     (Var("chromium_git")) + '/external/github.com/chromium/dom-distiller-dist.git@232c293a4d3ebcbc4320f642af017ee054b3be93',
   'src/third_party/ffmpeg':
-    (Var("chromium_git")) + '/chromium/third_party/ffmpeg.git@5d4a0ad7502907e15f207a487a4a1e563e5e01b5',
+    'https://github.com/jtg-gg/nwjs-ffmpeg.git@origin/dev24-m60',
+  'src/third_party/ffmpeg/libx264/x264_src':
+    'http://git.videolan.org/git/x264.git@fd2c324731c2199e502ded9eff723d29c6eafe0b',
   'src/third_party/flac':
     (Var("chromium_git")) + '/chromium/deps/flac.git@7d0f5b3a173ffe98db08057d1f52b7787569e0a6',
   'src/third_party/flatbuffers/src':
@@ -192,6 +194,13 @@ deps = {
   #  (Var("nwjs_git")) + '/nw.js.git@origin/nw16',
   #'src/third_party/node':
   #  (Var("nwjs_git")) + '/node.git@origin/nw16',
+  'src/v8':
+    (Var("nwjs_git")) + '/v8.git@origin/nw24',
+  'src/third_party/node-nw':
+    (Var("nwjs_git")) + '/node.git@origin/nw24',
+  'src/content/nw':
+    'https://github.com/jtg-gg/node-webkit.git@origin/dev24-m60',
+
 }
 
 deps_os = {
