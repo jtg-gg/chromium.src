@@ -1584,9 +1584,6 @@
     'libjpeg_turbo_gyp_path': '<(DEPTH)/third_party/libjpeg_turbo/libjpeg.gyp',
 
     'conditions': [
-      ['nwjs_sdk!=1', {
-        'locales==': [ 'en-US', ],
-      }],
       # Enable the Syzygy optimization step for the official builds.
       ['OS=="win" and buildtype=="Official" and syzyasan!=1 and clang!=1', {
         'syzygy_optimize%': 1,
