@@ -1830,6 +1830,16 @@ hooks = [
     'pattern': '.',
     'action': [
       'python',
+      'src/build/node_build_tools.py',
+    ],
+    'pattern':
+      '.',
+    'name':
+      'node_build_tools'
+  },
+  {
+    'action': [
+      'python',
       'src/content/nw/tools/patcher.py'
       ],
   },
