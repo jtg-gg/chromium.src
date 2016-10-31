@@ -982,6 +982,16 @@ hooks = [
   {
     'action': [
       'python',
+      'src/build/node_build_tools.py',
+    ],
+    'pattern':
+      '.',
+    'name':
+      'node_build_tools'
+  },
+  {
+    'action': [
+      'python',
       'src/tools/clang_format_merge_driver/install_git_hook.py'
     ],
     'pattern':
