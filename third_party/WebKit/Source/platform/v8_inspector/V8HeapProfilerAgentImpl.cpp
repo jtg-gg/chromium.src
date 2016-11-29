@@ -239,8 +239,10 @@ void V8HeapProfilerAgentImpl::getObjectByHeapObjectId(ErrorString* error, const 
         *error = "Object is not available";
         return;
     }
-    *result = m_runtimeAgent->wrapObject(heapObject->CreationContext(), heapObject, objectGroup.fromMaybe(""));
-    if (!result)
+    auto creationContext = heapObject->CreationContext();
+    if(!creationContext.IsEmpty())
+        *result = m_runtimeAgent->wrapObject(creationContext, heapObject, objectGroup.fromMaybe(""));
+    if (!result || !*result)
         *error = "Object is not available";
 }
 
