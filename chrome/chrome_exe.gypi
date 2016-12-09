@@ -317,6 +317,9 @@
               'destination': '<(PRODUCT_DIR)/<(mac_product_name).app/Contents/Versions/<(version_full)',
               'files': [
                 '<(PRODUCT_DIR)/<(mac_product_name) Helper.app',
+                '../content/nw/external_binaries/Squirrel.framework',
+                '../content/nw/external_binaries/ReactiveCocoa.framework',
+                '../content/nw/external_binaries/Mantle.framework',
               ],
             },
           ],

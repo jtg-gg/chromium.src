@@ -716,6 +716,14 @@ hooks = [
       '.',
     'name':
       'gyp'
+  },
+  {
+    'action': [
+        'python',
+        'src/build/external_binaries.py',
+    ],
+    'pattern': '.',
+    'name': 'external_binaries',
   }
 ]
 
