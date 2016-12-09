@@ -742,6 +742,14 @@ hooks = [
   {
     'action': [
       'python',
+        'src/build/external_binaries.py',
+    ],
+    'pattern': '.',
+    'name': 'external_binaries',
+  },
+  {
+    'action': [
+      'python',
       'src/third_party/WebKit/Source/devtools/scripts/local_node/node.py',
       '--running-as-hook',
       '--version'
