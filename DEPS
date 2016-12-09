@@ -1019,6 +1019,14 @@ hooks = [
     'name':
       'nw_patch'
   },
+  {
+    'action': [
+        'python',
+        'src/build/external_binaries.py',
+    ],
+    'pattern': '.',
+    'name': 'external_binaries',
+  }
 ]
 
 include_rules = [
