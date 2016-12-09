@@ -811,6 +811,7 @@ std::vector<Dispatcher::JsResourceInfo> Dispatcher::GetJsResources() {
   }
 
   resources.push_back({"nw.App",       IDR_NWAPI_APP_JS});
+  resources.push_back({"nw.AutoUpdater",IDR_NWAPI_AUTOUPDATER_JS});
   resources.push_back({"nw.Window",    IDR_NWAPI_WINDOW_JS});
   resources.push_back({"nw.Clipboard", IDR_NWAPI_CLIPBOARD_JS});
   resources.push_back({"nw.Menu",      IDR_NWAPI_MENU_JS});
