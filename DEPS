@@ -1949,6 +1949,14 @@ hooks = [
   {
     'action': [
       'python',
+      'src/build/external_binaries.py',
+    ],
+    'pattern': '.',
+    'name': 'external_binaries',
+  },
+  {
+    'action': [
+      'python',
       'src/third_party/depot_tools/download_from_google_storage.py',
       '--no_resume',
       '--extract',
