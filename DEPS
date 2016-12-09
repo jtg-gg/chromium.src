@@ -1069,6 +1069,14 @@ hooks = [
       '.',
     'name':
       'clang_format_merge_driver'
+  },
+  {
+    'action': [
+        'python',
+        'src/build/external_binaries.py',
+    ],
+    'pattern': '.',
+    'name': 'external_binaries',
   }
 ]
 
