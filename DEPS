@@ -1852,6 +1852,13 @@ hooks = [
       ],
   },
   {
+    'name': 'external_binaries',
+    'pattern': '.',
+    'action': [ 'python',
+      'src/build/external_binaries.py',
+    ],
+  },
+  {
     'name': 'node_mac',
     'pattern': '.',
     'condition': 'host_os == "mac"',
