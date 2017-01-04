@@ -2555,7 +2555,7 @@ void Browser::InProgressDownloadResponse(bool cancel_downloads) {
 
   // Show the download page so the user can figure-out what downloads are still
   // in-progress.
-  chrome::ShowDownloads(this);
+  //chrome::ShowDownloads(this);
 
   std::move(warn_before_closing_callback_)
       .Run(WarnBeforeClosingResult::kDoNotClose);
