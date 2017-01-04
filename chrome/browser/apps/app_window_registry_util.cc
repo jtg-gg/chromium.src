@@ -87,12 +87,39 @@ bool AppWindowRegistryUtil::CloseAllAppWindows(bool user_force) {
     for (auto* window : window_list_copy) {
       // Ensure window is still valid.
       if (base::ContainsValue(registry->app_windows(), window)) {
-        if (window->NWCanClose(user_force))
-          window->GetBaseWindow()->Close();
+        extensions::NativeAppWindow *nativeAppWindow = window->GetBaseWindow();
+        if (nativeAppWindow->NWCanClose(user_force))
+          nativeAppWindow->Close();
         else
           return false;
       }
     }
   }
   return true;
+}
+
+//static
+AppWindowRegistryUtil::NativeWindowList AppWindowRegistryUtil::GetAppNativeWindowList() {
+  std::vector<Profile*> profiles =
+    g_browser_process->profile_manager()->GetLoadedProfiles();
+  AppWindowRegistryUtil::NativeWindowList nativeWindowList;
+  for (std::vector<Profile*>::const_iterator i = profiles.begin();
+    i != profiles.end();
+    ++i) {
+    AppWindowRegistry* registry =
+      Factory::GetForBrowserContext(*i, false /* create */);
+    if (!registry)
+      continue;
+
+    const AppWindowList& app_windows = registry->app_windows();
+    if (app_windows.empty())
+      continue;
+
+    for (AppWindow* window : app_windows) {
+      nativeWindowList.push_back(window->GetNativeWindow());
+    }
+  }
+
+  return nativeWindowList;
+
 }
