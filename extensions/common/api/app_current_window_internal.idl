@@ -52,6 +52,7 @@ namespace app.currentWindowInternal {
     static void setShape(Region region);
     static void setAlwaysOnTop(boolean always_on_top);
     static void setVisibleOnAllWorkspaces(boolean always_visible);
+    [allowAmbiguousOptionalArguments] static void setWindowButtonsOffset(optional long x, optional long y);
   };
 
   interface Events {
