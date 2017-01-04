@@ -445,6 +445,7 @@ static base::mac::ScopedObjCClassSwizzler* g_swizzle_imk_input_session;
   // to quit (and thus cancel downloads). Only check if we're not already
   // shutting down, else the user might be prompted multiple times if the
   // download isn't stopped before terminate is called again.
+  if (base::FeatureList::IsEnabled(::features::kNWNewWin) || AppWindowRegistryUtil::GetAppNativeWindowList().size())
   if (!browser_shutdown::IsTryingToQuit() &&
       ![self shouldQuitWithInProgressDownloads])
     return NO;
@@ -879,6 +880,7 @@ static base::mac::ScopedObjCClassSwizzler* g_swizzle_imk_input_session;
         download_manager->NonMaliciousInProgressCount() > 0) {
       int downloadCount = download_manager->NonMaliciousInProgressCount();
       if ([self userWillWaitForInProgressDownloads:downloadCount]) {
+#if 0
         // Create a new browser window (if necessary) and navigate to the
         // downloads page if the user chooses to wait.
         Browser* browser = chrome::FindBrowserWithProfile(profiles[i]);
@@ -888,6 +890,7 @@ static base::mac::ScopedObjCClassSwizzler* g_swizzle_imk_input_session;
         }
         DCHECK(browser);
         chrome::ShowDownloads(browser);
+#endif
         return NO;
       }
 

@@ -16,6 +16,7 @@ const char kNWJSMain[] = "main";
 const char kNWJSMixedContext[] = "mixed_context";
 const char kNWJSEnableNode[] = "nodejs";
 const char kNWJSDomain[] = "domain";
+const char kNWJSAppName[] = "appName";
 
 const char kAboutPage[] = "about_page";
 const char kAction[] = "action";
