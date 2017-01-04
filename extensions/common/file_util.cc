@@ -244,6 +244,10 @@ std::unique_ptr<base::DictionaryValue> LoadManifest(
   if (cmdline->HasSwitch("mixed-context"))
     manifest->SetBoolean(manifest_keys::kNWJSMixedContext, true);
 
+  std::string appName;
+  if (manifest->GetString(manifest_keys::kNWJSAppName, &appName))
+    manifest->SetString(manifest_keys::kName, appName);
+
   return manifest;
 }
 

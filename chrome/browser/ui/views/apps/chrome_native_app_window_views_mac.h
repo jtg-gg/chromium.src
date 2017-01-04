@@ -46,12 +46,18 @@ class ChromeNativeAppWindowViewsMac : public ChromeNativeAppWindowViews {
 
   // WidgetObserver implementation.
   void OnWidgetCreated(views::Widget* widget) override;
+  
+  bool NWCanClose(bool user_force = false) override;
 
  private:
   // Adjust buttons according to window_buttons_offset_
   bool Adjust_Hidden_Inset_Buttons();
   TitleBarStyle title_bar_style() const;
   void title_bar_style(TitleBarStyle style);
+
+  // Handle download on closing
+  bool userWillWaitForInProgressDownloads(int downloadCount) const;
+  bool shouldQuitWithInProgressDownloads() const;
 
   // Used to notify us about certain NSWindow events.
   base::scoped_nsobject<ResizeNotificationObserver> nswindow_observer_;
