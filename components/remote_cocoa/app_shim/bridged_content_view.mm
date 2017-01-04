@@ -224,6 +224,10 @@ ui::TextEditCommand GetTextEditCommandForMenuAction(SEL action) {
   [super dealloc];
 }
 
+- (BOOL)mouseDownCanMoveWindow {
+  return bridge_->title_bar_style() != TitleBarStyle::NORMAL;
+}
+
 - (void)clearView {
   bridge_ = nullptr;
   [[NSDistributedNotificationCenter defaultCenter] removeObserver:self];

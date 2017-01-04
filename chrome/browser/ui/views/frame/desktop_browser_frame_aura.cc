@@ -104,6 +104,11 @@ void DesktopBrowserFrameAura::GetWindowPlacement(
     *show_state = ui::SHOW_STATE_NORMAL;
 }
 
+bool DesktopBrowserFrameAura::SetWindowButtonsOffset(int x, int y) {
+  // SetWindowButtonsOffset is only for Mac's hidden inset titlebar
+  return false;
+}
+
 content::KeyboardEventProcessingResult
 DesktopBrowserFrameAura::PreHandleKeyboardEvent(
     const content::NativeWebKeyboardEvent& event) {

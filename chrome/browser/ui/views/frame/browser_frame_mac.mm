@@ -107,7 +107,16 @@ API_AVAILABLE(macos(10.12.2))
 
 BrowserFrameMac::BrowserFrameMac(BrowserFrame* browser_frame,
                                  BrowserView* browser_view)
-    : views::NativeWidgetMac(browser_frame), browser_view_(browser_view) {}
+    : views::NativeWidgetMac(browser_frame), browser_view_(browser_view),
+      window_did_resize_notification_observer_(NULL) {
+  const std::string& browser_title_bar_style = browser_view_->browser()->title_bar_style();
+  if (browser_title_bar_style == "hidden")
+    title_bar_style(TitleBarStyle::HIDDEN);
+  else if (!std::strncmp(browser_title_bar_style.c_str(), "hidden-inset", 12)) {
+    title_bar_style(TitleBarStyle::HIDDEN_INSET);
+    sscanf(browser_title_bar_style.c_str()+13, "%lf,%lf", &window_buttons_offset_.x, &window_buttons_offset_.y);
+  }
+}
 
 BrowserFrameMac::~BrowserFrameMac() {
 }
@@ -148,6 +157,18 @@ void BrowserFrameMac::OnFocusWindowToolbar() {
 }
 
 void BrowserFrameMac::OnWindowFullscreenStateChange() {
+  if (browser_view_->IsFullscreen()) {
+    if (title_bar_style() == TitleBarStyle::HIDDEN_INSET) {
+      [GetNativeWindow().GetNativeNSWindow() setToolbar:nil];
+    }
+  } else {
+    if (title_bar_style() == TitleBarStyle::HIDDEN_INSET) {
+      base::scoped_nsobject<NSToolbar> toolbar(
+          [[NSToolbar alloc] initWithIdentifier:@"titlebarStylingToolbar"]);
+      [toolbar setShowsBaselineSeparator:NO];
+      [GetNativeWindow().GetNativeNSWindow() setToolbar:toolbar];
+    }
+  }
   browser_view_->FullscreenStateChanged();
 }
 
@@ -311,6 +332,8 @@ void BrowserFrameMac::PopulateCreateWindowParams(
     params->window_class = remote_cocoa::mojom::WindowClass::kDefault;
     if (widget_params.remove_standard_frame)
       params->style_mask = NSBorderlessWindowMask;
+    if (title_bar_style() != TitleBarStyle::NORMAL)
+      params->style_mask |= (NSFullSizeContentViewWindowMask | NSTexturedBackgroundWindowMask);
   }
   params->animation_enabled = true;
 }
@@ -318,6 +341,27 @@ void BrowserFrameMac::PopulateCreateWindowParams(
 NativeWidgetMacNSWindow* BrowserFrameMac::CreateNSWindow(
     const remote_cocoa::mojom::CreateWindowParams* params) {
   NativeWidgetMacNSWindow* ns_window = NativeWidgetMac::CreateNSWindow(params);
+  if (title_bar_style() != TitleBarStyle::NORMAL) {
+    [ns_window setMovable:YES];
+    [ns_window setMovableByWindowBackground:YES];
+    if (@available(macos 10.10, *))
+      [ns_window setTitlebarAppearsTransparent:YES];
+    if (title_bar_style() == TitleBarStyle::HIDDEN_INSET) {
+      base::scoped_nsobject<NSToolbar> toolbar(
+                                               [[NSToolbar alloc] initWithIdentifier:@"titlebarStylingToolbar"]);
+      [toolbar setShowsBaselineSeparator:NO];
+      [ns_window setToolbar:toolbar];
+      [ns_window enableWindowButtonsOffset];
+      [ns_window setWindowButtonsOffset:window_buttons_offset_];
+      DCHECK(window_did_resize_notification_observer_ == 0);
+      window_did_resize_notification_observer_ = [[NSNotificationCenter defaultCenter]
+                                                  addObserverForName:NSWindowDidResizeNotification
+                                                  object:ns_window queue:nil
+                                                  usingBlock:^(NSNotification *){
+                                                    Adjust_Hidden_Inset_Buttons();
+                                                  }];
+    }
+  }
   if (@available(macOS 10.12.2, *)) {
     touch_bar_delegate_.reset([[BrowserWindowTouchBarViewsDelegate alloc]
         initWithBrowser:browser_view_->browser()
@@ -326,6 +370,33 @@ NativeWidgetMacNSWindow* BrowserFrameMac::CreateNSWindow(
   }
 
   return ns_window;
+}
+
+bool BrowserFrameMac::SetWindowButtonsOffset(int x, int y) {
+  if (title_bar_style() != TitleBarStyle::HIDDEN_INSET)
+    return false;
+  
+  NativeWidgetMacNSWindow* window =
+      base::mac::ObjCCastStrict<NativeWidgetMacNSWindow>(GetNativeWindow().GetNativeNSWindow());
+  if(x >=0 && y>=0) {
+    window_buttons_offset_.x = x;
+    window_buttons_offset_.y = y;
+    [window setWindowButtonsOffset:window_buttons_offset_];
+  }
+  return Adjust_Hidden_Inset_Buttons();
+}
+
+bool BrowserFrameMac::Adjust_Hidden_Inset_Buttons() {
+  if (title_bar_style() != TitleBarStyle::HIDDEN_INSET)
+    return false;
+  
+  NativeWidgetMacNSWindow* window =
+      base::mac::ObjCCastStrict<NativeWidgetMacNSWindow>(GetNativeWindow().GetNativeNSWindow());
+  [window setToolbar:window.toolbar];
+
+  return [window adjustButton:[window standardWindowButton:NSWindowCloseButton] ofKind:NSWindowCloseButton] &&
+      [window adjustButton:[window standardWindowButton:NSWindowMiniaturizeButton] ofKind:NSWindowMiniaturizeButton] &&
+      [window adjustButton:[window standardWindowButton:NSWindowZoomButton] ofKind:NSWindowZoomButton];
 }
 
 remote_cocoa::ApplicationHost*
@@ -349,6 +420,9 @@ void BrowserFrameMac::OnWindowInitialized() {
 }
 
 void BrowserFrameMac::OnWindowDestroying(gfx::NativeWindow native_window) {
+  [[NSNotificationCenter defaultCenter]
+      removeObserver:window_did_resize_notification_observer_];
+  window_did_resize_notification_observer_ = NULL;
   // Clear delegates set in CreateNSWindow() to prevent objects with a reference
   // to |window| attempting to validate commands by looking for a Browser*.
   NativeWidgetMacNSWindow* ns_window =

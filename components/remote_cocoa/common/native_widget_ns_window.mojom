@@ -61,6 +61,13 @@ enum VisibilityTransition {
   kNone = 4,
 };
 
+// TitleBarStyle, mirrors views::NativeWidgetMac::TitleBarStyle.
+enum TitleBarStyle {
+  NORMAL,
+  HIDDEN,
+  HIDDEN_INSET,
+};
+
 struct NativeWidgetNSWindowInitParams {
   ui.mojom.ModalType modal_type;
   // If true, the underlying window potentially be seen through.
@@ -79,6 +86,8 @@ struct NativeWidgetNSWindowInitParams {
   // NSWindowCollectionBehaviorParticipatesInCycle (this is not the
   // default for NSWindows with NSBorderlessWindowMask).
   bool force_into_collection_cycle;
+  // enum value of title bar style
+  TitleBarStyle title_bar_style;
 };
 
 // The interface through which a NativeWidgetMac may interact with an NSWindow
