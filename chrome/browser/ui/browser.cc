@@ -791,7 +791,7 @@ void Browser::InProgressDownloadResponse(bool cancel_downloads) {
 
   // Show the download page so the user can figure-out what downloads are still
   // in-progress.
-  chrome::ShowDownloads(this);
+  // chrome::ShowDownloads(this);
 
   // Reset UnloadController::is_attempting_to_close_browser_ so that we don't
   // prompt every time any tab is closed. http://crbug.com/305516

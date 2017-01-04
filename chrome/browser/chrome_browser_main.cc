@@ -13,7 +13,7 @@
 #include <utility>
 #include <vector>
 
-
+#include "content/nw/src/nw_base.h"
 #include "content/nw/src/browser/nw_chrome_browser_hooks.h"
 #include "content/nw/src/browser/nw_content_browser_hooks.h"
 
@@ -1165,6 +1165,12 @@ int ChromeBrowserMainParts::PreCreateThreads() {
     result_code_ = nw::MainPartsPreCreateThreadsHook();
     if (result_code_ != service_manager::RESULT_CODE_NORMAL_EXIT)
       return result_code_;
+    {
+      nw::Package* package = nw::package();
+      base::string16 name = base::UTF8ToUTF16(package->GetName());
+      package->root()->GetString("appName", &name);
+      ui::ResourceBundle::SetAppName(name);
+    }
 #if !defined(OS_ANDROID)
     // These members must be initialized before exiting this function normally.
     DCHECK(master_prefs_.get());

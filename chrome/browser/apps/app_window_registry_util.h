@@ -5,6 +5,7 @@
 #ifndef CHROME_BROWSER_APPS_APP_WINDOW_REGISTRY_UTIL_H_
 #define CHROME_BROWSER_APPS_APP_WINDOW_REGISTRY_UTIL_H_
 
+#include <list>
 #include "ui/gfx/native_widget_types.h"
 
 namespace extensions {
@@ -25,6 +26,9 @@ class AppWindowRegistryUtil {
 
   // Close all app windows in all profiles.
   static bool CloseAllAppWindows(bool user_force = false);
+
+  typedef std::list<gfx::NativeWindow> NativeWindowList;
+  static NativeWindowList GetAppNativeWindowList();
 };
 
 #endif  // CHROME_BROWSER_APPS_APP_WINDOW_REGISTRY_UTIL_H_
