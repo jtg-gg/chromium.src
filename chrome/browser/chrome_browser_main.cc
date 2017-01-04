@@ -13,7 +13,7 @@
 #include <utility>
 #include <vector>
 
-
+#include "content/nw/src/nw_base.h"
 #include "content/nw/src/browser/nw_chrome_browser_hooks.h"
 #include "content/nw/src/browser/nw_content_browser_hooks.h"
 
@@ -185,6 +185,7 @@
 #include "content/public/common/service_manager_connection.h"
 #include "device/vr/buildflags/buildflags.h"
 #include "extensions/buildflags/buildflags.h"
+#include "extensions/common/manifest_constants.h"
 #include "media/base/localized_strings.h"
 #include "media/media_buildflags.h"
 #include "net/base/net_module.h"
@@ -894,6 +895,12 @@ int ChromeBrowserMainParts::PreCreateThreads() {
     result_code_ = nw::MainPartsPreCreateThreadsHook();
     if (result_code_ != service_manager::RESULT_CODE_NORMAL_EXIT)
       return result_code_;
+    {
+      nw::Package* package = nw::package();
+      base::string16 appName = base::UTF8ToUTF16(package->GetName());
+      package->root()->GetString(extensions::manifest_keys::kNWJSAppName, &appName);
+      ui::ResourceBundle::SetAppName(appName);
+    }
     // These members must be initialized before exiting this function normally.
 #if !defined(OS_ANDROID)
     DCHECK(browser_creator_.get());
