@@ -149,6 +149,8 @@ class UI_BASE_EXPORT ResourceBundle {
   // Return the global resource loader instance.
   static ResourceBundle& GetSharedInstance();
 
+  static void SetAppName(base::string16 appName);
+
   // Check if the .pak for the given locale exists.
   bool LocaleDataPakExists(const std::string& locale);
 
