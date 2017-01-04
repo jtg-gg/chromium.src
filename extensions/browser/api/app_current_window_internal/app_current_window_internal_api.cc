@@ -32,6 +32,7 @@ namespace SetShape = app_current_window_internal::SetShape;
 namespace SetAlwaysOnTop = app_current_window_internal::SetAlwaysOnTop;
 namespace SetVisibleOnAllWorkspaces =
     app_current_window_internal::SetVisibleOnAllWorkspaces;
+namespace SetWindowButtonsOffset = app_current_window_internal::SetWindowButtonsOffset;
 
 using app_current_window_internal::Bounds;
 using app_current_window_internal::Region;
@@ -389,6 +390,20 @@ bool AppCurrentWindowInternalSetVisibleOnAllWorkspacesFunction::RunWithWindow(
   CHECK(params.get());
   window->GetBaseWindow()->SetVisibleOnAllWorkspaces(params->always_visible);
   return true;
+}
+
+bool AppCurrentWindowInternalSetWindowButtonsOffsetFunction::RunWithWindow(
+    AppWindow* window) {
+  scoped_ptr<SetWindowButtonsOffset::Params> params(
+      SetWindowButtonsOffset::Params::Create(*args_));
+  CHECK(params.get());
+  const int x = params->x ? *params->x : -1;
+  const int y = params->y ? *params->y : -1;
+  if(window->GetBaseWindow()->SetWindowButtonsOffset(x, y))
+    return true;
+
+  error_ = "return false";
+  return false;
 }
 
 }  // namespace extensions

@@ -66606,6 +66606,7 @@ http://cs/file:chrome/histograms.xml - but prefer this file for new entries.
   <int value="1107" label="INPUT_IME_DEACTIVATE"/>
   <int value="1108" label="ENTERPRISE_PLATFORMKEYS_CHALLENGEMACHINEKEY"/>
   <int value="1109" label="ENTERPRISE_PLATFORMKEYS_CHALLENGEUSERKEY"/>
+  <int value="1110" label="APP_CURRENTWINDOWINTERNAL_SETWINDOWBUTTONSOFFSET"/>
 </enum>
 
 <enum name="ExtensionInstallCause" type="int">

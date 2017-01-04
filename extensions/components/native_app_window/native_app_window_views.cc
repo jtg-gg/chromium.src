@@ -563,4 +563,8 @@ void NativeAppWindowViews::SetVisibleOnAllWorkspaces(bool always_visible) {
   widget_->SetVisibleOnAllWorkspaces(always_visible);
 }
 
+bool NativeAppWindowViews::SetWindowButtonsOffset(int x, int y) {
+  return false;
+}
+
 }  // namespace native_app_window
