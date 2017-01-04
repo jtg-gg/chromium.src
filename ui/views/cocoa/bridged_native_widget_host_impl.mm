@@ -425,6 +425,7 @@ void BridgedNativeWidgetHostImpl::InitWindow(const Widget::InitParams& params) {
     bridge_params->widget_is_top_level = widget->is_top_level();
     bridge_params->position_window_in_screen_coords =
         PositionWindowInScreenCoordinates(widget, widget_type_);
+    bridge_params->title_bar_style = native_widget_mac_->title_bar_style();
 
     // OSX likes to put shadows on most things. However, frameless windows (with
     // styleMask = NSBorderlessWindowMask) default to no shadow. So change that.

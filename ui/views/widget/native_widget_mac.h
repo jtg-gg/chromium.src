@@ -6,6 +6,7 @@
 #define UI_VIEWS_WIDGET_NATIVE_WIDGET_MAC_H_
 
 #include "base/macros.h"
+#include "components/remote_cocoa/common/bridged_native_widget.mojom.h"
 #include "ui/base/window_open_disposition.h"
 #include "ui/gfx/native_widget_types.h"
 #include "ui/views/widget/native_widget_private.h"
@@ -16,6 +17,7 @@
 class NativeWidgetMacNSWindow;
 #endif
 
+typedef remote_cocoa::mojom::TitleBarStyle TitleBarStyle;
 namespace remote_cocoa {
 namespace mojom {
 class BridgedNativeWidget;
@@ -61,6 +63,9 @@ class VIEWS_EXPORT NativeWidgetMac : public internal::NativeWidgetPrivate {
 
   // Notifies that the widget starts to enter or exit fullscreen mode.
   virtual void OnWindowFullscreenStateChange() {}
+
+  TitleBarStyle title_bar_style() const { return title_bar_style_; }
+  void title_bar_style(TitleBarStyle style) { title_bar_style_ = style; }
 
   // Handle "Move focus to the window toolbar" shortcut.
   virtual void OnFocusWindowToolbar() {}
@@ -224,6 +229,9 @@ class VIEWS_EXPORT NativeWidgetMac : public internal::NativeWidgetPrivate {
   std::unique_ptr<BridgedNativeWidgetHostImpl> bridge_host_;
 
   Widget::InitParams::Ownership ownership_;
+
+  // The "titleBarStyle" option.
+  TitleBarStyle title_bar_style_ = TitleBarStyle::NORMAL;
 
   // Internal name.
   std::string name_;
