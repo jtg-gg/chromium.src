@@ -438,6 +438,7 @@ void NativeWidgetNSWindowBridge::InitWindow(
   force_enable_drag_region_ = params->force_enable_drag_region;
   widget_is_top_level_ = params->widget_is_top_level;
   position_window_in_screen_coords_ = params->position_window_in_screen_coords;
+  title_bar_style_ = params->title_bar_style;
 
   // Register for application hide notifications so that visibility can be
   // properly tracked. This is not done in the delegate so that the lifetime is

@@ -28,6 +28,7 @@
 @class ModalShowAnimationWithLayer;
 @class NativeWidgetMacNSWindow;
 @class ViewsNSWindowDelegate;
+typedef remote_cocoa::mojom::TitleBarStyle TitleBarStyle;
 
 namespace views {
 namespace test {
@@ -167,6 +168,7 @@ class REMOTE_COCOA_APP_SHIM_EXPORT NativeWidgetNSWindowBridge
   remote_cocoa::DragDropClient* drag_drop_client();
   bool is_translucent_window() const { return is_translucent_window_; }
   bool force_enable_drag_region() const { return force_enable_drag_region_; }
+  TitleBarStyle title_bar_style() const { return title_bar_style_; }
 
   // The parent widget specified in Widget::InitParams::parent. If non-null, the
   // parent will close children before the parent closes, and children will be
@@ -316,6 +318,7 @@ class REMOTE_COCOA_APP_SHIM_EXPORT NativeWidgetNSWindowBridge
   bool force_enable_drag_region_ = false;
   bool widget_is_top_level_ = false;
   bool position_window_in_screen_coords_ = false;
+  TitleBarStyle title_bar_style_ = TitleBarStyle::NORMAL;
 
   NativeWidgetNSWindowBridge* parent_ =
       nullptr;  // Weak. If non-null, owns this.

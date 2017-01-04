@@ -64,6 +64,11 @@ class WindowsGetAllFunction : public ExtensionFunction {
   ResponseAction Run() override;
   DECLARE_EXTENSION_FUNCTION("windows.getAll", WINDOWS_GETALL)
 };
+class WindowsSetWindowButtonsOffsetFunction : public ExtensionFunction {
+  ~WindowsSetWindowButtonsOffsetFunction() override {}
+  ResponseAction Run() override;
+  DECLARE_EXTENSION_FUNCTION("windows.setWindowButtonsOffset", UNKNOWN)
+};
 class WindowsCreateFunction : public ExtensionFunction {
   ~WindowsCreateFunction() override {}
   ResponseAction Run() override;

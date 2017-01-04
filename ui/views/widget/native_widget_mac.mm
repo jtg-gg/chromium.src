@@ -205,7 +205,7 @@ void NativeWidgetMac::InitNativeWidget(Widget::InitParams params) {
       remote_cocoa::mojom::WindowClass::kDefault;
   create_window_params->style_mask = StyleMaskForParams(params);
   create_window_params->titlebar_appears_transparent = false;
-  create_window_params->window_title_hidden = false;
+  create_window_params->window_title_hidden = (title_bar_style_ != TitleBarStyle::NORMAL);
   PopulateCreateWindowParams(params, create_window_params.get());
 
   if (application_host) {
