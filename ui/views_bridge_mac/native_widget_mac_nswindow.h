@@ -59,6 +59,10 @@ VIEWS_BRIDGE_MAC_EXPORT
 
 // The BridgedNativeWidgetImpl that this will use to call back to the host.
 @property(assign, nonatomic) views::BridgedNativeWidgetImpl* bridgeImpl;
+@property NSPoint windowButtonsOffset;
+- (void)enableWindowButtonsOffset;
+- (BOOL)adjustButton:(NSButton*)button
+              ofKind:(NSWindowButton)kind;
 @end
 
 #endif  // UI_VIEWS_BRIDGE_MAC_NATIVE_WIDGET_MAC_NSWINDOW_H_

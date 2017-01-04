@@ -84,9 +84,11 @@
   id<WindowTouchBarDelegate> touchBarDelegate_;  // Weak.
   uint64_t bridgedNativeWidgetId_;
   views::BridgedNativeWidgetImpl* bridgeImpl_;
+  CGFloat windowButtonsInterButtonSpacing_;
 }
 @synthesize bridgedNativeWidgetId = bridgedNativeWidgetId_;
 @synthesize bridgeImpl = bridgeImpl_;
+@synthesize windowButtonsOffset = windowButtonsOffset_;
 
 - (instancetype)initWithContentRect:(NSRect)contentRect
                           styleMask:(NSUInteger)windowStyle
@@ -109,6 +111,41 @@
 }
 
 // Public methods.
+
+- (void)enableWindowButtonsOffset {
+  auto closeButton = [self standardWindowButton:NSWindowCloseButton];
+  auto miniaturizeButton = [self standardWindowButton:NSWindowMiniaturizeButton];
+  windowButtonsInterButtonSpacing_ =
+      NSMinX([miniaturizeButton frame]) - NSMaxX([closeButton frame]);
+}
+
+- (BOOL)adjustButton:(NSButton*)button
+              ofKind:(NSWindowButton)kind {
+  NSRect buttonFrame = [button frame];
+  NSPoint offset = self.windowButtonsOffset;
+  NSRect frameViewBounds = [[button superview] bounds];
+  buttonFrame.origin = NSMakePoint(
+      offset.x, (NSHeight(frameViewBounds) - NSHeight(buttonFrame) - offset.y));
+  
+  switch (kind) {
+    case NSWindowZoomButton:
+      buttonFrame.origin.x += NSWidth(
+          [[self standardWindowButton:NSWindowMiniaturizeButton] frame]);
+      buttonFrame.origin.x += windowButtonsInterButtonSpacing_;
+      FALLTHROUGH;
+    case NSWindowMiniaturizeButton:
+      buttonFrame.origin.x += NSWidth(
+          [[self standardWindowButton:NSWindowCloseButton] frame]);
+      buttonFrame.origin.x += windowButtonsInterButtonSpacing_;
+      FALLTHROUGH;
+    default:
+      break;
+  }
+  
+  [button setFrame:buttonFrame];
+  BOOL success = CGRectEqualToRect(buttonFrame,  [button frame]);
+  return success;
+}
 
 - (void)setCommandDispatcherDelegate:(id<CommandDispatcherDelegate>)delegate {
   [commandDispatcher_ setDelegate:delegate];
