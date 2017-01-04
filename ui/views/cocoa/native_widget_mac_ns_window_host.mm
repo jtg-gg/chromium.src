@@ -438,6 +438,7 @@ void NativeWidgetMacNSWindowHost::InitWindow(const Widget::InitParams& params) {
     window_params->widget_is_top_level = widget->is_top_level();
     window_params->position_window_in_screen_coords =
         PositionWindowInScreenCoordinates(widget, widget_type_);
+    window_params->title_bar_style = native_widget_mac_->title_bar_style();
 
     // OSX likes to put shadows on most things. However, frameless windows (with
     // styleMask = NSBorderlessWindowMask) default to no shadow. So change that.

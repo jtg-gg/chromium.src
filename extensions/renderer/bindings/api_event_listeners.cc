@@ -335,7 +335,7 @@ void FilteredEventListeners::LazilySetContextOwner(
   if (context_owner_id_.empty()) {
     DCHECK(context_owner_id_getter_);
     context_owner_id_ = context_owner_id_getter_.Run(context);
-    DCHECK(!context_owner_id_.empty());
+    //DCHECK(!context_owner_id_.empty());
   }
 }
 
@@ -343,8 +343,8 @@ void FilteredEventListeners::InvalidateListener(
     const ListenerData& listener,
     bool was_manual,
     v8::Local<v8::Context> context) {
-  DCHECK(!context_owner_id_.empty())
-      << "The context owner must be instantiated if listeners were removed.";
+  //DCHECK(!context_owner_id_.empty())
+  //    << "The context owner must be instantiated if listeners were removed.";
 
   bool was_last_of_kind = false;
   std::unique_ptr<base::DictionaryValue> filter;
