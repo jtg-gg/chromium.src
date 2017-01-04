@@ -56,6 +56,7 @@
 #include "extensions/common/permissions/permissions_data.h"
 #include "third_party/skia/include/core/SkBitmap.h"
 #include "third_party/skia/include/core/SkRegion.h"
+#include "ui/base/resource/resource_bundle.h"
 #include "ui/display/display.h"
 #include "ui/display/screen.h"
 #include "ui/events/keycodes/keyboard_codes.h"
@@ -320,6 +321,12 @@ void AppWindow::Init(const GURL& url,
   web_contents()->GetMutableRendererPrefs()->nw_inject_js_doc_end = js_doc_end;
   if (!js_doc_start.empty() || !js_doc_end.empty())
     web_contents()->GetRenderViewHost()->SyncRendererPrefs();
+
+  {
+    base::string16 name = base::UTF8ToUTF16(package->GetName());
+    package->root()->GetString("appName", &name);
+    ui::ResourceBundle::SetAppName(name);
+  }
 
   initial_url_ = url;
 

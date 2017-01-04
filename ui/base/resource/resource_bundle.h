@@ -151,6 +151,8 @@ class UI_BASE_EXPORT ResourceBundle {
   // Return the global resource loader instance.
   static ResourceBundle& GetSharedInstance();
 
+  static void SetAppName(base::string16 appName);
+
   // Loads a secondary locale data pack using the given file region.
   void LoadSecondaryLocaleDataWithPakFileRegion(
       base::File pak_file,
