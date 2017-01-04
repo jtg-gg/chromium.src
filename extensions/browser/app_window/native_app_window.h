@@ -101,6 +101,7 @@ class NativeAppWindow : public ui::BaseWindow,
   // when compositing.
   virtual bool CanHaveAlphaEnabled() const = 0;
   virtual bool SetWindowButtonsOffset(int x, int y) = 0;
+  virtual bool NWCanClose(bool user_force) = 0;
 
   // Sets whether the window should be activated on pointer event.
   virtual void SetActivateOnPointer(bool activate_on_pointer) = 0;
