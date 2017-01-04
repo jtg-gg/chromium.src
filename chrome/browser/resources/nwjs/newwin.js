@@ -32,6 +32,16 @@ if (manifest.window) {
     options.alwaysOnTop = true;
   if (manifest.window['visible_on_all_workspaces'] === true)
     options.allVisible = true;
+  if (manifest.window.titleBarStyle) {
+    options.title_bar_style = manifest.window.titleBarStyle;
+    if (require('os').platform() == "darwin" &&
+        options.title_bar_style &&
+        options.title_bar_style.startsWith("hidden") &&
+        manifest.window.frame === false) {
+      options.frameless = false;
+      options.force_enable_drag_region = true;
+    }
+  }
   if (manifest.window.force_enable_drag_region)
     options.force_enable_drag_region = true;
   if (manifest.window.transparent)
@@ -45,4 +55,8 @@ if (manifest.window) {
 }
 
 chrome.windows.create(options, function(win) {
+  if (require('os').platform() == "darwin" &&
+      options.title_bar_style &&
+      options.title_bar_style.startsWith("hidden-inset"))
+    chrome.windows.setWindowButtonsOffset(win.id);
 });

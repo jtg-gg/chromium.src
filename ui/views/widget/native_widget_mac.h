@@ -53,6 +53,13 @@ class VIEWS_EXPORT NativeWidgetMac : public internal::NativeWidgetPrivate {
 
   // Notifies that the widget starts to enter or exit fullscreen mode.
   virtual void OnWindowFullscreenStateChange() {}
+  enum TitleBarStyle {
+    NORMAL,
+    HIDDEN,
+    HIDDEN_INSET,
+  };
+  TitleBarStyle title_bar_style() const { return title_bar_style_; }
+  void title_bar_style(TitleBarStyle style) { title_bar_style_ = style; }
 
   // internal::NativeWidgetPrivate:
   void InitNativeWidget(const Widget::InitParams& params) override;
@@ -177,6 +184,9 @@ class VIEWS_EXPORT NativeWidgetMac : public internal::NativeWidgetPrivate {
   std::unique_ptr<BridgedNativeWidgetHostImpl> bridge_host_;
 
   Widget::InitParams::Ownership ownership_;
+
+  // The "titleBarStyle" option.
+  TitleBarStyle title_bar_style_ = NORMAL;
 
   // Internal name.
   std::string name_;

@@ -57,6 +57,7 @@
 #include "chrome/browser/ui/recently_audible_helper.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/browser/ui/tabs/tab_utils.h"
+#include "chrome/browser/ui/views/frame/native_browser_frame.h"
 #include "chrome/browser/ui/window_sizer/window_sizer.h"
 #include "chrome/browser/web_applications/components/web_app_helpers.h"
 #include "chrome/common/extensions/api/tabs.h"
@@ -430,6 +431,29 @@ ExtensionFunction::ResponseAction WindowsGetAllFunction::Run() {
   return RespondNow(OneArgument(std::move(window_list)));
 }
 
+ExtensionFunction::ResponseAction WindowsSetWindowButtonsOffsetFunction::Run() {
+#if defined(OS_MACOSX)
+  std::unique_ptr<windows::SetWindowButtonsOffset::Params> params(
+      windows::SetWindowButtonsOffset::Params::Create(*args_));
+  EXTENSION_FUNCTION_VALIDATE(params.get());
+
+  ApiParameterExtractor<windows::SetWindowButtonsOffset::Params> extractor(params.get());
+  Browser* browser = nullptr;
+  std::string error;
+  if (!windows_util::GetBrowserFromWindowID(
+          this, params->window_id, WindowController::GetAllWindowFilter(),
+          &browser, &error)) {
+    return RespondNow(Error(error));
+  }
+  const int x = params->x ? *params->x : -1;
+  const int y = params->y ? *params->y : -1;
+  if(BrowserView::GetBrowserViewForBrowser(browser)->frame()->
+      native_browser_frame()->SetWindowButtonsOffset(x,y))
+    return RespondNow(OneArgument(std::make_unique<base::Value>(true)));
+#endif  
+  return RespondNow(OneArgument(std::make_unique<base::Value>(false)));
+}
+  
 bool WindowsCreateFunction::ShouldOpenIncognitoWindow(
     const windows::Create::Params::CreateData* create_data,
     std::vector<GURL>* urls,
@@ -555,6 +579,7 @@ ExtensionFunction::ResponseAction WindowsCreateFunction::Run() {
   bool show_in_taskbar = true;
   bool resizable = true;
   std::string title;
+  std::string title_bar_style;
   int min_width = 0; int min_height = 0; int max_width = 0; int max_height = 0;
   std::string extension_id;
   std::string position;
@@ -638,6 +663,8 @@ ExtensionFunction::ResponseAction WindowsCreateFunction::Run() {
       show_in_taskbar = *create_data->show_in_taskbar;
     if (create_data->title)
       title = *create_data->title;
+    if (create_data->title_bar_style)
+      title_bar_style = *create_data->title_bar_style;
     if (create_data->position)
       position = *create_data->position;
   }
@@ -661,6 +688,7 @@ ExtensionFunction::ResponseAction WindowsCreateFunction::Run() {
   create_params.all_visible = all_visible;
   create_params.resizable = resizable;
   create_params.show_in_taskbar = show_in_taskbar;
+  create_params.title_bar_style = title_bar_style;
   create_params.title = title;
 
   if (create_data && create_data->icon) {

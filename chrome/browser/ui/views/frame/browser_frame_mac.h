@@ -9,6 +9,7 @@
 
 #import "base/mac/scoped_nsobject.h"
 #include "base/macros.h"
+#import <Foundation/NSGeometry.h>
 #include "ui/views/widget/native_widget_mac.h"
 
 class BrowserFrame;
@@ -41,6 +42,7 @@ class BrowserFrameMac : public views::NativeWidgetMac,
   bool ShouldSaveWindowPlacement() const override;
   void GetWindowPlacement(gfx::Rect* bounds,
                           ui::WindowShowState* show_state) const override;
+  bool SetWindowButtonsOffset(int x, int y) override;
   content::KeyboardEventProcessingResult PreHandleKeyboardEvent(
       const content::NativeWebKeyboardEvent& event) override;
   bool HandleKeyboardEvent(
@@ -63,6 +65,13 @@ class BrowserFrameMac : public views::NativeWidgetMac,
   base::scoped_nsobject<ChromeCommandDispatcherDelegate>
       command_dispatcher_delegate_;
   base::scoped_nsobject<BrowserWindowTouchBarViewsDelegate> touch_bar_delegate_;
+
+  // The "titleBarStyle" option.
+  NSPoint window_buttons_offset_;
+  // Adjust buttons according to window_buttons_offset_
+  bool Adjust_Hidden_Inset_Buttons();
+  // Window resize observer needed for adjusting hidden inset buttons
+  id window_did_resize_notification_observer_;
 
   DISALLOW_COPY_AND_ASSIGN(BrowserFrameMac);
 };

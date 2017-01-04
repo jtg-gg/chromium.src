@@ -221,6 +221,18 @@
         ]
       },
       {
+        "name": "setWindowButtonsOffset",
+        "type": "function",
+        "description": "set window buttons offset for frame of type hidden-inset",
+        "allowAmbiguousOptionalArguments" : true,
+        "parameters": [
+          {"type": "integer", "name": "windowId", "minimum": -2},
+          {"type": "integer", "name": "x", "optional": true},
+          {"type": "integer", "name": "y", "optional": true},
+		  {"type": "function", "name": "callback", "optional": true, "parameters": [{"type": "boolean", "name": "result"}]}
+        ]
+      },
+      {
         "name": "create",
         "type": "function",
         "description": "Creates (opens) a new browser window with any optional sizing, position, or default URL provided.",
@@ -249,6 +261,7 @@
               "focused": {"type": "boolean", "optional": true, "description": "If <code>true</code>, opens an active window. If <code>false</code>, opens an inactive window."},
               "hidden": {"type": "boolean", "optional": true, "description": ""},
               "frameless": {"type": "boolean", "optional": true, "description": ""},
+              "title_bar_style": {"type": "string", "optional": true, "description": ""},
               "force_enable_drag_region": {"type": "boolean", "optional": true, "description": ""},
               "alphaEnabled": {"type": "boolean", "optional": true, "description": ""},
               "new_instance": {"type": "boolean", "optional": true, "description": ""},
