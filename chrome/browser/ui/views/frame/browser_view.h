@@ -462,7 +462,7 @@ class BrowserView : public BrowserWindow,
                                   ui::Accelerator* accelerator) const override;
 
   // views::WidgetDelegate:
-  bool NWCanClose(bool user_force = false) const override;
+  bool NWCanClose(bool user_force = false) override;
   bool ShouldDescendIntoChildForEventHandling(
       gfx::NativeView child,
       const gfx::Point& location) override;

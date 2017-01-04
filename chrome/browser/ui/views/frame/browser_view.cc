@@ -496,7 +496,7 @@ BrowserView::BrowserView(std::unique_ptr<Browser> browser)
 void BrowserView::ForceClose() {
   GetWidget()->Close(true);
 }
-bool BrowserView::NWCanClose(bool user_force) const {
+bool BrowserView::NWCanClose(bool user_force) {
   return browser_->NWCanClose(user_force);
 }
 
