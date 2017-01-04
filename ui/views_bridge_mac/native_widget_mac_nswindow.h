@@ -51,6 +51,11 @@ VIEWS_EXPORT
 // may be used to look up the BridgedNativeWidgetHostImpl in the browser process
 // or the BridgedNativeWidgetImpl in a display process.
 @property(assign, nonatomic) uint64_t bridgedNativeWidgetId;
+
+@property NSPoint windowButtonsOffset;
+- (void)enableWindowButtonsOffset;
+- (BOOL)adjustButton:(NSButton*)button
+              ofKind:(NSWindowButton)kind;
 @end
 
 #endif  // UI_VIEWS_BRIDGE_MAC_NATIVE_WIDGET_MAC_NSWINDOW_H_
