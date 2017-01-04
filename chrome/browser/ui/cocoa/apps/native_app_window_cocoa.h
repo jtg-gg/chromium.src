@@ -79,6 +79,7 @@ class NativeAppWindowCocoa : public extensions::NativeAppWindow,
   void FlashFrame(bool flash) override;
   bool IsAlwaysOnTop() const override;
   void SetShowInTaskbar(bool show) override;
+  bool SetWindowButtonsOffset(int x, int y) override;
 
   // Called when the window is about to be closed.
   void WindowWillClose();
@@ -110,9 +111,15 @@ class NativeAppWindowCocoa : public extensions::NativeAppWindow,
 
   // Called when the window is zoomed (maximized or de-maximized).
   void WindowWillZoom();
+  
+  // Called when the window will enter fullscreen.
+  void WindowWillEnterFullscreen();
 
   // Called when the window enters fullscreen.
   void WindowDidEnterFullscreen();
+
+  // Called when the window will exit fullscreen.
+  void WindowWillExitFullscreen();
 
   // Called when the window exits fullscreen.
   void WindowDidExitFullscreen();
@@ -127,6 +134,13 @@ class NativeAppWindowCocoa : public extensions::NativeAppWindow,
   bool IsWithinDraggableRegion(NSPoint point) const;
 
   NSRect restored_bounds() const { return restored_bounds_; }
+
+  enum TitleBarStyle {
+    NORMAL,
+    HIDDEN,
+    HIDDEN_INSET,
+  };
+  TitleBarStyle title_bar_style() const { return title_bar_style_; }
 
  protected:
   // NativeAppWindow implementation.
@@ -193,9 +207,12 @@ class NativeAppWindowCocoa : public extensions::NativeAppWindow,
   // Hides the window unconditionally. Used by Hide and HideWithApp.
   void HideWithoutMarkingHidden();
 
+  bool Adjust_Hidden_Inset_Buttons();
 public:
   extensions::AppWindow* app_window_;  // weak - AppWindow owns NativeAppWindow.
 private:
+  // The "titleBarStyle" option.
+  TitleBarStyle title_bar_style_;
 
   bool has_frame_;
   const bool force_enable_drag_region_;

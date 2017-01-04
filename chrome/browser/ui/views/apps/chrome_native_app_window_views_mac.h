@@ -23,6 +23,15 @@ class ChromeNativeAppWindowViewsMac : public ChromeNativeAppWindowViews {
   void OnWindowWillStartLiveResize();
   void OnWindowWillExitFullScreen();
   void OnWindowDidExitFullScreen();
+  void OnWindowWillEnterFullScreen();
+  void OnWindowDidResize();
+  
+  enum TitleBarStyle {
+    NORMAL,
+    HIDDEN,
+    HIDDEN_INSET,
+  };
+  TitleBarStyle title_bar_style() const { return title_bar_style_; }
 
  protected:
   // ChromeNativeAppWindowViews implementation.
@@ -42,6 +51,7 @@ class ChromeNativeAppWindowViewsMac : public ChromeNativeAppWindowViews {
   void Maximize() override;
   void Restore() override;
   void FlashFrame(bool flash) override;
+  bool SetWindowButtonsOffset(int x, int y) override;
 
   // WidgetObserver implementation.
   void OnWidgetCreated(views::Widget* widget) override;
@@ -54,6 +64,9 @@ class ChromeNativeAppWindowViewsMac : public ChromeNativeAppWindowViews {
   void HideWithApp() override;
 
  private:
+  // Adjust buttons according to window_buttons_offset_
+  bool Adjust_Hidden_Inset_Buttons();
+
   // Unset is_hidden_with_app_ and tell the shim to unhide.
   void UnhideWithoutActivation();
 
@@ -70,6 +83,10 @@ class ChromeNativeAppWindowViewsMac : public ChromeNativeAppWindowViews {
   // Set true during an exit fullscreen transition, so that the live resize
   // event AppKit sends can be distinguished from a zoom-triggered live resize.
   bool in_fullscreen_transition_ = false;
+
+  // The "titleBarStyle" option.
+  TitleBarStyle title_bar_style_ = NORMAL;
+  NSPoint window_buttons_offset_;
 
   DISALLOW_COPY_AND_ASSIGN(ChromeNativeAppWindowViewsMac);
 };
