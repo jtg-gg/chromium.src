@@ -100,6 +100,7 @@ class NativeAppWindow : public ui::BaseWindow,
   // Returns false if the underlying native window ignores alpha transparency
   // when compositing.
   virtual bool CanHaveAlphaEnabled() const = 0;
+  virtual bool SetWindowButtonsOffset(int x, int y) = 0;
 
   // Sets whether the window should be activated on pointer event.
   virtual void SetActivateOnPointer(bool activate_on_pointer) = 0;
