@@ -384,6 +384,9 @@ ExtensionFunction::ResponseAction AppWindowCreateFunction::Run() {
 
     if (options->force_enable_drag_region.get())
       create_params.force_enable_drag_region = *options->force_enable_drag_region.get();
+
+    if (options->title_bar_style.get())
+      create_params.title_bar_style = *options->title_bar_style.get();
     
     if (options->inject_js_start.get()) {
       create_params.inject_js_start =
