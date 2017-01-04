@@ -190,6 +190,7 @@ class Browser : public TabStripModelObserver,
     bool resizable = true;
     bool show_in_taskbar = true;
     std::string title;
+    std::string title_bar_style;
     gfx::Image icon;
     // The browser type.
     Type type;
@@ -283,6 +284,7 @@ class Browser : public TabStripModelObserver,
 
   Type type() const { return type_; }
   const std::string& app_name() const { return app_name_; }
+  const std::string& title_bar_style() const { return title_bar_style_; }
   bool is_trusted_source() const { return is_trusted_source_; }
   bool is_frameless() const { return frameless_; }
   bool force_enable_drag_region() const { return force_enable_drag_region_; }
@@ -970,6 +972,9 @@ class Browser : public TabStripModelObserver,
   // 1) we launch an application via an application shortcut or extension API.
   // 2) we launch an undocked devtool window.
   std::string app_name_;
+
+  // Browse title bar style
+  const std::string title_bar_style_;
 
   // True if the source is trusted (i.e. we do not need to show the URL in a
   // a popup window). Also used to determine which app windows to save and

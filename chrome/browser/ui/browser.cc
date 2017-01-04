@@ -412,6 +412,7 @@ Browser::Browser(const CreateParams& params)
           std::make_unique<TabStripModel>(tab_strip_model_delegate_.get(),
                                           params.profile)),
       app_name_(params.app_name),
+      title_bar_style_(params.title_bar_style),
       is_trusted_source_(params.trusted_source),
       session_id_(SessionID::NewUnique()),
       cancel_download_confirmation_state_(NOT_PROMPTED),
