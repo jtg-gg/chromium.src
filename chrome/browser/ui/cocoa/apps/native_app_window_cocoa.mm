@@ -220,17 +220,103 @@ std::vector<gfx::Rect> CalculateNonDraggableRegions(
 
 @end
 
-@interface AppNSWindow : ChromeEventProcessingWindow
+@interface AppNSWindow : ChromeEventProcessingWindow {
+  @private
+   CGFloat windowButtonsInterButtonSpacing_;
+}
+@property NSPoint windowButtonsOffset;
+- (void)enableWindowButtonsOffset;
 @end
 
 @implementation AppNSWindow
-
+  @synthesize windowButtonsOffset;
 // Similar to ChromeBrowserWindow, don't draw the title, but allow it to be seen
 // in menus, Expose, etc.
 - (BOOL)_isTitleHidden {
   return NO;
 }
 
+- (void)enableWindowButtonsOffset {
+  auto closeButton = [self standardWindowButton:NSWindowCloseButton];
+  auto miniaturizeButton = [self standardWindowButton:NSWindowMiniaturizeButton];
+  auto zoomButton = [self standardWindowButton:NSWindowZoomButton];
+  
+  [closeButton setPostsFrameChangedNotifications:YES];
+  [miniaturizeButton setPostsFrameChangedNotifications:YES];
+  [zoomButton setPostsFrameChangedNotifications:YES];
+  
+  windowButtonsInterButtonSpacing_ =
+    NSMinX([miniaturizeButton frame]) - NSMaxX([closeButton frame]);
+  
+  auto center = [NSNotificationCenter defaultCenter];
+  
+  [center addObserver:self
+             selector:@selector(adjustCloseButton:)
+                 name:NSViewFrameDidChangeNotification
+               object:closeButton];
+  
+  [center addObserver:self
+             selector:@selector(adjustMiniaturizeButton:)
+                 name:NSViewFrameDidChangeNotification
+               object:miniaturizeButton];
+  
+  [center addObserver:self
+             selector:@selector(adjustZoomButton:)
+                 name:NSViewFrameDidChangeNotification
+               object:zoomButton];
+
+}
+
+- (void)adjustCloseButton:(NSNotification*)notification {
+  [self adjustButton:[notification object]
+              ofKind:NSWindowCloseButton];
+}
+  
+- (void)adjustMiniaturizeButton:(NSNotification*)notification {
+  [self adjustButton:[notification object]
+              ofKind:NSWindowMiniaturizeButton];
+}
+  
+- (void)adjustZoomButton:(NSNotification*)notification {
+  [self adjustButton:[notification object]
+              ofKind:NSWindowZoomButton];
+}
+  
+- (BOOL)adjustButton:(NSButton*)button
+              ofKind:(NSWindowButton)kind {
+  NSRect buttonFrame = [button frame];
+  NSRect frameViewBounds = [[self frameView] bounds];
+  NSPoint offset = self.windowButtonsOffset;
+
+  buttonFrame.origin = NSMakePoint(
+    offset.x, (NSHeight(frameViewBounds) - NSHeight(buttonFrame) - offset.y));
+  
+  switch (kind) {
+    case NSWindowZoomButton:
+      buttonFrame.origin.x += NSWidth(
+        [[self standardWindowButton:NSWindowMiniaturizeButton] frame]);
+      buttonFrame.origin.x += windowButtonsInterButtonSpacing_;
+      // fallthrough
+    case NSWindowMiniaturizeButton:
+      buttonFrame.origin.x += NSWidth(
+        [[self standardWindowButton:NSWindowCloseButton] frame]);
+      buttonFrame.origin.x += windowButtonsInterButtonSpacing_;
+      // fallthrough
+    default:
+      break;
+  }
+  
+  BOOL didPost = [button postsBoundsChangedNotifications];
+  [button setPostsFrameChangedNotifications:NO];
+  [button setFrame:buttonFrame];
+  [button setPostsFrameChangedNotifications:didPost];
+  BOOL success = CGRectEqualToRect(buttonFrame,  [button frame]);
+  return success;
+}
+  
+- (NSView*)frameView {
+  return [[self contentView] superview];
+}
 @end
 
 @interface AppFramelessNSWindow : AppNSWindow
@@ -285,6 +371,7 @@ NativeAppWindowCocoa::NativeAppWindowCocoa(
     AppWindow* app_window,
     const AppWindow::CreateParams& params)
     : app_window_(app_window),
+      title_bar_style_(NORMAL),
       has_frame_(params.frame == AppWindow::FRAME_CHROME),
       force_enable_drag_region_(params.force_enable_drag_region),
       is_hidden_with_app_(false),
@@ -297,6 +384,13 @@ NativeAppWindowCocoa::NativeAppWindowCocoa(
       active_frame_color_(params.active_frame_color),
       inactive_frame_color_(params.inactive_frame_color) {
   Observe(WebContents());
+  if (params.title_bar_style == "hidden")
+    title_bar_style_ = HIDDEN;
+  else if (!std::strncmp(params.title_bar_style.c_str(), "hidden-inset", 12))
+    title_bar_style_ = HIDDEN_INSET;
+        
+  if(title_bar_style_ != NORMAL)
+    has_frame_ = false;
 
   Class window_class = has_frame_ ?
       [AppNSWindow class] : [AppFramelessNSWindow class];
@@ -368,6 +462,13 @@ NativeAppWindowCocoa::NativeAppWindowCocoa(
       window,
       extensions::ExtensionKeybindingRegistry::PLATFORM_APPS_ONLY,
       NULL));
+
+  if (title_bar_style_ == HIDDEN_INSET) {
+    [this->window() enableWindowButtonsOffset];
+    int x = 0; int y = 0;
+    sscanf(params.title_bar_style.c_str()+13, "%d,%d", &x, &y);
+    [this->window() setWindowButtonsOffset:NSMakePoint(x, y)];
+  }
 }
 
 NSUInteger NativeAppWindowCocoa::GetWindowStyleMask() const {
@@ -405,6 +506,11 @@ void NativeAppWindowCocoa::InstallView() {
     [frameView addSubview:view];
     [FullSizeContentWindow setDisableSymbolication:old];
 
+    UpdateDraggableRegionViews();
+    if (title_bar_style_ != NORMAL) {
+      return;
+    }
+
     [[window() standardWindowButton:NSWindowZoomButton] setHidden:YES];
     [[window() standardWindowButton:NSWindowMiniaturizeButton] setHidden:YES];
     [[window() standardWindowButton:NSWindowCloseButton] setHidden:YES];
@@ -414,7 +520,6 @@ void NativeAppWindowCocoa::InstallView() {
     // prevent them from doing so in a frameless app window.
     [[window() standardWindowButton:NSWindowZoomButton] setEnabled:NO];
 
-    UpdateDraggableRegionViews();
   }
 }
 
@@ -774,6 +879,21 @@ void NativeAppWindowCocoa::WindowWillClose() {
 
 bool NativeAppWindowCocoa::NWCanClose(bool user_force) {
   return app_window_->NWCanClose(user_force);
+}
+
+bool NativeAppWindowCocoa::SetWindowButtonsOffset(int x, int y) {
+  
+  if (title_bar_style_ != HIDDEN_INSET)
+    return false;
+  
+  AppNSWindow* window = this->window();
+
+  if(x >=0 && y>=0)
+    [window setWindowButtonsOffset:NSMakePoint(x, y)];
+
+  return [window adjustButton:[window standardWindowButton:NSWindowCloseButton] ofKind:NSWindowCloseButton] &&
+    [window adjustButton:[window standardWindowButton:NSWindowMiniaturizeButton] ofKind:NSWindowMiniaturizeButton] &&
+    [window adjustButton:[window standardWindowButton:NSWindowZoomButton] ofKind:NSWindowZoomButton];
 }
 
 void NativeAppWindowCocoa::WindowDidBecomeKey() {
