@@ -83,7 +83,7 @@ class NativeAppWindowCocoa : public extensions::NativeAppWindow,
   // Called when the window is about to be closed.
   void WindowWillClose();
 
-  bool NWCanClose(bool user_force = false);
+  bool NWCanClose(bool user_force = false) override;
 
   // Called when the window is focused.
   void WindowDidBecomeKey();
@@ -199,6 +199,8 @@ class NativeAppWindowCocoa : public extensions::NativeAppWindow,
   // Hides the window unconditionally. Used by Hide and HideWithApp.
   void HideWithoutMarkingHidden();
 
+  bool userWillWaitForInProgressDownloads(int downloadCount) const;
+  bool shouldQuitWithInProgressDownloads() const;
 public:
   extensions::AppWindow* app_window_;  // weak - AppWindow owns NativeAppWindow.
 private:
