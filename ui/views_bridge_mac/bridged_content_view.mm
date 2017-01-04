@@ -321,6 +321,11 @@ ui::TextEditCommand GetTextEditCommandForMenuAction(SEL action) {
   [super dealloc];
 }
 
+- (BOOL)mouseDownCanMoveWindow {
+  views::NativeWidgetMac* widget = reinterpret_cast<views::NativeWidgetMac*>(views::Widget::GetWidgetForNativeView(self));
+  return widget->title_bar_style() != views::NativeWidgetMac::NORMAL;
+}
+
 - (void)clearView {
   [self setTextInputClient:nullptr];
   bridge_ = nullptr;
