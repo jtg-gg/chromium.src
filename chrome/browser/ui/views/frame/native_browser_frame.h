@@ -33,6 +33,9 @@ class NativeBrowserFrame {
   // Returns true when the window placement should be stored.
   virtual bool ShouldSaveWindowPlacement() const = 0;
 
+  // Returns true when the function is successfuly executed
+  virtual bool SetWindowButtonsOffset(int x, int y) = 0;
+
   // Retrieves the window placement (show state and bounds) for restoring.
   virtual void GetWindowPlacement(gfx::Rect* bounds,
                                   ui::WindowShowState* show_state) const = 0;
