@@ -9,7 +9,9 @@
 #include "base/mac/mac_util.h"
 #include "base/mac/sdk_forward_declarations.h"
 #include "base/strings/sys_string_conversions.h"
+#include "chrome/browser/apps/app_window_registry_util.h"
 #include "chrome/browser/apps/app_shim/extension_app_shim_handler_mac.h"
+#include "chrome/browser/download/download_core_service.h"
 #include "chrome/browser/profiles/profile.h"
 #import "chrome/browser/ui/cocoa/apps/titlebar_background_view.h"
 #include "chrome/browser/ui/cocoa/browser_window_utils.h"
@@ -17,6 +19,8 @@
 #include "chrome/browser/ui/cocoa/extensions/extension_keybinding_registry_cocoa.h"
 #include "chrome/browser/ui/cocoa/extensions/extension_view_mac.h"
 #include "chrome/common/chrome_switches.h"
+#include "chrome/grit/chromium_strings.h"
+#include "chrome/grit/generated_resources.h"
 #include "content/public/browser/native_web_keyboard_event.h"
 #include "content/public/browser/render_view_host.h"
 #include "content/public/browser/render_widget_host.h"
@@ -25,6 +29,7 @@
 #include "extensions/common/extension.h"
 #include "skia/ext/skia_utils_mac.h"
 #include "third_party/skia/include/core/SkRegion.h"
+#include "ui/base/l10n/l10n_util_mac.h"
 #import "ui/gfx/mac/nswindow_frame_controls.h"
 #include "ui/gfx/skia_util.h"
 
@@ -48,6 +53,8 @@
 // windowWillUseStandardFrame, as the window would not restore back to the
 // desired size.
 
+using content::BrowserContext;
+using content::DownloadManager;
 using extensions::AppWindow;
 using extensions::AppWindowRegistry;
 
@@ -881,8 +888,63 @@ void NativeAppWindowCocoa::WindowWillClose() {
   app_window_->OnNativeClose();
 }
 
+// Helper function for populating and displaying the in progress downloads at
+// exit alert panel.
+bool NativeAppWindowCocoa::userWillWaitForInProgressDownloads(int downloadCount) const {
+  NSString* titleText = nil;
+  NSString* explanationText = nil;
+  NSString* waitTitle = nil;
+  NSString* exitTitle = nil;
+  
+  // Set the dialog text based on whether or not there are multiple downloads.
+  // Dialog text: warning and explanation.
+  titleText = l10n_util::GetPluralNSStringF(
+      IDS_ABANDON_DOWNLOAD_DIALOG_TITLE, downloadCount);
+  explanationText = l10n_util::GetPluralNSStringF(
+      IDS_ABANDON_DOWNLOAD_DIALOG_BROWSER_MESSAGE, downloadCount);
+  // Cancel download and exit button text.
+  exitTitle = l10n_util::GetPluralNSStringF(
+      IDS_ABANDON_DOWNLOAD_DIALOG_EXIT_BUTTON, downloadCount);
+  
+  // Wait for download button text.
+  waitTitle = l10n_util::GetPluralNSStringF(
+      IDS_ABANDON_DOWNLOAD_DIALOG_CONTINUE_BUTTON, downloadCount);
+  
+  // 'waitButton' is the default choice.
+  int choice = NSRunAlertPanel(titleText, @"%@",
+      waitTitle, exitTitle, nil, explanationText);
+  
+  return choice == NSAlertDefaultReturn ? YES : NO;
+}
+
+// Check all profiles for in progress downloads, and if we find any, prompt the
+// user to see if we should continue to exit (and thus cancel the downloads), or
+// if we should wait.
+bool NativeAppWindowCocoa::shouldQuitWithInProgressDownloads() const {
+  if(AppWindowRegistryUtil::GetAppNativeWindowList().size() > 1) {
+    return true;
+  }
+
+  int total_download_count =
+    DownloadCoreService::NonMaliciousDownloadCountAllProfiles();
+
+  if (total_download_count > 0) {
+    if (userWillWaitForInProgressDownloads(total_download_count)) {
+      return false;
+    }
+    
+    // User wants to exit.
+    return true;
+  }
+  
+  // No profiles or active downloads found, okay to exit.
+  return true;
+}
+
 bool NativeAppWindowCocoa::NWCanClose(bool user_force) {
-  return app_window_->NWCanClose(user_force);
+  if (shouldQuitWithInProgressDownloads())
+    return app_window_->NWCanClose(user_force);
+  return false;
 }
 
 bool NativeAppWindowCocoa::Adjust_Hidden_Inset_Buttons() {
