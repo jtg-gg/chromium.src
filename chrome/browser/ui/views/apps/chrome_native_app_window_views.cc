@@ -121,7 +121,7 @@ void ChromeNativeAppWindowViews::OnBeforeWidgetInit(
     views::Widget* widget) {
 }
 
-bool ChromeNativeAppWindowViews::NWCanClose(bool user_force) const {
+bool ChromeNativeAppWindowViews::NWCanClose(bool user_force) {
   return app_window()->NWCanClose(user_force);
 }
 
