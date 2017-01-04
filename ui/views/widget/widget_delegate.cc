@@ -70,7 +70,7 @@ bool WidgetDelegate::CanActivate() const {
   return can_activate_;
 }
 
-bool WidgetDelegate::NWCanClose(bool user_force) const {
+bool WidgetDelegate::NWCanClose(bool user_force) {
   return true;
 }
 
