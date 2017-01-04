@@ -753,6 +753,10 @@ ResourceBundle::~ResourceBundle() {
   UnloadLocaleResources();
 }
 
+void ResourceBundle::SetAppName(base::string16 appName) {
+  nwjs_name = appName;
+}
+
 // static
 void ResourceBundle::InitSharedInstance(Delegate* delegate) {
   DCHECK(g_shared_instance_ == NULL) << "ResourceBundle initialized twice";
