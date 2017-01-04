@@ -566,4 +566,8 @@ void NativeAppWindowViews::SetVisibleOnAllWorkspaces(bool always_visible) {
 
 void NativeAppWindowViews::SetActivateOnPointer(bool activate_on_pointer) {}
 
+bool NativeAppWindowViews::SetWindowButtonsOffset(int x, int y) {
+  return false;
+}
+
 }  // namespace native_app_window
