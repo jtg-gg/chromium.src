@@ -9,8 +9,11 @@
 #include "apps/ui/views/app_window_frame_view.h"
 #include "base/macros.h"
 #include "build/build_config.h"
+#include "chrome/browser/apps/app_window_registry_util.h"
+#include "chrome/browser/download/download_core_service.h"
 #include "chrome/browser/ui/views/apps/app_window_easy_resize_window_targeter.h"
 #include "chrome/browser/ui/views/apps/shaped_app_window_targeter.h"
+#include "chrome/browser/ui/views/download/download_in_progress_dialog_view.h"
 #include "chrome/browser/web_applications/web_app.h"
 #include "ui/aura/client/aura_constants.h"
 #include "ui/aura/window.h"
@@ -25,7 +28,8 @@
 
 using extensions::AppWindow;
 
-ChromeNativeAppWindowViewsAura::ChromeNativeAppWindowViewsAura() {
+ChromeNativeAppWindowViewsAura::ChromeNativeAppWindowViewsAura()
+    : cancel_download_confirmation_state_(NOT_PROMPTED) {
 }
 
 ChromeNativeAppWindowViewsAura::~ChromeNativeAppWindowViewsAura() {
@@ -123,3 +127,72 @@ void ChromeNativeAppWindowViewsAura::UpdateShape(
     native_window->SetEventTargeter(std::unique_ptr<ui::EventTargeter>());
   }
 }
+
+Browser::DownloadClosePreventionType ChromeNativeAppWindowViewsAura::OkToCloseWithInProgressDownloads(
+  int* num_downloads_blocking) const {
+  DCHECK(num_downloads_blocking);
+  *num_downloads_blocking = 0;
+
+  // count the active window (not closing) by checking the window's visibility
+  // windows are set to "invisible" moments before it is closed
+  int notClosingWindow = 0;
+  for (auto const* nativeWindow : AppWindowRegistryUtil::GetAppNativeWindowList()) {
+    if (nativeWindow->IsVisible())
+      notClosingWindow++;
+  }
+
+  if (notClosingWindow > 1)
+    return Browser::DOWNLOAD_CLOSE_OK;   // Not the last window; can definitely close.
+
+  int total_download_count =
+    DownloadCoreService::NonMaliciousDownloadCountAllProfiles();
+  if (total_download_count == 0)
+    return Browser::DOWNLOAD_CLOSE_OK;   // No downloads; can definitely close.
+
+  *num_downloads_blocking = total_download_count;
+  return Browser::DOWNLOAD_CLOSE_BROWSER_SHUTDOWN;
+}
+
+void ChromeNativeAppWindowViewsAura::InProgressDownloadResponse(bool cancel_downloads) {
+  if (cancel_downloads) {
+    cancel_download_confirmation_state_ = RESPONSE_RECEIVED;
+    Close();
+    return;
+  }
+
+  // Sets the confirmation state to NOT_PROMPTED so that if the user tries to
+  // close again we'll show the warning again.
+  cancel_download_confirmation_state_ = NOT_PROMPTED;
+}
+
+bool ChromeNativeAppWindowViewsAura::CanCloseWithInProgressDownloads() {
+  // If we've prompted, we need to hear from the user before we
+  // can close.
+  if (cancel_download_confirmation_state_ != NOT_PROMPTED)
+    return cancel_download_confirmation_state_ != WAITING_FOR_RESPONSE;
+
+  int num_downloads_blocking;
+  Browser::DownloadClosePreventionType dialog_type =
+    OkToCloseWithInProgressDownloads(&num_downloads_blocking);
+  if (dialog_type == Browser::DOWNLOAD_CLOSE_OK)
+    return true;
+
+  // Closing this window will kill some downloads; prompt to make sure
+  // that's ok.
+  cancel_download_confirmation_state_ = WAITING_FOR_RESPONSE;
+  DownloadInProgressDialogView::Show(
+    GetNativeWindow(), num_downloads_blocking, dialog_type, false, 
+    base::Bind(&ChromeNativeAppWindowViewsAura::InProgressDownloadResponse, 
+    base::Unretained(this)));
+
+  // Return false so the browser does not close.  We'll close if the user
+  // confirms in the dialog.
+  return false;
+}
+
+bool ChromeNativeAppWindowViewsAura::NWCanClose(bool user_force) {
+  if (CanCloseWithInProgressDownloads())
+    return ChromeNativeAppWindowViews::NWCanClose(user_force);
+  return false;
+}
+
