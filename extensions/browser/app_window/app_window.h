@@ -219,6 +219,8 @@ class AppWindow : public content::WebContentsDelegate,
     std::string title;
     
     bool force_enable_drag_region;
+    
+    std::string title_bar_style;
 
     std::string inject_js_start, inject_js_end;
 
