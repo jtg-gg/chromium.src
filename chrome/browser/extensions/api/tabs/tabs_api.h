@@ -64,6 +64,11 @@ class WindowsGetAllFunction : public UIThreadExtensionFunction {
   ResponseAction Run() override;
   DECLARE_EXTENSION_FUNCTION("windows.getAll", WINDOWS_GETALL)
 };
+class WindowsSetWindowButtonsOffsetFunction : public UIThreadExtensionFunction {
+  ~WindowsSetWindowButtonsOffsetFunction() override {}
+  ResponseAction Run() override;
+  DECLARE_EXTENSION_FUNCTION("windows.setWindowButtonsOffset", UNKNOWN)
+};
 class WindowsCreateFunction : public UIThreadExtensionFunction {
   ~WindowsCreateFunction() override {}
   ResponseAction Run() override;
