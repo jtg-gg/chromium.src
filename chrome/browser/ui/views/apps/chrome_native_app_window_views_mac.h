@@ -56,12 +56,18 @@ class ChromeNativeAppWindowViewsMac : public ChromeNativeAppWindowViews {
   // differentiate the reason a window was hidden.
   void ShowWithApp() override;
   void HideWithApp() override;
+  
+  bool NWCanClose(bool user_force = false) override;
 
  private:
   // Adjust buttons according to window_buttons_offset_
   bool Adjust_Hidden_Inset_Buttons();
   TitleBarStyle title_bar_style() const;
   void title_bar_style(TitleBarStyle style);
+
+  // Handle download on closing
+  bool userWillWaitForInProgressDownloads(int downloadCount) const;
+  bool shouldQuitWithInProgressDownloads() const;
 
   // Unset is_hidden_with_app_ and tell the shim to unhide.
   void UnhideWithoutActivation();
