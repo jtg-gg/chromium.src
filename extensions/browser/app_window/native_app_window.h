@@ -97,6 +97,7 @@ class NativeAppWindow : public ui::BaseWindow,
   // Returns false if the underlying native window ignores alpha transparency
   // when compositing.
   virtual bool CanHaveAlphaEnabled() const = 0;
+  virtual bool SetWindowButtonsOffset(int x, int y) = 0;
 
   ~NativeAppWindow() override {}
 };
