@@ -2536,8 +2536,8 @@ void Browser::SyncHistoryWithTabs(int index) {
 bool Browser::CanCloseWithInProgressDownloads() {
 #if defined(OS_MACOSX)
   // On Mac, non-incognito download can still continue after window is closed.
-  if (!profile_->IsOffTheRecord())
-    return true;
+  //if (!profile_->IsOffTheRecord())
+  //  return true;
 #endif
 
   // If we've prompted, we need to hear from the user before we
@@ -2578,7 +2578,7 @@ void Browser::InProgressDownloadResponse(bool cancel_downloads) {
 
   // Show the download page so the user can figure-out what downloads are still
   // in-progress.
-  chrome::ShowDownloads(this);
+  //chrome::ShowDownloads(this);
 
   std::move(warn_before_closing_callback_)
       .Run(WarnBeforeClosingResult::kDoNotClose);
