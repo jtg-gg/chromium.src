@@ -9,8 +9,13 @@
 #import "base/mac/scoped_nsobject.h"
 #import "base/mac/sdk_forward_declarations.h"
 #include "chrome/browser/apps/app_shim/extension_app_shim_handler_mac.h"
+#include "chrome/browser/apps/platform_apps/app_window_registry_util.h"
+#include "chrome/browser/download/download_core_service.h"
 #import "chrome/browser/ui/views/apps/app_window_native_widget_mac.h"
 #import "chrome/browser/ui/views/apps/native_app_window_frame_view_mac.h"
+#include "chrome/grit/chromium_strings.h"
+#include "chrome/grit/generated_resources.h"
+#include "ui/base/l10n/l10n_util_mac.h"
 #import "ui/gfx/mac/coordinate_conversion.h"
 #import "ui/views/cocoa/native_widget_mac_nswindow.h"
 
@@ -288,4 +293,67 @@ bool ChromeNativeAppWindowViewsMac::SetWindowButtonsOffset(int x, int y) {
     [window setWindowButtonsOffset:window_buttons_offset_];
   }
   return Adjust_Hidden_Inset_Buttons();
+}
+
+bool ChromeNativeAppWindowViewsMac::userWillWaitForInProgressDownloads(int downloadCount) const {
+  NSString* titleText = nil;
+  NSString* explanationText = nil;
+  NSString* waitTitle = nil;
+  NSString* exitTitle = nil;
+  
+  // Set the dialog text based on whether or not there are multiple downloads.
+  // Dialog text: warning and explanation.
+  titleText = l10n_util::GetPluralNSStringF(
+      IDS_ABANDON_DOWNLOAD_DIALOG_TITLE, downloadCount);
+  explanationText = l10n_util::GetPluralNSStringF(
+      IDS_ABANDON_DOWNLOAD_DIALOG_BROWSER_MESSAGE, downloadCount);
+  // Cancel download and exit button text.
+  exitTitle = l10n_util::GetPluralNSStringF(
+      IDS_ABANDON_DOWNLOAD_DIALOG_EXIT_BUTTON, downloadCount);
+  
+  // Wait for download button text.
+  waitTitle = l10n_util::GetPluralNSStringF(
+      IDS_ABANDON_DOWNLOAD_DIALOG_CONTINUE_BUTTON, downloadCount);
+  
+  // 'waitButton' is the default choice.
+  int choice = NSRunAlertPanel(titleText, @"%@",
+      waitTitle, exitTitle, nil, explanationText);
+  
+  return choice == NSAlertDefaultReturn ? YES : NO;
+}
+
+// Check all profiles for in progress downloads, and if we find any, prompt the
+// user to see if we should continue to exit (and thus cancel the downloads), or
+// if we should wait.
+bool ChromeNativeAppWindowViewsMac::shouldQuitWithInProgressDownloads() const {
+  // count the active window (not closing) by checking the window's visibility
+  // windows are set to "invisible" moments before it is closed
+  int notClosingWindow = 0;
+  for (auto const* nswindow : AppWindowRegistryUtil::GetAppNativeWindowList()) {
+    if (nswindow.visible)
+      notClosingWindow++;
+  }
+  if (notClosingWindow > 1)
+    return true;   // Not the last window; can definitely close.
+  
+  static bool cancel_download_prompt = false;
+  int total_download_count = DownloadCoreService::NonMaliciousDownloadCountAllProfiles();
+  if (total_download_count > 0 && !cancel_download_prompt) {
+    cancel_download_prompt = true;
+    if (userWillWaitForInProgressDownloads(total_download_count)) {
+      cancel_download_prompt = false;
+      return false;
+    }
+    // User wants to exit, keep cancel_download_prompt to true, so we won't ask the user again
+    return true;
+  }
+  
+  // No profiles or active downloads found, okay to exit.
+  return true;
+}
+
+bool ChromeNativeAppWindowViewsMac::NWCanClose(bool user_force) {
+  if (shouldQuitWithInProgressDownloads())
+    return ChromeNativeAppWindowViews::NWCanClose(user_force);
+  return false;
 }

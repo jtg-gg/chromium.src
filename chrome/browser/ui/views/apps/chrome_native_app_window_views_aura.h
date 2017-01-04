@@ -10,6 +10,7 @@
 #include "base/gtest_prod_util.h"
 #include "base/macros.h"
 #include "build/build_config.h"
+#include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/views/apps/chrome_native_app_window_views.h"
 
 // Aura-specific parts of ChromeNativeAppWindowViews. This is used directly on
@@ -37,8 +38,21 @@ class ChromeNativeAppWindowViewsAura : public ChromeNativeAppWindowViews {
 
   // NativeAppWindow implementation.
   void UpdateShape(std::unique_ptr<ShapeRects> rects) override;
+  bool NWCanClose(bool user_force = false) override;
 
  private:
+   enum CancelDownloadConfirmationState {
+     NOT_PROMPTED,          // We have not asked the user.
+     WAITING_FOR_RESPONSE,  // We have asked the user and have not received a
+     // reponse yet.
+     RESPONSE_RECEIVED      // The user was prompted and made a decision already.
+   };
+   CancelDownloadConfirmationState cancel_download_confirmation_state_;
+
+   bool CanCloseWithInProgressDownloads();
+   Browser::DownloadClosePreventionType OkToCloseWithInProgressDownloads(int* num_downloads_blocking) const;
+   void InProgressDownloadResponse(bool cancel_downloads);
+
   FRIEND_TEST_ALL_PREFIXES(ShapedAppWindowTargeterTest,
                            ResizeInsetsWithinBounds);
 
