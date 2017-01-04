@@ -10,6 +10,7 @@
 #include <wrl/client.h>
 
 #include "base/logging.h"
+#include "chrome/browser/apps/app_window_registry_util.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_list.h"
 #include "chrome/browser/ui/browser_window.h"
@@ -40,6 +41,17 @@ void UpdateTaskbarProgressBar(int download_count,
     if (!window)
       continue;
     HWND frame = views::HWNDForNativeWindow(window->GetNativeWindow());
+    if (download_count == 0 || progress == 1.0f)
+      taskbar->SetProgressState(frame, TBPF_NOPROGRESS);
+    else if (!progress_known)
+      taskbar->SetProgressState(frame, TBPF_INDETERMINATE);
+    else
+      taskbar->SetProgressValue(frame, static_cast<int>(progress * 100), 100);
+  }
+
+  const AppWindowRegistryUtil::NativeWindowList& nativeWindowList = AppWindowRegistryUtil::GetAppNativeWindowList();
+  for (auto* nativeWindow : nativeWindowList) {
+    HWND frame = views::HWNDForNativeWindow(nativeWindow);
     if (download_count == 0 || progress == 1.0f)
       taskbar->SetProgressState(frame, TBPF_NOPROGRESS);
     else if (!progress_known)
