@@ -324,6 +324,12 @@ void AppWindow::Init(const GURL& url,
   if (!js_doc_start.empty() || !js_doc_end.empty())
     web_contents()->GetRenderViewHost()->SyncRendererPrefs();
 
+  {
+    base::string16 name = base::UTF8ToUTF16(package->GetName());
+    package->root()->GetString("appName", &name);
+    ResourceBundle::SetAppName(name);
+  }
+
   initial_url_ = url;
 
   content::WebContentsObserver::Observe(web_contents());
