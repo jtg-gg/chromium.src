@@ -219,5 +219,5 @@ void DownloadUIController::OnDownloadUpdated(content::DownloadManager* manager,
     return;
 
   DownloadItemModel(item).SetWasUINotified(true);
-  delegate_->OnNewDownloadReady(item);
+  //delegate_->OnNewDownloadReady(item);
 }
