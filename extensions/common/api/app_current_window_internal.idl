@@ -53,6 +53,7 @@ namespace app.currentWindowInternal {
     static void setAlwaysOnTop(boolean always_on_top);
     static void setVisibleOnAllWorkspaces(boolean always_visible);
     static void setActivateOnPointer(boolean activate_on_pointer);
+    [allowAmbiguousOptionalArguments] static void setWindowButtonsOffset(optional long x, optional long y);
   };
 
   interface Events {
