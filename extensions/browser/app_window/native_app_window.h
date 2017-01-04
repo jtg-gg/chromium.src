@@ -98,6 +98,7 @@ class NativeAppWindow : public ui::BaseWindow,
   // when compositing.
   virtual bool CanHaveAlphaEnabled() const = 0;
   virtual bool SetWindowButtonsOffset(int x, int y) = 0;
+  virtual bool NWCanClose(bool user_force) = 0;
 
   ~NativeAppWindow() override {}
 };
