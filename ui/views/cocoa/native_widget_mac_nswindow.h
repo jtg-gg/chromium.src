@@ -34,6 +34,11 @@ VIEWS_EXPORT
 VIEWS_EXPORT
 @interface NativeWidgetMacNSWindow : NSWindow<CommandDispatchingWindow>
 
+@property NSPoint windowButtonsOffset;
+- (void)enableWindowButtonsOffset;
+- (BOOL)adjustButton:(NSButton*)button
+              ofKind:(NSWindowButton)kind;
+
 // Set a CommandDispatcherDelegate, i.e. to implement key event handling.
 - (void)setCommandDispatcherDelegate:(id<CommandDispatcherDelegate>)delegate;
 

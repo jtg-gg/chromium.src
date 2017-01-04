@@ -155,6 +155,7 @@ class NativeAppWindowViews : public extensions::NativeAppWindow,
   bool CanHaveAlphaEnabled() const override;
   void SetVisibleOnAllWorkspaces(bool always_visible) override;
   void SetActivateOnPointer(bool activate_on_pointer) override;
+  bool SetWindowButtonsOffset(int x, int y) override;
   void SetShowInTaskbar(bool show) override;
 
   // web_modal::WebContentsModalDialogHost implementation.

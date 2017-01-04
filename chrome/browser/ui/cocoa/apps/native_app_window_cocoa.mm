@@ -153,9 +153,19 @@ std::vector<gfx::Rect> CalculateNonDraggableRegions(
     appWindow_->WindowDidFinishResize();
 }
 
+- (void)windowWillEnterFullScreen:(NSNotification *)notification {
+  if(appWindow_)
+    appWindow_->WindowWillEnterFullscreen();
+}
+
 - (void)windowDidEnterFullScreen:(NSNotification*)notification {
   if (appWindow_)
     appWindow_->WindowDidEnterFullscreen();
+}
+
+- (void)windowWillExitFullScreen:(NSNotification *)notification {
+  if (appWindow_)
+    appWindow_->WindowWillExitFullscreen();
 }
 
 - (void)windowDidExitFullScreen:(NSNotification*)notification {
@@ -219,17 +229,60 @@ std::vector<gfx::Rect> CalculateNonDraggableRegions(
 
 @end
 
-@interface AppNSWindow : ChromeEventProcessingWindow
+@interface AppNSWindow : ChromeEventProcessingWindow {
+  @private
+   CGFloat windowButtonsInterButtonSpacing_;
+}
+@property NSPoint windowButtonsOffset;
+- (void)enableWindowButtonsOffset;
 @end
 
 @implementation AppNSWindow
-
+  @synthesize windowButtonsOffset;
 // Similar to ChromeBrowserWindow, don't draw the title, but allow it to be seen
 // in menus, Expose, etc.
 - (BOOL)_isTitleHidden {
   return NO;
 }
 
+- (void)enableWindowButtonsOffset {
+  auto closeButton = [self standardWindowButton:NSWindowCloseButton];
+  auto miniaturizeButton = [self standardWindowButton:NSWindowMiniaturizeButton];
+  windowButtonsInterButtonSpacing_ =
+    NSMinX([miniaturizeButton frame]) - NSMaxX([closeButton frame]);
+}
+
+- (BOOL)adjustButton:(NSButton*)button
+              ofKind:(NSWindowButton)kind {
+  NSRect buttonFrame = [button frame];
+  NSPoint offset = self.windowButtonsOffset;
+  NSRect frameViewBounds = [[button superview] bounds];
+  buttonFrame.origin = NSMakePoint(
+    offset.x, (NSHeight(frameViewBounds) - NSHeight(buttonFrame) - offset.y));
+  
+  switch (kind) {
+    case NSWindowZoomButton:
+      buttonFrame.origin.x += NSWidth(
+        [[self standardWindowButton:NSWindowMiniaturizeButton] frame]);
+      buttonFrame.origin.x += windowButtonsInterButtonSpacing_;
+      FALLTHROUGH;
+    case NSWindowMiniaturizeButton:
+      buttonFrame.origin.x += NSWidth(
+        [[self standardWindowButton:NSWindowCloseButton] frame]);
+      buttonFrame.origin.x += windowButtonsInterButtonSpacing_;
+      FALLTHROUGH;
+    default:
+      break;
+  }
+  
+  [button setFrame:buttonFrame];
+  BOOL success = CGRectEqualToRect(buttonFrame,  [button frame]);
+  return success;
+}
+  
+- (NSView*)frameView {
+  return [[self contentView] superview];
+}
 @end
 
 @interface AppFramelessNSWindow : AppNSWindow
@@ -284,6 +337,7 @@ NativeAppWindowCocoa::NativeAppWindowCocoa(
     AppWindow* app_window,
     const AppWindow::CreateParams& params)
     : app_window_(app_window),
+      title_bar_style_(NORMAL),
       has_frame_(params.frame == AppWindow::FRAME_CHROME),
       force_enable_drag_region_(params.force_enable_drag_region),
       is_hidden_with_app_(false),
@@ -296,6 +350,13 @@ NativeAppWindowCocoa::NativeAppWindowCocoa(
       active_frame_color_(params.active_frame_color),
       inactive_frame_color_(params.inactive_frame_color) {
   Observe(WebContents());
+  if (params.title_bar_style == "hidden")
+    title_bar_style_ = HIDDEN;
+  else if (!std::strncmp(params.title_bar_style.c_str(), "hidden-inset", 12))
+    title_bar_style_ = HIDDEN_INSET;
+        
+  if(title_bar_style_ != NORMAL)
+    has_frame_ = false;
 
   Class window_class = has_frame_ ?
       [AppNSWindow class] : [AppFramelessNSWindow class];
@@ -368,6 +429,19 @@ NativeAppWindowCocoa::NativeAppWindowCocoa(
       window,
       extensions::ExtensionKeybindingRegistry::PLATFORM_APPS_ONLY,
       NULL));
+
+  if (title_bar_style_ == HIDDEN_INSET) {
+    if (@available(macos 10.10, *))
+      [window setTitlebarAppearsTransparent:YES];
+    base::scoped_nsobject<NSToolbar> toolbar(
+        [[NSToolbar alloc] initWithIdentifier:@"titlebarStylingToolbar"]);
+    [toolbar setShowsBaselineSeparator:NO];
+    [window setToolbar:toolbar];
+    [this->window() enableWindowButtonsOffset];
+    int x = 0; int y = 0;
+    sscanf(params.title_bar_style.c_str()+13, "%d,%d", &x, &y);
+    [this->window() setWindowButtonsOffset:NSMakePoint(x, y)];
+  }
 }
 
 NSUInteger NativeAppWindowCocoa::GetWindowStyleMask() const {
@@ -376,6 +450,11 @@ NSUInteger NativeAppWindowCocoa::GetWindowStyleMask() const {
                           NSTexturedBackgroundWindowMask;
   if (shows_resize_controls_)
     style_mask |= NSResizableWindowMask;
+  if (title_bar_style_ == HIDDEN_INSET) {
+    //this flag does not works with clickthrough transparency
+    if (@available(macos 10.10, *))
+      style_mask |= NSFullSizeContentViewWindowMask;
+  }
   return style_mask;
 }
 
@@ -401,7 +480,16 @@ void NativeAppWindowCocoa::InstallView() {
 
     NSView* frameView = [[window() contentView] superview];
     [view setFrame:[frameView bounds]];
-    [frameView addSubview:view];
+    if (title_bar_style_ == HIDDEN_INSET) {
+      [frameView addSubview:view positioned:NSWindowBelow relativeTo:nil];
+    } else {
+      [frameView addSubview:view];
+    }
+
+    UpdateDraggableRegionViews();
+    if (title_bar_style_ != NORMAL) {
+      return;
+    }
 
     [[window() standardWindowButton:NSWindowZoomButton] setHidden:YES];
     [[window() standardWindowButton:NSWindowMiniaturizeButton] setHidden:YES];
@@ -412,7 +500,6 @@ void NativeAppWindowCocoa::InstallView() {
     // prevent them from doing so in a frameless app window.
     [[window() standardWindowButton:NSWindowZoomButton] setEnabled:NO];
 
-    UpdateDraggableRegionViews();
   }
 }
 
@@ -533,6 +620,7 @@ void NativeAppWindowCocoa::Show() {
 
   [window() makeKeyAndOrderFront:nil];
   [NSApp activateIgnoringOtherApps:YES];
+  Adjust_Hidden_Inset_Buttons();
 }
 
 void NativeAppWindowCocoa::ShowInactive() {
@@ -797,6 +885,30 @@ bool NativeAppWindowCocoa::NWCanClose(bool user_force) {
   return app_window_->NWCanClose(user_force);
 }
 
+bool NativeAppWindowCocoa::Adjust_Hidden_Inset_Buttons() {
+  if (title_bar_style_ != HIDDEN_INSET)
+    return false;
+    
+  AppNSWindow* window = this->window();
+  [window setToolbar:window.toolbar];
+  return [window adjustButton:[window standardWindowButton:NSWindowCloseButton] ofKind:NSWindowCloseButton] &&
+    [window adjustButton:[window standardWindowButton:NSWindowMiniaturizeButton] ofKind:NSWindowMiniaturizeButton] &&
+    [window adjustButton:[window standardWindowButton:NSWindowZoomButton] ofKind:NSWindowZoomButton];
+}
+
+bool NativeAppWindowCocoa::SetWindowButtonsOffset(int x, int y) {
+  
+  if (title_bar_style_ != HIDDEN_INSET)
+    return false;
+  
+  AppNSWindow* window = this->window();
+
+  if(x >=0 && y>=0)
+    [window setWindowButtonsOffset:NSMakePoint(x, y)];
+
+  return Adjust_Hidden_Inset_Buttons();
+}
+
 void NativeAppWindowCocoa::WindowDidBecomeKey() {
   app_window_->OnNativeWindowActivated();
 
@@ -832,6 +944,7 @@ void NativeAppWindowCocoa::WindowDidFinishResize() {
 void NativeAppWindowCocoa::WindowDidResize() {
   app_window_->OnNativeWindowChanged();
   UpdateDraggableRegionViews();
+  Adjust_Hidden_Inset_Buttons();
 }
 
 void NativeAppWindowCocoa::WindowDidMove() {
@@ -847,10 +960,26 @@ void NativeAppWindowCocoa::WindowDidDeminiaturize() {
   app_window_->OnNativeWindowChanged();
 }
 
+void NativeAppWindowCocoa::WindowWillEnterFullscreen() {
+  if (title_bar_style_ == HIDDEN_INSET) {
+    [window() setToolbar:nil];
+  }
+}
+
 void NativeAppWindowCocoa::WindowDidEnterFullscreen() {
   is_maximized_ = false;
   is_fullscreen_ = true;
   app_window_->OnNativeWindowChanged();
+}
+
+void NativeAppWindowCocoa::WindowWillExitFullscreen() {
+  if (title_bar_style_ == HIDDEN_INSET) {
+    base::scoped_nsobject<NSToolbar> toolbar(
+      [[NSToolbar alloc] initWithIdentifier:@"titlebarStylingToolbar"]);
+    [toolbar setShowsBaselineSeparator:NO];
+    AppNSWindow* window = this->window();
+    [window setToolbar:toolbar];
+  }
 }
 
 void NativeAppWindowCocoa::WindowDidExitFullscreen() {
@@ -861,6 +990,7 @@ void NativeAppWindowCocoa::WindowDidExitFullscreen() {
   WindowDidFinishResize();
 
   app_window_->OnNativeWindowChanged();
+  Adjust_Hidden_Inset_Buttons();
 }
 
 void NativeAppWindowCocoa::WindowWillZoom() {

@@ -34,6 +34,7 @@ namespace SetVisibleOnAllWorkspaces =
     app_current_window_internal::SetVisibleOnAllWorkspaces;
 namespace SetActivateOnPointer =
     app_current_window_internal::SetActivateOnPointer;
+namespace SetWindowButtonsOffset = app_current_window_internal::SetWindowButtonsOffset;
 
 using app_current_window_internal::Bounds;
 using app_current_window_internal::Region;
@@ -393,6 +394,19 @@ AppCurrentWindowInternalSetActivateOnPointerFunction::Run() {
   CHECK(params.get());
   window()->GetBaseWindow()->SetActivateOnPointer(params->activate_on_pointer);
   return RespondNow(NoArguments());
+}
+
+ExtensionFunction::ResponseAction
+AppCurrentWindowInternalSetWindowButtonsOffsetFunction::Run() {
+  std::unique_ptr<SetWindowButtonsOffset::Params> params(
+      SetWindowButtonsOffset::Params::Create(*args_));
+  CHECK(params.get());
+  const int x = params->x ? *params->x : -1;
+  const int y = params->y ? *params->y : -1;
+  if(window()->GetBaseWindow()->SetWindowButtonsOffset(x, y))
+    return RespondNow(NoArguments());
+
+  return RespondNow(Error("return false"));
 }
 
 }  // namespace extensions

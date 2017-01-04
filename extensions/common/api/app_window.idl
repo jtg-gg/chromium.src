@@ -308,6 +308,7 @@ namespace app.window {
     boolean? show_in_taskbar;
     boolean? new_instance;
     boolean? force_enable_drag_region;
+    DOMString? title_bar_style;
     DOMString? inject_js_start;
     DOMString? inject_js_end;
   };

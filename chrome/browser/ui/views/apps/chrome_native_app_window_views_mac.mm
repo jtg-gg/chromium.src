@@ -12,6 +12,7 @@
 #import "chrome/browser/ui/views/apps/app_window_native_widget_mac.h"
 #import "chrome/browser/ui/views/apps/native_app_window_frame_view_mac.h"
 #import "ui/gfx/mac/coordinate_conversion.h"
+#import "ui/views/cocoa/native_widget_mac_nswindow.h"
 
 // This observer is used to get NSWindow notifications. We need to monitor
 // zoom and full screen events to store the correct bounds to Restore() to.
@@ -50,6 +51,18 @@
                name:NSWindowDidExitFullScreenNotification
              object:static_cast<ui::BaseWindow*>(nativeAppWindow)
                         ->GetNativeWindow()];
+    [[NSNotificationCenter defaultCenter]
+        addObserver:self
+           selector:@selector(onWindowDidResize:)
+               name:NSWindowDidResizeNotification
+             object:static_cast<ui::BaseWindow*>(nativeAppWindow)
+                        ->GetNativeWindow()];
+    [[NSNotificationCenter defaultCenter]
+        addObserver:self
+           selector:@selector(onWindowWillEnterFullScreen:)
+               name:NSWindowWillEnterFullScreenNotification
+             object:static_cast<ui::BaseWindow*>(nativeAppWindow)
+                        ->GetNativeWindow()];
   }
   return self;
 }
@@ -64,6 +77,14 @@
 
 - (void)onWindowDidExitFullScreen:(NSNotification*)notification {
   nativeAppWindow_->OnWindowDidExitFullScreen();
+}
+
+- (void)onWindowDidResize:(NSNotification*)notification {
+  nativeAppWindow_->OnWindowDidResize();
+}
+
+- (void)onWindowWillEnterFullScreen:(NSNotification*)notification {
+  nativeAppWindow_->OnWindowWillEnterFullScreen();
 }
 
 - (void)stopObserving {
@@ -101,10 +122,26 @@ void ChromeNativeAppWindowViewsMac::OnWindowWillStartLiveResize() {
 
 void ChromeNativeAppWindowViewsMac::OnWindowWillExitFullScreen() {
   in_fullscreen_transition_ = true;
+  if (title_bar_style_ == HIDDEN_INSET) {
+    base::scoped_nsobject<NSToolbar> toolbar(
+      [[NSToolbar alloc] initWithIdentifier:@"titlebarStylingToolbar"]);
+    [toolbar setShowsBaselineSeparator:NO];
+    [GetNativeWindow() setToolbar:toolbar];
+  }
 }
 
 void ChromeNativeAppWindowViewsMac::OnWindowDidExitFullScreen() {
   in_fullscreen_transition_ = false;
+}
+
+void ChromeNativeAppWindowViewsMac::OnWindowWillEnterFullScreen() {
+  if (title_bar_style_ == HIDDEN_INSET) {
+    [GetNativeWindow() setToolbar:nil];
+  }
+}
+
+void ChromeNativeAppWindowViewsMac::OnWindowDidResize() {
+  Adjust_Hidden_Inset_Buttons();
 }
 
 void ChromeNativeAppWindowViewsMac::OnBeforeWidgetInit(
@@ -113,6 +150,14 @@ void ChromeNativeAppWindowViewsMac::OnBeforeWidgetInit(
     views::Widget* widget) {
   DCHECK(!init_params->native_widget);
   init_params->remove_standard_frame = IsFrameless();
+
+  if (create_params.title_bar_style == "hidden")
+    title_bar_style_ = HIDDEN;
+  else if (!std::strncmp(create_params.title_bar_style.c_str(), "hidden-inset", 12)) {
+    title_bar_style_ = HIDDEN_INSET;
+    sscanf(create_params.title_bar_style.c_str()+13, "%lf,%lf", &window_buttons_offset_.x, &window_buttons_offset_.y);
+  }
+
   init_params->native_widget = new AppWindowNativeWidgetMac(widget, this);
   ChromeNativeAppWindowViews::OnBeforeWidgetInit(create_params, init_params,
                                                  widget);
@@ -143,6 +188,7 @@ gfx::Rect ChromeNativeAppWindowViewsMac::GetRestoredBounds() const {
 void ChromeNativeAppWindowViewsMac::Show() {
   UnhideWithoutActivation();
   ChromeNativeAppWindowViews::Show();
+  Adjust_Hidden_Inset_Buttons();
 }
 
 void ChromeNativeAppWindowViewsMac::ShowInactive() {
@@ -184,6 +230,19 @@ void ChromeNativeAppWindowViewsMac::FlashFrame(bool flash) {
 }
 
 void ChromeNativeAppWindowViewsMac::OnWidgetCreated(views::Widget* widget) {
+  if (title_bar_style_ == HIDDEN_INSET) {
+    NativeWidgetMacNSWindow* window = (NativeWidgetMacNSWindow*)GetNativeWindow();
+    window.styleMask |= NSFullSizeContentViewWindowMask;
+    if (@available(macos 10.10, *))
+      [window setTitlebarAppearsTransparent:YES];
+    base::scoped_nsobject<NSToolbar> toolbar(
+      [[NSToolbar alloc] initWithIdentifier:@"titlebarStylingToolbar"]);
+    [toolbar setShowsBaselineSeparator:NO];
+    [window setToolbar:toolbar];
+    [window enableWindowButtonsOffset];
+    [window setWindowButtonsOffset:window_buttons_offset_];
+  }
+
   nswindow_observer_.reset(
       [[ResizeNotificationObserver alloc] initForNativeAppWindow:this]);
 }
@@ -205,4 +264,28 @@ void ChromeNativeAppWindowViewsMac::UnhideWithoutActivation() {
         app_window());
     is_hidden_with_app_ = false;
   }
+}
+
+bool ChromeNativeAppWindowViewsMac::Adjust_Hidden_Inset_Buttons() {
+  if (title_bar_style_ != HIDDEN_INSET)
+    return false;
+  
+  NativeWidgetMacNSWindow* window = (NativeWidgetMacNSWindow*)GetNativeWindow();
+  [window setToolbar:window.toolbar];
+  return [window adjustButton:[window standardWindowButton:NSWindowCloseButton] ofKind:NSWindowCloseButton] &&
+    [window adjustButton:[window standardWindowButton:NSWindowMiniaturizeButton] ofKind:NSWindowMiniaturizeButton] &&
+    [window adjustButton:[window standardWindowButton:NSWindowZoomButton] ofKind:NSWindowZoomButton];
+}
+
+bool ChromeNativeAppWindowViewsMac::SetWindowButtonsOffset(int x, int y) {
+  if (title_bar_style_ != HIDDEN_INSET)
+    return false;
+  
+  NativeWidgetMacNSWindow* window = (NativeWidgetMacNSWindow*)GetNativeWindow();
+  if(x >=0 && y>=0) {
+    window_buttons_offset_.x = x;
+    window_buttons_offset_.y = y;
+    [window setWindowButtonsOffset:window_buttons_offset_];
+  }
+  return Adjust_Hidden_Inset_Buttons();
 }
