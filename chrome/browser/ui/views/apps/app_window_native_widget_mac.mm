@@ -15,6 +15,8 @@ AppWindowNativeWidgetMac::AppWindowNativeWidgetMac(
     views::Widget* widget,
     extensions::NativeAppWindow* native_app_window)
     : NativeWidgetMac(widget), native_app_window_(native_app_window) {
+  const NativeWidgetMac* widget_mac = reinterpret_cast<const NativeWidgetMac*>(widget);
+  title_bar_style(widget_mac->title_bar_style());
 }
 
 AppWindowNativeWidgetMac::~AppWindowNativeWidgetMac() {
