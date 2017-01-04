@@ -484,7 +484,7 @@ const char BrowserView::kViewClassName[] = "BrowserView";
 void BrowserView::ForceClose() {
   GetWidget()->Close(true);
 }
-bool BrowserView::NWCanClose(bool user_force) const {
+bool BrowserView::NWCanClose(bool user_force) {
   return browser_->NWCanClose(user_force);
 }
 

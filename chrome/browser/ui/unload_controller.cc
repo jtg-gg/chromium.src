@@ -206,7 +206,7 @@ bool UnloadController::TabsNeedBeforeUnloadFired() {
 
 void UnloadController::CancelWindowClose() {
   // Closing of window can be canceled from a beforeunload handler.
-  DCHECK(is_attempting_to_close_browser_);
+  // DCHECK(is_attempting_to_close_browser_);
   tabs_needing_before_unload_fired_.clear();
   for (auto it = tabs_needing_unload_fired_.begin();
        it != tabs_needing_unload_fired_.end(); ++it) {
