@@ -200,6 +200,18 @@ class AppCurrentWindowInternalSetVisibleOnAllWorkspacesFunction
   ResponseAction Run() override;
 };
 
+class AppCurrentWindowInternalSetWindowButtonsOffsetFunction
+    : public AppCurrentWindowInternalExtensionFunction {
+ public:
+  DECLARE_EXTENSION_FUNCTION(
+      "app.currentWindowInternal.setWindowButtonsOffset",
+      UNKNOWN)
+
+ protected:
+  ~AppCurrentWindowInternalSetWindowButtonsOffsetFunction() override {}
+  ResponseAction Run() override;
+};
+
 }  // namespace extensions
 
 #endif  // EXTENSIONS_BROWSER_API_APP_CURRENT_WINDOW_INTERNAL_APP_CURRENT_WINDOW_INTERNAL_API_H_
