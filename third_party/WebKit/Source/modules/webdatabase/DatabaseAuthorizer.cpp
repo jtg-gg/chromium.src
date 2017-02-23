@@ -117,6 +117,26 @@ void DatabaseAuthorizer::addWhitelistedFunctions()
     // SQLite ICU functions
     // like(), lower() and upper() are already in the list
     m_whitelistedFunctions.add("regexp");
+
+    m_whitelistedFunctions.add("json");
+    m_whitelistedFunctions.add("json_array");
+    m_whitelistedFunctions.add("json_array_length");
+    m_whitelistedFunctions.add("json_array_length");
+    m_whitelistedFunctions.add("json_extract");
+    m_whitelistedFunctions.add("json_insert");
+    m_whitelistedFunctions.add("json_object");
+    m_whitelistedFunctions.add("json_remove");
+    m_whitelistedFunctions.add("json_replace");
+    m_whitelistedFunctions.add("json_set");
+    m_whitelistedFunctions.add("json_type");
+    m_whitelistedFunctions.add("json_type");
+    m_whitelistedFunctions.add("json_valid");
+    m_whitelistedFunctions.add("json_quote");
+  
+    m_whitelistedFunctions.add("json_group_array");
+    m_whitelistedFunctions.add("json_group_object");
+    m_whitelistedFunctions.add("json_each");
+    m_whitelistedFunctions.add("json_tree");
 }
 
 int DatabaseAuthorizer::createTable(const String& tableName)

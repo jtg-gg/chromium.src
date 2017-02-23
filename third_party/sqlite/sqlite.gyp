@@ -52,6 +52,7 @@
       #   src/tool/mkkeywordhash.c
       'SQLITE_HAS_CODEC=1',
       'SQLITE_TEMP_STORE=2',
+      'SQLITE_ENABLE_JSON1',
     ],
   },
   'targets': [
