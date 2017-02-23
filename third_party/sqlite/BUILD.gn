@@ -100,6 +100,7 @@ if (!use_system_sqlite) {
       #   src/tool/mkkeywordhash.c
       "SQLITE_HAS_CODEC=1",
       "SQLITE_TEMP_STORE=2",
+      "SQLITE_ENABLE_JSON1",
     ]
     if (is_component_build) {
       if (is_win) {
