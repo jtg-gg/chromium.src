@@ -71,6 +71,7 @@ config("chromium_sqlite3_compile_options") {
     #   src/tool/mkkeywordhash.c
       "SQLITE_HAS_CODEC=1",
       "SQLITE_TEMP_STORE=2",
+      "SQLITE_ENABLE_JSON1",
 
     # The flags below are recommended in the SQLite documentation, and disable
     # features Chromium doesn't use.
