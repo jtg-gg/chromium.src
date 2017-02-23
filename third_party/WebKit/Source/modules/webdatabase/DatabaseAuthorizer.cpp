@@ -91,6 +91,11 @@ const FunctionNameList& WhitelistedFunctions() {
           // SQLite ICU functions
           // like(), lower() and upper() are already in the list
           "regexp",
+          // JSON1 extension
+          "json", "json_array", "json_array_length", "json_array_length",
+          "json_extract", "json_insert", "json_object", "json_remove", "json_replace",
+          "json_set", "json_type", "json_type","json_valid", "json_quote",
+          "json_group_array", "json_group_object", "json_each", "json_tree",
       }));
   return list;
 }
