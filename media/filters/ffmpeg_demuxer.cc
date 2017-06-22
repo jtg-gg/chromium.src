@@ -380,7 +380,7 @@ void FFmpegDemuxerStream::EnqueuePacket(ScopedAVPacket packet) {
   // Convert the packet if there is a bitstream filter.
   if (packet->data && bitstream_converter_ &&
       !bitstream_converter_->ConvertPacket(packet.get())) {
-    LOG(ERROR) << "Format conversion failed.";
+    VLOG(1) << "Format conversion failed.";
   }
 #endif
 
