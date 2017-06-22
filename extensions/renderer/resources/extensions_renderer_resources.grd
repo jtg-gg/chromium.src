@@ -90,6 +90,7 @@
       <include name="IDR_NWAPI_APP_JS"    file="../../../content/nw/src/resources/api_nw_app.js" type="BINDATA" />
       <include name="IDR_NWAPI_WINDOW_JS" file="../../../content/nw/src/resources/api_nw_window.js" type="BINDATA" />
       <include name="IDR_NWAPI_CLIPBOARD_JS" file="../../../content/nw/src/resources/api_nw_clipboard.js" type="BINDATA" />
+      <include name="IDR_NWAPI_MEDIA_RECORDER_JS" file="../../../content/nw/src/resources/api_nw_media_recorder.js" type="BINDATA" />
       <include name="IDR_NWAPI_MENU_JS" file="../../../content/nw/src/resources/api_nw_menu.js" type="BINDATA" />
       <include name="IDR_NWAPI_MENUITEM_JS" file="../../../content/nw/src/resources/api_nw_menuitem.js" type="BINDATA" />
       <include name="IDR_NWAPI_SCREEN_JS" file="../../../content/nw/src/resources/api_nw_screen.js" type="BINDATA" />

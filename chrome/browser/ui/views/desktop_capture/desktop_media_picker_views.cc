@@ -259,7 +259,11 @@ void DesktopMediaPickerDialogView::OnSourceTypeSwitched(int index) {
 #endif
         break;
       case DesktopMediaID::TYPE_WINDOW:
+#if defined(USE_CRAS) || defined(OS_WIN)
+        audio_share_checkbox_->SetVisible(true);
+#else
         audio_share_checkbox_->SetVisible(false);
+#endif
         break;
       case DesktopMediaID::TYPE_WEB_CONTENTS:
         audio_share_checkbox_->SetVisible(true);
