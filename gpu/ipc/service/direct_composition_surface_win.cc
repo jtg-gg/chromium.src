@@ -313,8 +313,8 @@ class DCLayerTree::SwapChainPresenter {
 
 bool DCLayerTree::Initialize(HWND window) {
   HRESULT hr = d3d11_device_.CopyTo(video_device_.GetAddressOf());
-  if (FAILED(hr))
-    return false;
+  //if (FAILED(hr))
+  //  return false;
 
   Microsoft::WRL::ComPtr<ID3D11DeviceContext> context;
   d3d11_device_->GetImmediateContext(context.GetAddressOf());
