@@ -420,7 +420,7 @@ void AudioInputDevice::AudioThreadCallback::Process(uint32_t pending_data) {
       base::TimeTicks() +
       base::TimeDelta::FromMicroseconds(buffer->params.capture_time_us);
   const base::TimeTicks now_time = base::TimeTicks::Now();
-  DCHECK_GE(now_time, capture_time);
+  //DCHECK_GE(now_time, capture_time);
 
   capture_callback_->Capture(audio_bus,
                              (now_time - capture_time).InMilliseconds(),
