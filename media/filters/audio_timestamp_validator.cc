@@ -101,7 +101,7 @@ void AudioTimestampValidator::CheckForTimestampGap(
 
       // Let developers know if their files timestamps are way off from
       if (num_unstable_audio_tries_ > limit_unstable_audio_tries_) {
-        MEDIA_LOG(ERROR, media_log_)
+        MEDIA_LOG(INFO, media_log_)
             << "Failed to reconcile encoded audio times with decoded output.";
       }
     }
