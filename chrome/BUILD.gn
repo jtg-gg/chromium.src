@@ -1259,6 +1259,7 @@ if (is_win || (is_linux && !is_component_build)) {
 
     if (is_component_build) {
       libs = [ "Carbon.framework" ]
+      deps += ["//media/ffmpeg:ffmpeg"]
     }
 
     ldflags = [
