@@ -8,6 +8,9 @@ assert(media_use_ffmpeg)
 
 source_set("ffmpeg") {
   visibility = [ "//media/*" ]
+  if (is_component_build) {
+    visibility += ["//chrome:chrome_dll"]
+  }
   allow_circular_includes_from = [ "//media/base" ]
   configs += [ "//media/base:base_config" ]
   sources = [
