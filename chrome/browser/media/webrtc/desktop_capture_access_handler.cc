@@ -41,6 +41,10 @@
 #include "ash/shell.h"
 #endif  // defined(OS_CHROMEOS)
 
+#if defined(OS_WIN)
+#include "base/win/windows_version.h"
+#endif
+
 using content::BrowserThread;
 
 namespace {
@@ -429,6 +433,9 @@ void DesktopCaptureAccessHandler::HandleRequest(
   // Currently loopback audio capture is supported only on Windows and ChromeOS.
   loopback_audio_supported = true;
 #endif
+#if defined(OS_WIN)
+  loopback_audio_supported = base::win::GetVersion() > base::win::VERSION_XP;
+#endif
 
   // This value essentially from the checkbox on picker window, so it
   // corresponds to user permission.
@@ -442,7 +449,7 @@ void DesktopCaptureAccessHandler::HandleRequest(
   // can support audio sharing. Currently audio is only supported for screen and
   // tab/webcontents capture streams.
   const bool audio_supported =
-      (media_id.type == content::DesktopMediaID::TYPE_SCREEN &&
+      (//media_id.type == content::DesktopMediaID::TYPE_SCREEN &&
        loopback_audio_supported) ||
       media_id.type == content::DesktopMediaID::TYPE_WEB_CONTENTS;
 
