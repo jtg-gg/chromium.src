@@ -160,9 +160,19 @@ std::vector<gfx::Rect> CalculateNonDraggableRegions(
     appWindow_->WindowDidFinishResize();
 }
 
+- (void)windowWillEnterFullScreen:(NSNotification *)notification {
+  if(appWindow_)
+    appWindow_->WindowWillEnterFullscreen();
+}
+
 - (void)windowDidEnterFullScreen:(NSNotification*)notification {
   if (appWindow_)
     appWindow_->WindowDidEnterFullscreen();
+}
+
+- (void)windowWillExitFullScreen:(NSNotification *)notification {
+  if (appWindow_)
+    appWindow_->WindowWillExitFullscreen();
 }
 
 - (void)windowDidExitFullScreen:(NSNotification*)notification {
@@ -245,55 +255,15 @@ std::vector<gfx::Rect> CalculateNonDraggableRegions(
 - (void)enableWindowButtonsOffset {
   auto closeButton = [self standardWindowButton:NSWindowCloseButton];
   auto miniaturizeButton = [self standardWindowButton:NSWindowMiniaturizeButton];
-  auto zoomButton = [self standardWindowButton:NSWindowZoomButton];
-  
-  [closeButton setPostsFrameChangedNotifications:YES];
-  [miniaturizeButton setPostsFrameChangedNotifications:YES];
-  [zoomButton setPostsFrameChangedNotifications:YES];
-  
   windowButtonsInterButtonSpacing_ =
     NSMinX([miniaturizeButton frame]) - NSMaxX([closeButton frame]);
-  
-  auto center = [NSNotificationCenter defaultCenter];
-  
-  [center addObserver:self
-             selector:@selector(adjustCloseButton:)
-                 name:NSViewFrameDidChangeNotification
-               object:closeButton];
-  
-  [center addObserver:self
-             selector:@selector(adjustMiniaturizeButton:)
-                 name:NSViewFrameDidChangeNotification
-               object:miniaturizeButton];
-  
-  [center addObserver:self
-             selector:@selector(adjustZoomButton:)
-                 name:NSViewFrameDidChangeNotification
-               object:zoomButton];
-
 }
 
-- (void)adjustCloseButton:(NSNotification*)notification {
-  [self adjustButton:[notification object]
-              ofKind:NSWindowCloseButton];
-}
-  
-- (void)adjustMiniaturizeButton:(NSNotification*)notification {
-  [self adjustButton:[notification object]
-              ofKind:NSWindowMiniaturizeButton];
-}
-  
-- (void)adjustZoomButton:(NSNotification*)notification {
-  [self adjustButton:[notification object]
-              ofKind:NSWindowZoomButton];
-}
-  
 - (BOOL)adjustButton:(NSButton*)button
               ofKind:(NSWindowButton)kind {
   NSRect buttonFrame = [button frame];
-  NSRect frameViewBounds = [[self frameView] bounds];
   NSPoint offset = self.windowButtonsOffset;
-
+  NSRect frameViewBounds = [[button superview] bounds];
   buttonFrame.origin = NSMakePoint(
     offset.x, (NSHeight(frameViewBounds) - NSHeight(buttonFrame) - offset.y));
   
@@ -312,10 +282,7 @@ std::vector<gfx::Rect> CalculateNonDraggableRegions(
       break;
   }
   
-  BOOL didPost = [button postsBoundsChangedNotifications];
-  [button setPostsFrameChangedNotifications:NO];
   [button setFrame:buttonFrame];
-  [button setPostsFrameChangedNotifications:didPost];
   BOOL success = CGRectEqualToRect(buttonFrame,  [button frame]);
   return success;
 }
@@ -474,6 +441,14 @@ NativeAppWindowCocoa::NativeAppWindowCocoa(
       NULL));
 
   if (title_bar_style_ == HIDDEN_INSET) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
+    [window setTitlebarAppearsTransparent:YES];
+#pragma clang diagnostic pop
+    base::scoped_nsobject<NSToolbar> toolbar(
+        [[NSToolbar alloc] initWithIdentifier:@"titlebarStylingToolbar"]);
+    [toolbar setShowsBaselineSeparator:NO];
+    [window setToolbar:toolbar];
     [this->window() enableWindowButtonsOffset];
     int x = 0; int y = 0;
     sscanf(params.title_bar_style.c_str()+13, "%d,%d", &x, &y);
@@ -487,6 +462,10 @@ NSUInteger NativeAppWindowCocoa::GetWindowStyleMask() const {
                           NSTexturedBackgroundWindowMask;
   if (shows_resize_controls_)
     style_mask |= NSResizableWindowMask;
+  if (title_bar_style_ == HIDDEN_INSET) {
+    //this flag does not works with clickthrough transparency
+    style_mask |= NSFullSizeContentViewWindowMask;
+  }
   return style_mask;
 }
 
@@ -517,7 +496,11 @@ void NativeAppWindowCocoa::InstallView() {
 
     NSView* frameView = [[window() contentView] superview];
     [view setFrame:[frameView bounds]];
-    [frameView addSubview:view];
+    if (title_bar_style_ == HIDDEN_INSET) {
+      [frameView addSubview:view positioned:NSWindowBelow relativeTo:nil];
+    } else {
+      [frameView addSubview:view];
+    }
     UpdateDraggableRegionViews();
 
     if (title_bar_style_ != NORMAL) {
@@ -682,6 +665,7 @@ void NativeAppWindowCocoa::Show() {
 
   [window() makeKeyAndOrderFront:nil];
   [NSApp activateIgnoringOtherApps:YES];
+  Adjust_Hidden_Inset_Buttons();
 }
 
 void NativeAppWindowCocoa::ShowInactive() {
@@ -991,6 +975,17 @@ bool NativeAppWindowCocoa::NWCanClose(bool user_force) {
   return false;
 }
 
+bool NativeAppWindowCocoa::Adjust_Hidden_Inset_Buttons() {
+  if (title_bar_style_ != HIDDEN_INSET)
+    return false;
+    
+  AppNSWindow* window = this->window();
+  [window setToolbar:window.toolbar];
+  return [window adjustButton:[window standardWindowButton:NSWindowCloseButton] ofKind:NSWindowCloseButton] &&
+    [window adjustButton:[window standardWindowButton:NSWindowMiniaturizeButton] ofKind:NSWindowMiniaturizeButton] &&
+    [window adjustButton:[window standardWindowButton:NSWindowZoomButton] ofKind:NSWindowZoomButton];
+}
+
 bool NativeAppWindowCocoa::SetWindowButtonsOffset(int x, int y) {
   
   if (title_bar_style_ != HIDDEN_INSET)
@@ -1001,9 +996,7 @@ bool NativeAppWindowCocoa::SetWindowButtonsOffset(int x, int y) {
   if(x >=0 && y>=0)
     [window setWindowButtonsOffset:NSMakePoint(x, y)];
 
-  return [window adjustButton:[window standardWindowButton:NSWindowCloseButton] ofKind:NSWindowCloseButton] &&
-    [window adjustButton:[window standardWindowButton:NSWindowMiniaturizeButton] ofKind:NSWindowMiniaturizeButton] &&
-    [window adjustButton:[window standardWindowButton:NSWindowZoomButton] ofKind:NSWindowZoomButton];
+  return Adjust_Hidden_Inset_Buttons();
 }
 
 void NativeAppWindowCocoa::WindowDidBecomeKey() {
@@ -1050,6 +1043,7 @@ void NativeAppWindowCocoa::WindowDidFinishResize() {
 void NativeAppWindowCocoa::WindowDidResize() {
   app_window_->OnNativeWindowChanged();
   UpdateDraggableRegionViews();
+  Adjust_Hidden_Inset_Buttons();
 }
 
 void NativeAppWindowCocoa::WindowDidMove() {
@@ -1065,10 +1059,26 @@ void NativeAppWindowCocoa::WindowDidDeminiaturize() {
   app_window_->OnNativeWindowChanged();
 }
 
+void NativeAppWindowCocoa::WindowWillEnterFullscreen() {
+  if (title_bar_style_ == HIDDEN_INSET) {
+    [window() setToolbar:nil];
+  }
+}
+
 void NativeAppWindowCocoa::WindowDidEnterFullscreen() {
   is_maximized_ = false;
   is_fullscreen_ = true;
   app_window_->OnNativeWindowChanged();
+}
+
+void NativeAppWindowCocoa::WindowWillExitFullscreen() {
+  if (title_bar_style_ == HIDDEN_INSET) {
+    base::scoped_nsobject<NSToolbar> toolbar(
+      [[NSToolbar alloc] initWithIdentifier:@"titlebarStylingToolbar"]);
+    [toolbar setShowsBaselineSeparator:NO];
+    AppNSWindow* window = this->window();
+    [window setToolbar:toolbar];
+  }
 }
 
 void NativeAppWindowCocoa::WindowDidExitFullscreen() {
@@ -1079,6 +1089,7 @@ void NativeAppWindowCocoa::WindowDidExitFullscreen() {
   WindowDidFinishResize();
 
   app_window_->OnNativeWindowChanged();
+  Adjust_Hidden_Inset_Buttons();
 }
 
 void NativeAppWindowCocoa::WindowWillZoom() {

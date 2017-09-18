@@ -109,9 +109,15 @@ class NativeAppWindowCocoa : public extensions::NativeAppWindow,
 
   // Called when the window is zoomed (maximized or de-maximized).
   void WindowWillZoom();
+  
+  // Called when the window will enter fullscreen.
+  void WindowWillEnterFullscreen();
 
   // Called when the window enters fullscreen.
   void WindowDidEnterFullscreen();
+
+  // Called when the window will exit fullscreen.
+  void WindowWillExitFullscreen();
 
   // Called when the window exits fullscreen.
   void WindowDidExitFullscreen();
@@ -198,6 +204,7 @@ class NativeAppWindowCocoa : public extensions::NativeAppWindow,
   // Hides the window unconditionally. Used by Hide and HideWithApp.
   void HideWithoutMarkingHidden();
 
+  bool Adjust_Hidden_Inset_Buttons();
   void ShowWindowButton(NSWindowButton button);
   bool userWillWaitForInProgressDownloads(int downloadCount) const;
   bool shouldQuitWithInProgressDownloads() const;
