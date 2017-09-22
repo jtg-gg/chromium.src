@@ -8360,8 +8360,15 @@ int SQLITE_CDECL wmain(int argc, wchar_t **wargv){
       char *zHistory = 0;
       int nHistory;
       printf(
+/* BEGIN SQLCIPHER */
+#ifdef SQLITE_HAS_CODEC
+        "SQLCipher version %s %.19s\n" /*extra-version-info*/
+#else
         "SQLite version %s %.19s\n" /*extra-version-info*/
-        "Enter \".help\" for usage hints.\n",
+#endif
+/* END SQLCIPHER */
+        "Enter \".help\" for instructions\n"
+        "Enter SQL statements terminated with a \";\"\n",
         sqlite3_libversion(), sqlite3_sourceid()
       );
       if( warnInmemoryDb ){
