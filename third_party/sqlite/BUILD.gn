@@ -69,6 +69,8 @@ config("chromium_sqlite3_compile_options") {
     # execution failing. Review:
     #   src/src/parse.py
     #   src/tool/mkkeywordhash.c
+      "SQLITE_HAS_CODEC=1",
+      "SQLITE_TEMP_STORE=2",
 
     # The flags below are recommended in the SQLite documentation, and disable
     # features Chromium doesn't use.
@@ -262,6 +264,7 @@ component("chromium_sqlite3") {
 
   deps = [
     "//third_party/icu",
+      "//third_party/boringssl",
   ]
 }
 
@@ -283,7 +286,7 @@ group("sqlite") {
   ]
 }
 
-if (is_linux) {
+if (is_linux || is_mac || is_win) {
   executable("sqlite_shell") {
     include_dirs = [
       # shell.c contains an '#include "sqlite3.h", which we want to be
@@ -293,11 +296,16 @@ if (is_linux) {
 
     sources = [
       "amalgamation/shell/shell.c",
-      "src/src/shell_icu_linux.c",
 
       # Include a dummy c++ file to force linking of libstdc++.
       "build_as_cpp.cc",
     ]
+
+      if (is_win) {
+        sources += ["src/src/shell_icu_win.c"]
+      } else {
+        sources += ["src/src/shell_icu_linux.c"]
+      }
 
     deps = [
       ":sqlite",
