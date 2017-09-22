@@ -1060,10 +1060,10 @@ LTLIBS = $(LTLIBS) rpcrt4.lib
 # set this for you.  Otherwise, the linker will attempt
 # to deduce the binary type based on the object files.
 !IFDEF PLATFORM
-LTLINKOPTS = /NOLOGO /MACHINE:$(PLATFORM)
+LTLINKOPTS = $(LTLINKOPTS) /NOLOGO /MACHINE:$(PLATFORM)
 LTLIBOPTS = /NOLOGO /MACHINE:$(PLATFORM)
 !ELSE
-LTLINKOPTS = /NOLOGO
+LTLINKOPTS = $(LTLINKOPTS) /NOLOGO
 LTLIBOPTS = /NOLOGO
 !ENDIF
 
@@ -1227,6 +1227,13 @@ LIBRESOBJS =
 # Core source code files, part 1.
 #
 SRC00 = \
+	$(TOP)\src\crypto.c \
+	$(TOP)\src\crypto_cc.c \
+	$(TOP)\src\crypto_impl.c \
+	$(TOP)\src\crypto_libtomcrypt.c \
+	$(TOP)\src\crypto_openssl.c \
+	$(TOP)\src\crypto.h \
+	$(TOP)\src\sqlcipher.h \
   $(TOP)\src\alter.c \
   $(TOP)\src\analyze.c \
   $(TOP)\src\attach.c \
