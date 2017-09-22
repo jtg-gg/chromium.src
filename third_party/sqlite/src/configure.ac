@@ -74,7 +74,7 @@
 # you don't need (for example BLT) by erasing or commenting out
 # the corresponding code.
 #
-AC_INIT(sqlite, m4_esyscmd([cat VERSION | tr -d '\n']))
+AC_INIT(sqlcipher, m4_esyscmd([cat VERSION | tr -d '\n']))
 
 dnl Make sure the local VERSION file matches this configure script
 sqlite_version_sanity_check=`cat $srcdir/VERSION | tr -d '\n'`
@@ -140,7 +140,6 @@ if test "x${TCLLIBDIR+set}" != "xset" ; then
   TCLLIBDIR="${TCLLIBDIR}/sqlite3"
 fi
 
-
 #########
 # Set up an appropriate program prefix
 #
@@ -197,6 +196,54 @@ if test "$SQLITE_THREADSAFE" = "1"; then
   AC_SEARCH_LIBS(pthread_create, pthread)
   AC_SEARCH_LIBS(pthread_mutexattr_init, pthread)
 fi
+
+##########
+# Which crypto library do we use
+#
+AC_ARG_WITH([crypto-lib],
+AC_HELP_STRING([--with-crypto-lib],[Specify which crypto library to use]),
+crypto_lib=$withval)
+AC_MSG_CHECKING([for crypto library to use])
+if test "$crypto_lib" = "none"; then
+  AC_MSG_RESULT([none])
+else
+  if test "$crypto_lib" = "commoncrypto"; then
+    CFLAGS+=" -DSQLCIPHER_CRYPTO_CC"
+    BUILD_CFLAGS+=" -DSQLCIPHER_CRYPTO_CC"
+	  AC_MSG_RESULT([commoncrypto])
+  else
+    if test "$crypto_lib" = "libtomcrypt"; then
+      CFLAGS+=" -DSQLCIPHER_CRYPTO_LIBTOMCRYPT"
+      BUILD_CFLAGS+=" -DSQLCIPHER_CRYPTO_LIBTOMCRYPT"
+      AC_MSG_RESULT([libtomcrypt])
+      AC_CHECK_LIB([tomcrypt], [register_cipher], ,
+                   AC_MSG_ERROR([Library crypto not found. Install libtomcrypt!"]))
+    else
+        CFLAGS+=" -DSQLCIPHER_CRYPTO_OPENSSL"
+        BUILD_CFLAGS+=" -DSQLCIPHER_CRYPTO_OPENSSL"
+	      AC_MSG_RESULT([openssl])
+        AC_CHECK_LIB([crypto], [HMAC_Init_ex], ,
+                     AC_MSG_ERROR([Library crypto not found. Install openssl!"]))
+    fi
+  fi
+fi
+
+##########
+# Do we want to allow a connection created in one thread to be used
+# in another thread.  This does not work on many Linux systems (ex: RedHat 9)
+# due to bugs in the threading implementations.  This is thus off by default.
+#
+AC_ARG_ENABLE(cross-thread-connections, 
+AC_HELP_STRING([--enable-cross-thread-connections],[Allow connection sharing across threads]),,enable_xthreadconnect=no)
+AC_MSG_CHECKING([whether to allow connections to be shared across threads])
+if test "$enable_xthreadconnect" = "no"; then
+  XTHREADCONNECT=''
+  AC_MSG_RESULT([no])
+else
+  XTHREADCONNECT='-DSQLITE_ALLOW_XTHREAD_CONNECT=1'
+  AC_MSG_RESULT([yes])
+fi
+AC_SUBST(XTHREADCONNECT)
 
 ##########
 # Do we want to support release
@@ -737,5 +784,5 @@ AC_CONFIG_HEADERS(config.h)
 AC_SUBST(BUILD_CFLAGS)
 AC_OUTPUT([
 Makefile
-sqlite3.pc
+sqlcipher.pc
 ])
