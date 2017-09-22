@@ -98,6 +98,8 @@ if (!use_system_sqlite) {
       # syntax working but execution failing.  Review:
       #   src/src/parse.py
       #   src/tool/mkkeywordhash.c
+      "SQLITE_HAS_CODEC=1",
+      "SQLITE_TEMP_STORE=2",
     ]
     if (is_component_build) {
       if (is_win) {
@@ -180,6 +182,7 @@ if (!use_system_sqlite) {
 
     deps = [
       "//third_party/icu",
+      "//third_party/boringssl",
     ]
   }
 
@@ -198,18 +201,23 @@ if (!use_system_sqlite) {
     public_configs = [ ":sqlite_export" ]
   }
 
-  if (is_linux) {
+  if (is_linux || is_mac || is_win) {
     executable("sqlite_shell") {
       # So shell.c can find the correct sqlite3.h.
       include_dirs = [ "amalgamation" ]
 
       sources = [
         "src/src/shell.c",
-        "src/src/shell_icu_linux.c",
 
         # Include a dummy c++ file to force linking of libstdc++.
         "build_as_cpp.cc",
       ]
+
+      if (is_win) {
+        sources += ["src/src/shell_icu_win.c"]
+      } else {
+        sources += ["src/src/shell_icu_linux.c"]
+      }
 
       deps = [
         ":sqlite",
