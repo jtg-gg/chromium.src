@@ -50,6 +50,8 @@
 #include "components/crash/content/app/crash_reporter_client.h"
 #include "components/crash/core/common/crash_keys.h"
 #include "content/public/common/content_descriptors.h"
+#include "content/nw/src/nw_version.h"
+#include "nw/id/commit.h"
 
 #if defined(OS_ANDROID)
 #include <android/log.h>
@@ -2020,6 +2022,16 @@ void InitCrashReporter(const std::string& process_type) {
     VLOG(1) << "Non Browser crash dumping enabled for: " << process_type;
 #endif  // #if defined(OS_ANDROID)
   }
+
+  SetCrashKeyValue("nwjs-ver", NW_VERSION_STRING);
+  SetCrashKeyValue("nwjs-commit-id", NW_COMMIT_HASH);
+  SetCrashKeyValue("nwjs-sdk",
+#if defined(NWJS_SDK)
+    "yes"
+#else
+    "no"
+#endif
+  );
 
   PostEnableBreakpadInitialization();
 }

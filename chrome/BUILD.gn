@@ -1398,7 +1398,7 @@ if (is_win || (is_linux && !is_component_build)) {
       sources = _chrome_symbols_sources
 
       outputs = [
-        "$root_out_dir/{{source_file_part}}-$chrome_version_full.breakpad",
+        "$root_out_dir/{{source_file_part}}.breakpad.sym",
       ]
 
       # Use an absolute path to dump_syms in case a user has it in their path.
@@ -1423,18 +1423,18 @@ if (is_win || (is_linux && !is_component_build)) {
     }
 
     action("nw_sym_archive") {
-      script = "//content/nw/tools/archive_symbols.py"
+      script = "//content/nw/tools/zip_symbols.py"
 
       _syms = [
-        "$root_out_dir/$chrome_framework_name-$chrome_version_full.breakpad",
-        "$root_out_dir/$chrome_helper_name-$chrome_version_full.breakpad",
-        "$root_out_dir/$chrome_product_full_name-$chrome_version_full.breakpad",
-        "$root_out_dir/crashpad_handler-$chrome_version_full.breakpad",
+        "$root_out_dir/$chrome_framework_name.breakpad.sym",
+        "$root_out_dir/$chrome_helper_name.breakpad.sym",
+        "$root_out_dir/$chrome_product_full_name.breakpad.sym",
+        "$root_out_dir/crashpad_handler.breakpad.sym",
       ]
 
       sources = _chrome_symbols_sources
 
-      _output = "$root_out_dir/nwjs.breakpad.tar"
+      _output = "$root_out_dir/nwjs.breakpad.zip"
 
       outputs = [
         _output,
