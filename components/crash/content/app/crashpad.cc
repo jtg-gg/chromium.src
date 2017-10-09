@@ -28,8 +28,12 @@
 #include "base/strings/stringprintf.h"
 #include "base/strings/sys_string_conversions.h"
 #include "base/strings/utf_string_conversions.h"
+#include "base/values.h"
 #include "build/build_config.h"
 #include "components/crash/content/app/crash_reporter_client.h"
+#include "content/nw/src/nw_base.h"
+#include "content/nw/src/nw_version.h"
+#include "nw/id/commit.h"
 #include "third_party/crashpad/crashpad/client/crash_report_database.h"
 #include "third_party/crashpad/crashpad/client/crashpad_client.h"
 #include "third_party/crashpad/crashpad/client/crashpad_info.h"
@@ -199,6 +203,16 @@ void InitializeCrashpadImpl(bool initial_client,
   SetCrashKeyValue("pid", base::IntToString(::GetCurrentProcessId()));
 #endif
 
+  SetCrashKeyValue("nwjs-ver", NW_VERSION_STRING);
+  SetCrashKeyValue("nwjs-commit-id", NW_COMMIT_HASH);
+  SetCrashKeyValue("nwjs-sdk",
+#if defined(NWJS_SDK)
+    "yes"
+#else
+    "no"
+#endif
+  );
+
   logging::SetLogMessageHandler(LogMessageHandler);
 
   // If clients called CRASHPAD_SIMULATE_CRASH() instead of
@@ -221,9 +235,9 @@ void InitializeCrashpadImpl(bool initial_client,
   if (should_initialize_database_and_set_upload_policy) {
     g_database =
         crashpad::CrashReportDatabase::Initialize(database_path).release();
-
-    bool enable_uploads = false;
-    if (!crash_reporter_client->ReportingIsEnforcedByPolicy(&enable_uploads)) {
+	std::string url;
+    bool enable_uploads = nw::package()->root()->GetString("crash_report_url", &url);
+    if (!enable_uploads && !crash_reporter_client->ReportingIsEnforcedByPolicy(&enable_uploads)) {
       // Breakpad provided a --disable-breakpad switch to disable crash dumping
       // (not just uploading) here. Crashpad doesn't need it: dumping is enabled
       // unconditionally and uploading is gated on consent, which tests/bots

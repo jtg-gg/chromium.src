@@ -19,7 +19,9 @@
 #include "base/strings/string_piece.h"
 #include "base/strings/stringprintf.h"
 #include "base/strings/sys_string_conversions.h"
+#include "base/values.h"
 #include "components/crash/content/app/crash_reporter_client.h"
+#include "content/nw/src/nw_base.h"
 #include "third_party/crashpad/crashpad/client/crash_report_database.h"
 #include "third_party/crashpad/crashpad/client/crashpad_client.h"
 #include "third_party/crashpad/crashpad/client/crashpad_info.h"
@@ -64,6 +66,11 @@ base::FilePath PlatformCrashpadInitialization(bool initial_client,
       process_annotations["prod"] = base::SysNSStringToUTF8(product);
       process_annotations["ver"] = base::SysNSStringToUTF8(version);
       process_annotations["plat"] = std::string("OS X");
+
+      base::DictionaryValue* root = nw::InitNWPackage()->root();
+      root->GetString("crash_report_url", &url);
+      process_annotations["prod"] = nw::package()->GetName();
+      root->GetString("version", &process_annotations["ver"]);
 
       crashpad::CrashpadClient crashpad_client;
 

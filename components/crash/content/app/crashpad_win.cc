@@ -12,11 +12,13 @@
 #include "base/strings/string16.h"
 #include "base/strings/string_number_conversions.h"
 #include "base/strings/utf_string_conversions.h"
+#include "base/values.h"
 #include "build/build_config.h"
 #include "components/crash/content/app/crash_reporter_client.h"
 #include "components/crash/content/app/crash_switches.h"
 #include "components/startup_metric_utils/common/pre_read_field_trial_utils_win.h"
 #include "third_party/crashpad/crashpad/client/crashpad_client.h"
+#include "content/nw/src/nw_base.h"
 #include "third_party/crashpad/crashpad/client/crashpad_info.h"
 #include "third_party/crashpad/crashpad/client/simulate_crash_win.h"
 
@@ -70,6 +72,10 @@ base::FilePath PlatformCrashpadInitialization(bool initial_client,
     std::string url = "https://clients2.google.com/cr/report";
 #else
     std::string url;
+	base::DictionaryValue* root = nw::InitNWPackage()->root();
+	root->GetString("crash_report_url", &url);
+	process_annotations["prod"] = nw::package()->GetName();
+	root->GetString("version", &process_annotations["ver"]);
 #endif
 
     base::FilePath exe_file;
