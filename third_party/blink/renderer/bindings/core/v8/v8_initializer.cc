@@ -682,7 +682,7 @@ class ArrayBufferAllocator : public v8::ArrayBuffer::Allocator {
 
   void Free(void* data, size_t length, AllocationMode mode) override {
     if (mode == AllocationMode::kNodeJS) {
-#if defined(OS_WIN)
+#if defined(OS_WIN) && !defined(_DEBUG)
         ::HeapFree(_process_heap, 0, data);
 #else
         free(data);
