@@ -27,7 +27,7 @@ namespace viz {
 SoftwareOutputDeviceForceCPUMac::SoftwareOutputDeviceForceCPUMac(gfx::AcceleratedWidget widget)
     : widget_(widget), scale_factor_(1) {
   // this class should be created for g_force_cpu_draw
-  assert(g_force_cpu_draw);
+  assert(content::g_force_cpu_draw);
 }
 
 SoftwareOutputDeviceForceCPUMac::~SoftwareOutputDeviceForceCPUMac() {
