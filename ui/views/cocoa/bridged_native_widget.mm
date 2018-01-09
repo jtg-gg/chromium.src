@@ -390,8 +390,8 @@ void BridgedNativeWidget::SetBounds(const gfx::Rect& new_bounds,
 
   // A contentRect with zero width or height is a banned practice in ChromeMac,
   // due to unpredictable OSX treatment.
-  DCHECK(!clamped_content_size.IsEmpty())
-      << "Zero-sized windows not supported on Mac";
+  //DCHECK(!clamped_content_size.IsEmpty())
+  //    << "Zero-sized windows not supported on Mac";
 
   if (!window_visible_ && IsWindowModalSheet()) {
     // Window-Modal dialogs (i.e. sheets) are positioned by Cocoa when shown for
