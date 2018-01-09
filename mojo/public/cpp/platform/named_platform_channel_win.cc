@@ -8,6 +8,7 @@
 
 // NOTE: This needs to be included *after* windows.h.
 #include <sddl.h>
+#include <memory>
 
 #include "base/rand_util.h"
 #include "base/strings/stringprintf.h"
