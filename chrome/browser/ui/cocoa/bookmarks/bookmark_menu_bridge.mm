@@ -50,7 +50,7 @@ BookmarkMenuBridge::BookmarkMenuBridge(Profile* profile, NSMenu* menu_root)
       controller_([[BookmarkMenuCocoaController alloc] initWithBridge:this]),
       menu_root_([menu_root retain]) {
   DCHECK(profile_);
-  DCHECK(menu_root_);
+  //DCHECK(menu_root_);
   DCHECK(![menu_root_ delegate]);
   [menu_root_ setDelegate:controller_];
 
