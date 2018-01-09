@@ -58,9 +58,12 @@ PasswordReuseModalWarningDialog::PasswordReuseModalWarningDialog(
   SetLayoutManager(std::make_unique<views::FillLayout>());
 
   views::Label* message_body_label = new views::Label(
+#ifndef _DEBUG
       service_
           ? service_->GetWarningDetailText()
-          : l10n_util::GetStringUTF16(IDS_PAGE_INFO_CHANGE_PASSWORD_DETAILS));
+          :
+#endif
+          l10n_util::GetStringUTF16(IDS_PAGE_INFO_CHANGE_PASSWORD_DETAILS));
   message_body_label->SetMultiLine(true);
   message_body_label->SetHorizontalAlignment(gfx::ALIGN_LEFT);
   message_body_label->SetHandlesTooltips(false);
