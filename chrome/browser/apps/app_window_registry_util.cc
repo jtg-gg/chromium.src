@@ -100,8 +100,9 @@ bool AppWindowRegistryUtil::CloseAllAppWindows(bool user_force) {
 
 //static
 AppWindowRegistryUtil::NativeWindowList AppWindowRegistryUtil::GetAppNativeWindowList() {
-  std::vector<Profile*> profiles =
-    g_browser_process->profile_manager()->GetLoadedProfiles();
+  std::vector<Profile*> profiles;
+  if (g_browser_process->profile_manager())
+    profiles = g_browser_process->profile_manager()->GetLoadedProfiles();
   AppWindowRegistryUtil::NativeWindowList nativeWindowList;
   for (std::vector<Profile*>::const_iterator i = profiles.begin();
     i != profiles.end();
