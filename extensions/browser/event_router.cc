@@ -617,7 +617,7 @@ void EventRouter::DispatchEventToProcess(
       ExtensionAPI::GetSharedInstance()->IsAvailable(
           event->event_name, extension, target_context, listener_url,
           CheckAliasStatus::ALLOWED);
-  if (!availability.is_available() && !extension->is_nwjs_app()) {
+  if (!availability.is_available() && extension && !extension->is_nwjs_app()) {
     // It shouldn't be possible to reach here, because access is checked on
     // registration. However, for paranoia, check on dispatch as well.
     NOTREACHED() << "Trying to dispatch event " << event->event_name
