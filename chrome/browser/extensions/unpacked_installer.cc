@@ -21,6 +21,7 @@
 #include "chrome/browser/profiles/profile.h"
 #include "components/crx_file/id_util.h"
 #include "components/sync/model/string_ordinal.h"
+#include "content/nw/src/nw_base.h"
 #include "content/public/browser/browser_thread.h"
 #include "extensions/browser/api/declarative_net_request/utils.h"
 #include "extensions/browser/extension_file_task_runner.h"
@@ -108,9 +109,13 @@ bool UnpackedInstaller::LoadFromCommandLine(const base::FilePath& path_in,
   // Load extensions from the command line synchronously to avoid a race
   // between extension loading and loading an URL from the command line.
   base::ThreadRestrictions::ScopedAllowIO allow_io;
-
-  extension_path_ =
-      base::MakeAbsoluteFilePath(path_util::ResolveHomeDirectory(path_in));
+  nw::Package* package = nw::package();
+  if (!only_allow_apps && package) {
+    extension_path_ = package->ConvertToAbsoutePath(path_in);
+  }
+  else {
+    extension_path_ = base::MakeAbsoluteFilePath(path_util::ResolveHomeDirectory(path_in));
+  }
 
   if (!IsLoadingUnpackedAllowed()) {
     ReportExtensionLoadError(kUnpackedExtensionsBlacklistedError);

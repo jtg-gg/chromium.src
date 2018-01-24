@@ -79,6 +79,7 @@ developer::ExtensionType GetExtensionType(Manifest::Type manifest_type) {
     case Manifest::TYPE_LEGACY_PACKAGED_APP:
       type = developer::EXTENSION_TYPE_LEGACY_PACKAGED_APP;
       break;
+    case Manifest::TYPE_NWJS_APP:
     case Manifest::TYPE_PLATFORM_APP:
       type = developer::EXTENSION_TYPE_PLATFORM_APP;
       break;
