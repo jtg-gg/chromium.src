@@ -274,6 +274,17 @@ bool FFmpegAudioDecoder::OnNewFrame(const DecoderBuffer& buffer,
       // TODO(chcunningham): Fix FFmpeg and upstream it.
       output->AdjustSampleRate(config_.samples_per_second());
     }
+    base::TimeDelta diff = buffer.timestamp() - output->timestamp() - time_compensated_;
+    if (config_.codec() == kCodecAAC && diff.InMilliseconds() > 0) {
+      int frames = discard_helper_->TimeDeltaToFrames(diff);
+      MEDIA_LOG(WARNING, media_log_)
+          << "Encoded buffer - output buffer timestamp diff:" << diff.InMilliseconds() << "ms."
+          << " padding " << frames << " frames";
+      scoped_refptr<AudioBuffer> emptyBuffer = AudioBuffer::CreateEmptyBuffer(
+        output->channel_layout(), output->channel_count(), output->sample_rate(), frames, output->timestamp());
+      output_cb_.Run(emptyBuffer);
+      time_compensated_ += diff;
+    }
     output_cb_.Run(output);
   }
 
@@ -346,6 +357,7 @@ bool FFmpegAudioDecoder::ConfigureDecoder(const AudioDecoderConfig& config) {
 
 void FFmpegAudioDecoder::ResetTimestampState(const AudioDecoderConfig& config) {
   // Opus codec delay is handled by ffmpeg.
+  time_compensated_ = base::TimeDelta();
   const int codec_delay =
       config.codec() == kCodecOpus ? 0 : config.codec_delay();
   discard_helper_.reset(new AudioDiscardHelper(config.samples_per_second(),
