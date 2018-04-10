@@ -160,7 +160,7 @@ bool MultibufferDataSource::media_has_played() const {
 }
 
 bool MultibufferDataSource::assume_fully_buffered() {
-  return !url_data_->url().SchemeIsHTTPOrHTTPS();
+  return !(url_data_->url().SchemeIsHTTPOrHTTPS() || url_data_->url().scheme().compare("rtmp")==0);
 }
 
 void MultibufferDataSource::SetReader(MultiBufferReader* reader) {
