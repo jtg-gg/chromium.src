@@ -92,8 +92,13 @@ component("blink") {
 
   if (media_use_ffmpeg || !is_android) {
     sources += [
+      "rtmp_multibuffer_data_provider.cc",
+      "rtmp_multibuffer_data_provider.h",
       "webmediaplayer_impl.cc",
       "webmediaplayer_impl.h",
+    ]
+    deps += [
+      "//third_party/ffmpeg",
     ]
     if (is_android) {
       sources += [
