@@ -590,7 +590,8 @@ void FFmpegDemuxerStream::EnqueuePacket(ScopedAVPacket packet) {
       buffer->timestamp() < base::TimeDelta()) {
     MEDIA_LOG(ERROR, media_log_)
         << "FFmpegDemuxer: unfixable negative timestamp.";
-    demuxer_->NotifyDemuxerError(DEMUXER_ERROR_COULD_NOT_PARSE);
+    if (demuxer_->container() != container_names::CONTAINER_FLV)
+      demuxer_->NotifyDemuxerError(DEMUXER_ERROR_COULD_NOT_PARSE);
     return;
   }
 
@@ -1414,8 +1415,8 @@ void FFmpegDemuxer::OnFindStreamInfoDone(int result) {
                                                 MediaTrack::Kind("main"),
                                                 track_label, track_language);
       media_track->set_id(MediaTrack::Id(base::NumberToString(track_id)));
-      DCHECK(track_id_to_demux_stream_map_.find(media_track->id()) ==
-             track_id_to_demux_stream_map_.end());
+      //DCHECK(track_id_to_demux_stream_map_.find(media_track->id()) ==
+      //       track_id_to_demux_stream_map_.end());
       track_id_to_demux_stream_map_[media_track->id()] = streams_[i].get();
     } else if (codec_type == AVMEDIA_TYPE_VIDEO) {
       VideoDecoderConfig video_config = streams_[i]->video_decoder_config();
@@ -1427,8 +1428,8 @@ void FFmpegDemuxer::OnFindStreamInfoDone(int result) {
                                                 MediaTrack::Kind("main"),
                                                 track_label, track_language);
       media_track->set_id(MediaTrack::Id(base::NumberToString(track_id)));
-      DCHECK(track_id_to_demux_stream_map_.find(media_track->id()) ==
-             track_id_to_demux_stream_map_.end());
+      //DCHECK(track_id_to_demux_stream_map_.find(media_track->id()) ==
+      //       track_id_to_demux_stream_map_.end());
       track_id_to_demux_stream_map_[media_track->id()] = streams_[i].get();
     }
 
