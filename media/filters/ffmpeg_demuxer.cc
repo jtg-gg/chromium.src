@@ -1401,8 +1401,8 @@ void FFmpegDemuxer::OnFindStreamInfoDone(const PipelineStatusCB& status_cb,
       media_track = media_tracks->AddAudioTrack(audio_config, track_id, "main",
                                                 track_label, track_language);
       media_track->set_id(base::UintToString(track_id));
-      DCHECK(track_id_to_demux_stream_map_.find(media_track->id()) ==
-             track_id_to_demux_stream_map_.end());
+      //DCHECK(track_id_to_demux_stream_map_.find(media_track->id()) ==
+      //       track_id_to_demux_stream_map_.end());
       track_id_to_demux_stream_map_[media_track->id()] = streams_[i].get();
     } else if (codec_type == AVMEDIA_TYPE_VIDEO) {
       VideoDecoderConfig video_config = streams_[i]->video_decoder_config();
@@ -1413,8 +1413,8 @@ void FFmpegDemuxer::OnFindStreamInfoDone(const PipelineStatusCB& status_cb,
       media_track = media_tracks->AddVideoTrack(video_config, track_id, "main",
                                                 track_label, track_language);
       media_track->set_id(base::UintToString(track_id));
-      DCHECK(track_id_to_demux_stream_map_.find(media_track->id()) ==
-             track_id_to_demux_stream_map_.end());
+      //DCHECK(track_id_to_demux_stream_map_.find(media_track->id()) ==
+      //       track_id_to_demux_stream_map_.end());
       track_id_to_demux_stream_map_[media_track->id()] = streams_[i].get();
     }
 
