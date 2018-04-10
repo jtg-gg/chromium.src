@@ -122,6 +122,8 @@ class MEDIA_EXPORT FFmpegAudioDecoder : public AudioDecoder {
   scoped_refptr<AudioBufferMemoryPool> pool_;
 
   std::unique_ptr<FFmpegDecodingLoop> decoding_loop_;
+  
+  base::TimeDelta time_compensated_;
 
   DISALLOW_IMPLICIT_CONSTRUCTORS(FFmpegAudioDecoder);
 };

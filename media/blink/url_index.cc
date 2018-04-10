@@ -15,6 +15,7 @@
 #include "base/time/time.h"
 #include "media/base/media_switches.h"
 #include "media/blink/resource_multibuffer_data_provider.h"
+#include "media/blink/rtmp_multibuffer_data_provider.h"
 
 namespace media {
 
@@ -30,6 +31,11 @@ ResourceMultiBuffer::~ResourceMultiBuffer() = default;
 std::unique_ptr<MultiBuffer::DataProvider> ResourceMultiBuffer::CreateWriter(
     const MultiBufferBlockId& pos,
     bool is_client_audio_element) {
+  if (!url_data_->url().scheme().compare("rtmp")) {
+    auto writer = std::make_unique<RTMPMultiBufferDataProvider>(
+      url_data_, pos, is_client_audio_element);
+    return writer;
+  }
   auto writer = std::make_unique<ResourceMultiBufferDataProvider>(
       url_data_, pos, is_client_audio_element);
   writer->Start();
