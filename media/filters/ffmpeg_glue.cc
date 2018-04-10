@@ -153,6 +153,8 @@ bool FFmpegGlue::OpenContext() {
     container_ = container_names::CONTAINER_AMR;
   else if (strcmp(format_context_->iformat->name, "avi") == 0)
     container_ = container_names::CONTAINER_AVI;
+  else if (strcmp(format_context_->iformat->name, "flv") == 0)
+    container_ = container_names::CONTAINER_FLV;
 
   DCHECK_NE(container_, container_names::CONTAINER_UNKNOWN);
   base::UmaHistogramSparse("Media.DetectedContainer", container_);
