@@ -87,9 +87,9 @@ void DesktopMediaListBase::UpdateSourcesList(
   // Iterate through the old sources to find the removed sources.
   for (size_t i = 0; i < sources_.size(); ++i) {
     if (new_source_set.find(sources_[i].id) == new_source_set.end()) {
-      sources_.erase(sources_.begin() + i);
       if (observer_)
         observer_->OnSourceRemoved(this, i);
+      sources_.erase(sources_.begin() + i);
       --i;
     }
   }
