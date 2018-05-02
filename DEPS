@@ -863,7 +863,9 @@ deps = {
       (Var("chromium_git")) + '/feed@3a782b5dac6c8f2f927613d3f37b8cad72f934b2'
   },
   'src/third_party/ffmpeg':
-    (Var("chromium_git")) + '/chromium/third_party/ffmpeg.git@5af686b3cfa25ee98bb9a88008ff04257d560764',
+    'https://github.com/jtg-gg/nwjs-ffmpeg.git@origin/dev31-m67',
+  'src/third_party/ffmpeg/libx264/x264_src':
+    'http://git.videolan.org/git/x264.git@e9a5903edf8ca59ef20e6f4894c196f135af735e',
   'src/third_party/flac':
     (Var("chromium_git")) + '/chromium/deps/flac.git@7d0f5b3a173ffe98db08057d1f52b7787569e0a6',
   'src/third_party/flatbuffers/src':
@@ -1322,6 +1324,12 @@ deps = {
   #  (Var("nwjs_git")) + '/nw.js.git@origin/nw16',
   #'src/third_party/node':
   #  (Var("nwjs_git")) + '/node.git@origin/nw16',
+  'src/v8':
+    (Var("nwjs_git")) + '/v8.git@origin/nw31',
+  'src/third_party/node-nw':
+    (Var("nwjs_git")) + '/node.git@origin/nw31',
+  'src/content/nw':
+    'https://github.com/jtg-gg/node-webkit.git@origin/dev31-m67',
 }
 
 gclient_gn_args = [
