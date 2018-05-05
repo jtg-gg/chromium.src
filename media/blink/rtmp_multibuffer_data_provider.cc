@@ -16,9 +16,9 @@ RTMPMultiBufferDataProvider::RTMPMultiBufferDataProvider(
     UrlData* url_data,
     MultiBufferBlockId pos,
     bool is_client_audio_element)
-    : pb_(NULL), readFail_(false), pos_(pos), url_data_(url_data), weak_factory_(this) {
+    : pb_(NULL), shutting_down_(false), read_result_(0), pos_(pos), url_data_(url_data), weak_factory_(this) {
   AVDictionary* opt = NULL;
-  av_dict_parse_string(&opt, "timeout=5000000", "=", ";", 0);
+  av_dict_parse_string(&opt, url_data->url().query().c_str(), "=", ";", 0);
   base::PostTaskWithTraitsAndReplyWithResult(
     FROM_HERE,
     { base::MayBlock(), base::TaskPriority::BACKGROUND,
@@ -61,13 +61,16 @@ scoped_refptr<DataBuffer> RTMPMultiBufferDataProvider::Read() {
   return ret;
 }
 
-/*void Terminate() {
+void RTMPMultiBufferDataProvider::Terminate() {
   fifo_.push_back(DataBuffer::CreateEOSBuffer());
   url_data_->multibuffer()->OnDataProviderEvent(this);
-}*/
+}
 
 RTMPMultiBufferDataProvider::~RTMPMultiBufferDataProvider() {
+  DLOG(INFO) << "~RTMPMultiBufferDataProvider " << this;
+  shutting_down_ = true;
   base::AutoLock lock(lock_);
+  HandleError(read_result_);
   avio_close(pb_);
 }
 
@@ -76,9 +79,17 @@ int64_t RTMPMultiBufferDataProvider::block_size() const {
   return ret << url_data_->multibuffer()->block_size_shift();
 }
 
+int RTMPMultiBufferDataProvider::interrupt_cb(void *ctx) {
+  RTMPMultiBufferDataProvider* this_ = reinterpret_cast<RTMPMultiBufferDataProvider*>(ctx);
+  return this_->shutting_down_ ? -1 : 0;
+}
+
 int RTMPMultiBufferDataProvider::FFMPEGOpen(AVDictionary* opt) {
-  int ret = avio_open2(&pb_, url_data_->url().spec().c_str(), AVIO_FLAG_READ, NULL, &opt);
+  base::AutoLock lock(lock_);
+  const AVIOInterruptCB int_cb = { RTMPMultiBufferDataProvider::interrupt_cb, this };
+  int ret = avio_open2(&pb_, url_data_->url().spec().c_str(), AVIO_FLAG_READ, &int_cb, &opt);
   av_dict_free(&opt);
+  DLOG(INFO) << "RTMPMultiBufferDataProvider::FFMPEGOpen " << ret;
   return ret;
 }
 
@@ -88,7 +99,7 @@ void RTMPMultiBufferDataProvider::FFMPEGOpenHandler(int FFMPEGOpenResult) {
       FROM_HERE, base::Bind(&UrlData::Fail,
                             url_data_));
   } else {
-    base::PostTaskWithTraitsAndReply(
+    base::PostTaskWithTraitsAndReplyWithResult(
       FROM_HERE,
       { base::MayBlock(), base::TaskPriority::BACKGROUND,
       base::TaskShutdownBehavior::SKIP_ON_SHUTDOWN },
@@ -98,18 +109,33 @@ void RTMPMultiBufferDataProvider::FFMPEGOpenHandler(int FFMPEGOpenResult) {
   }
 }
 
-void RTMPMultiBufferDataProvider::FFMPEGReadData() {
+int RTMPMultiBufferDataProvider::FFMPEGReadData() {
   base::AutoLock lock(lock_);
   data_.resize(1024*32);
-  int data_read = avio_read_partial(pb_, data_.data(), data_.size());
-  readFail_ = data_read <= 0;
-  if(!readFail_)
-    data_.resize(data_read);
+  read_result_ = avio_read_partial(pb_, data_.data(), data_.size());
+  if ( read_result_ > 0 ) {
+    data_.resize(read_result_);
+  } else {
+    LOG(INFO) << "RTMPMultiBufferDataProvider::FFMPEGReadData " << read_result_;
+  }
+  return read_result_;
 }
 
-void RTMPMultiBufferDataProvider::DidReceiveData() {
-  if(readFail_) {
-    url_data_->Fail();
+bool RTMPMultiBufferDataProvider::HandleError(int read_result) {
+  if (read_result < 0) {
+    read_result_ = 0;
+    if ( read_result == AVERROR_EOF ) {
+      Terminate();
+    } else {
+      url_data_->Fail();
+    }
+    return true;
+  }
+  return false;
+}
+
+void RTMPMultiBufferDataProvider::DidReceiveData(int read_result) {
+  if (HandleError(read_result)) {
     return;
   }
   int data_length = data_.size();
@@ -129,7 +155,7 @@ void RTMPMultiBufferDataProvider::DidReceiveData() {
     data_length -= to_append;
   }
   url_data_->multibuffer()->OnDataProviderEvent(this);
-  base::PostTaskWithTraitsAndReply(
+  base::PostTaskWithTraitsAndReplyWithResult(
     FROM_HERE,
     { base::MayBlock(), base::TaskPriority::BACKGROUND,
     base::TaskShutdownBehavior::SKIP_ON_SHUTDOWN },

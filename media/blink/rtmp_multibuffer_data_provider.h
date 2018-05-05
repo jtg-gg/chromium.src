@@ -33,16 +33,20 @@ public:
   void SetDeferred(bool defer) override {}
 
 private:
+  static int interrupt_cb(void *ctx);
+  void Terminate();
+  bool HandleError(int read_result);
   int64_t block_size() const;
   int FFMPEGOpen(AVDictionary* opt);
   void FFMPEGOpenHandler(int FFMPEGOpenResult);
-  void FFMPEGReadData();
-  void DidReceiveData();
+  int  FFMPEGReadData();
+  void DidReceiveData(int read_result);
       
   AVIOContext* pb_;
   std::vector<unsigned char> data_;
   base::Lock lock_;
-  bool readFail_;
+  bool shutting_down_;
+  int read_result_;
 
   // Current Position.
   MultiBufferBlockId pos_;
