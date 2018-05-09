@@ -19,10 +19,11 @@ RTMPMultiBufferDataProvider::RTMPMultiBufferDataProvider(
     : pb_(NULL), shutting_down_(false), read_result_(0), pos_(pos), url_data_(url_data), weak_factory_(this) {
   AVDictionary* opt = NULL;
   av_dict_parse_string(&opt, url_data->url().query().c_str(), "=", ";", 0);
-  base::PostTaskWithTraitsAndReplyWithResult(
+  
+  worker_thread_.reset(new base::Thread("RTMPMultiBufferDataProvider_worker"));
+  worker_thread_->Start();
+  worker_thread_->task_runner()->PostTaskAndReply(
     FROM_HERE,
-    { base::MayBlock(), base::TaskPriority::BACKGROUND,
-    base::TaskShutdownBehavior::SKIP_ON_SHUTDOWN },
     base::Bind(&RTMPMultiBufferDataProvider::FFMPEGOpen, base::Unretained(this), opt),
     base::Bind(&RTMPMultiBufferDataProvider::FFMPEGOpenHandler, weak_factory_.GetWeakPtr())
   );
@@ -72,6 +73,8 @@ RTMPMultiBufferDataProvider::~RTMPMultiBufferDataProvider() {
   base::AutoLock lock(lock_);
   HandleError(read_result_);
   avio_close(pb_);
+  worker_thread_->Stop();
+  worker_thread_.reset();
 }
 
 int64_t RTMPMultiBufferDataProvider::block_size() const {
@@ -84,32 +87,29 @@ int RTMPMultiBufferDataProvider::interrupt_cb(void *ctx) {
   return this_->shutting_down_ ? -1 : 0;
 }
 
-int RTMPMultiBufferDataProvider::FFMPEGOpen(AVDictionary* opt) {
+void RTMPMultiBufferDataProvider::FFMPEGOpen(AVDictionary* opt) {
   base::AutoLock lock(lock_);
   const AVIOInterruptCB int_cb = { RTMPMultiBufferDataProvider::interrupt_cb, this };
   int ret = avio_open2(&pb_, url_data_->url().spec().c_str(), AVIO_FLAG_READ, &int_cb, &opt);
   av_dict_free(&opt);
   DLOG(INFO) << "RTMPMultiBufferDataProvider::FFMPEGOpen " << ret;
-  return ret;
 }
 
-void RTMPMultiBufferDataProvider::FFMPEGOpenHandler(int FFMPEGOpenResult) {
-  if (FFMPEGOpenResult<0) {
+void RTMPMultiBufferDataProvider::FFMPEGOpenHandler() {
+  if (pb_ == NULL) {
     base::ThreadTaskRunnerHandle::Get()->PostTask(
       FROM_HERE, base::Bind(&UrlData::Fail,
                             url_data_));
   } else {
-    base::PostTaskWithTraitsAndReplyWithResult(
+    worker_thread_->task_runner()->PostTaskAndReply(
       FROM_HERE,
-      { base::MayBlock(), base::TaskPriority::BACKGROUND,
-      base::TaskShutdownBehavior::SKIP_ON_SHUTDOWN },
       base::Bind(&RTMPMultiBufferDataProvider::FFMPEGReadData, base::Unretained(this)),
       base::Bind(&RTMPMultiBufferDataProvider::DidReceiveData, weak_factory_.GetWeakPtr())
     );
   }
 }
 
-int RTMPMultiBufferDataProvider::FFMPEGReadData() {
+void RTMPMultiBufferDataProvider::FFMPEGReadData() {
   base::AutoLock lock(lock_);
   data_.resize(1024*32);
   read_result_ = avio_read_partial(pb_, data_.data(), data_.size());
@@ -118,7 +118,6 @@ int RTMPMultiBufferDataProvider::FFMPEGReadData() {
   } else {
     LOG(INFO) << "RTMPMultiBufferDataProvider::FFMPEGReadData " << read_result_;
   }
-  return read_result_;
 }
 
 bool RTMPMultiBufferDataProvider::HandleError(int read_result) {
@@ -126,7 +125,7 @@ bool RTMPMultiBufferDataProvider::HandleError(int read_result) {
     read_result_ = 0;
     if ( read_result == AVERROR_EOF ) {
       Terminate();
-    } else {
+    } else if (!shutting_down_) {
       url_data_->Fail();
     }
     return true;
@@ -134,8 +133,8 @@ bool RTMPMultiBufferDataProvider::HandleError(int read_result) {
   return false;
 }
 
-void RTMPMultiBufferDataProvider::DidReceiveData(int read_result) {
-  if (HandleError(read_result)) {
+void RTMPMultiBufferDataProvider::DidReceiveData() {
+  if (HandleError(read_result_)) {
     return;
   }
   int data_length = data_.size();
@@ -155,10 +154,8 @@ void RTMPMultiBufferDataProvider::DidReceiveData(int read_result) {
     data_length -= to_append;
   }
   url_data_->multibuffer()->OnDataProviderEvent(this);
-  base::PostTaskWithTraitsAndReplyWithResult(
+  worker_thread_->task_runner()->PostTaskAndReply(
     FROM_HERE,
-    { base::MayBlock(), base::TaskPriority::BACKGROUND,
-    base::TaskShutdownBehavior::SKIP_ON_SHUTDOWN },
     base::Bind(&RTMPMultiBufferDataProvider::FFMPEGReadData, base::Unretained(this)),
     base::Bind(&RTMPMultiBufferDataProvider::DidReceiveData, weak_factory_.GetWeakPtr())
   );

@@ -6,6 +6,7 @@
 #define MEDIA_BLINK_RTMP_MULTIBUFFER_DATA_PROVIDER_H_
 
 #include "base/memory/weak_ptr.h"
+#include "base/threading/thread.h"
 #include "media/blink/multibuffer.h"
 
 struct AVDictionary;
@@ -37,13 +38,14 @@ private:
   void Terminate();
   bool HandleError(int read_result);
   int64_t block_size() const;
-  int FFMPEGOpen(AVDictionary* opt);
-  void FFMPEGOpenHandler(int FFMPEGOpenResult);
-  int  FFMPEGReadData();
-  void DidReceiveData(int read_result);
+  void FFMPEGOpen(AVDictionary* opt);
+  void FFMPEGOpenHandler();
+  void FFMPEGReadData();
+  void DidReceiveData();
       
   AVIOContext* pb_;
   std::vector<unsigned char> data_;
+  std::unique_ptr<base::Thread> worker_thread_;
   base::Lock lock_;
   bool shutting_down_;
   int read_result_;
