@@ -62,6 +62,7 @@ class Database final : public ScriptWrappable {
   void Trace(blink::Visitor*) override;
 
   bool OpenAndVerifyVersion(bool set_version_in_new_database,
+                            const String& immediateCommand,
                             DatabaseError&,
                             String& error_message,
                             V8DatabaseCallback* creation_callback);
@@ -134,6 +135,7 @@ class Database final : public ScriptWrappable {
   class DatabaseTableNamesTask;
 
   bool PerformOpenAndVerify(bool set_version_in_new_database,
+                            const String& immediateCommand,
                             DatabaseError&,
                             String& error_message);
   void RunCreationCallback(V8DatabaseCallback* creation_callback,
