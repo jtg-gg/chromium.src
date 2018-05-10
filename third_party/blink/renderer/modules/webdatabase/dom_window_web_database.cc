@@ -45,7 +45,29 @@ Database* DOMWindowWebDatabase::openDatabase(LocalDOMWindow& window,
                                              unsigned estimated_size,
                                              ExceptionState& exception_state) {
   return openDatabase(window, name, version, display_name, estimated_size,
-                      nullptr, exception_state);
+                       "", nullptr, exception_state);
+}
+
+Database* DOMWindowWebDatabase::openDatabase(LocalDOMWindow& window,
+                                             const String& name,
+                                             const String& version,
+                                             const String& display_name,
+                                             unsigned estimated_size,
+                                             const String& immediateCommand,
+                                             ExceptionState& exception_state) {
+  return openDatabase(window, name, version, display_name, estimated_size,
+                      immediateCommand, nullptr, exception_state);
+}
+
+Database* DOMWindowWebDatabase::openDatabase(LocalDOMWindow& window,
+                                             const String& name,
+                                             const String& version,
+                                             const String& display_name,
+                                             unsigned estimated_size,
+                                             V8DatabaseCallback* creation_callback,
+                                             ExceptionState& exception_state) {
+  return openDatabase(window, name, version, display_name, estimated_size, "",
+                      creation_callback, exception_state);
 }
 
 Database* DOMWindowWebDatabase::openDatabase(
@@ -54,6 +76,7 @@ Database* DOMWindowWebDatabase::openDatabase(
     const String& version,
     const String& display_name,
     unsigned estimated_size,
+    const String& immediateCommand,
     V8DatabaseCallback* creation_callback,
     ExceptionState& exception_state) {
   if (!window.IsCurrentlyDisplayedInFrame())
@@ -69,7 +92,7 @@ Database* DOMWindowWebDatabase::openDatabase(
 
     String error_message;
     database = db_manager.OpenDatabase(window.document(), name, version,
-                                       display_name, estimated_size,
+                                       display_name, estimated_size, immediateCommand,
                                        creation_callback, error, error_message);
     DCHECK(database || error != DatabaseError::kNone);
     if (error != DatabaseError::kNone)
