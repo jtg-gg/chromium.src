@@ -78,6 +78,7 @@ class Database::DatabaseOpenTask final : public DatabaseTask {
   DatabaseOpenTask(Database*,
                    bool set_version_in_new_database,
                    base::WaitableEvent*,
+                   const String&,
                    DatabaseError&,
                    String& error_message,
                    bool& success);
@@ -91,6 +92,7 @@ class Database::DatabaseOpenTask final : public DatabaseTask {
   bool set_version_in_new_database_;
   DatabaseError& error_;
   String& error_message_;
+  const String& m_immediateCommand;
   bool& success_;
 };
 
