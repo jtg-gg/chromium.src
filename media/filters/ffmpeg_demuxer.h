@@ -258,6 +258,10 @@ class MEDIA_EXPORT FFmpegDemuxer : public Demuxer {
     return blocking_task_runner_;
   }
 
+  container_names::MediaContainerName container() const {
+    return glue_->container();
+  }
+
  private:
   // To allow tests access to privates.
   friend class FFmpegDemuxerTest;

@@ -524,7 +524,8 @@ void FFmpegDemuxerStream::EnqueuePacket(ScopedAVPacket packet) {
       buffer->timestamp() < base::TimeDelta()) {
     MEDIA_LOG(DEBUG, media_log_)
         << "FFmpegDemuxer: unfixable negative timestamp";
-    demuxer_->NotifyDemuxerError(DEMUXER_ERROR_COULD_NOT_PARSE);
+    if (demuxer_->container() != container_names::CONTAINER_FLV)
+      demuxer_->NotifyDemuxerError(DEMUXER_ERROR_COULD_NOT_PARSE);
     return;
   }
 
