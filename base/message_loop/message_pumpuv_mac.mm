@@ -117,9 +117,10 @@ int kevent_hook(int kq, const struct kevent *changelist, int nchanges,
   // Have the helper thread start select()ing on the kqueue.
   write(g_main_thread_pipe_fd, "~", 1);
 
+  NSDate *date = [[NSDate alloc] initWithTimeIntervalSinceNow:ts];
   [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
-                             beforeDate:[NSDate dateWithTimeIntervalSinceNow:ts]];
-
+                             beforeDate:date];
+  [date release];
   // Stop the helper thread if it hasn't already woken up (in which case it
   // would have already stopped itself).
   if (!g_quit_written)
