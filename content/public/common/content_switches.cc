@@ -999,6 +999,9 @@ const char kDisableLegacyIntermediateWindow[] = "disable-legacy-window";
 const char kEnableWin7WebRtcHWH264Decoding[] =
     "enable-win7-webrtc-hw-h264-decoding";
 
+// Minimum resolution for VideoFrame to use GpuMemoryBuffer
+const char kGpuMemoryBufferMinResolution[] = "gpu-memory-buffer-min-resolution";
+
 // DirectWrite FontCache is shared by browser to renderers using shared memory.
 // This switch allows us to pass the shared memory handle to the renderer.
 const char kFontCacheSharedHandle[] = "font-cache-shared-handle";
