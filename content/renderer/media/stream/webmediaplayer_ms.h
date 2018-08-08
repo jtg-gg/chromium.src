@@ -240,7 +240,7 @@ class CONTENT_EXPORT WebMediaPlayerMS
   friend class WebMediaPlayerMSTest;
 
 #if defined(OS_WIN)
-  static const gfx::Size kUseGpuMemoryBufferVideoFramesMinResolution;
+  static gfx::Size* pUseGpuMemoryBufferVideoFramesMinResolution;
 #endif  // defined(OS_WIN)
 
   // When we lose the context_provider, we destroy the CompositorFrameSink to
