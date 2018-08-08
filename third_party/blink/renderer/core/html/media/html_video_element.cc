@@ -207,6 +207,11 @@ void HTMLVideoElement::ParseAttribute(
       remoting_interstitial_->OnPosterImageChanged();
     if (picture_in_picture_interstitial_)
       picture_in_picture_interstitial_->OnPosterImageChanged();
+  } else if (params.name == html_names::kNwflagsAttr) {
+      if (!web_media_player_)
+        return;
+      const int nwflags = params.new_value.ToInt();
+      web_media_player_->SetNwflags(nwflags);
   } else if (params.name == html_names::kAutopictureinpictureAttr &&
              RuntimeEnabledFeatures::AutoPictureInPictureEnabled(
                  GetExecutionContext())) {
@@ -774,6 +779,8 @@ void HTMLVideoElement::OnIntersectionChangedForLazyLoad(
 }
 
 void HTMLVideoElement::OnWebMediaPlayerCreated() {
+  const AtomicString& nwflags = FastGetAttribute(html_names::kNwflagsAttr);
+  web_media_player_->SetNwflags(nwflags.ToInt());
   if (RuntimeEnabledFeatures::RequestVideoFrameCallbackEnabled()) {
     if (auto* vfc_requester = VideoFrameCallbackRequester::From(*this))
       vfc_requester->OnWebMediaPlayerCreated();

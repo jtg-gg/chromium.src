@@ -114,6 +114,7 @@ class BLINK_MODULES_EXPORT WebMediaPlayerMS
   void SetRate(double rate) override;
   void SetVolume(double volume) override;
   void SetLatencyHint(double seconds) override;
+  void SetNwflags(int nwflags) override;
   void SetPreservesPitch(bool preserves_pitch) override;
   void OnRequestPictureInPicture() override;
   void OnPictureInPictureAvailabilityChanged(bool available) override;
@@ -314,6 +315,7 @@ class BLINK_MODULES_EXPORT WebMediaPlayerMS
   // to outlive |this|. It is therefore safe use a raw pointer directly.
   WebMediaPlayerDelegate* delegate_;
   int delegate_id_;
+  int nwflags_;
 
   // Inner class used for transfering frames on compositor thread to
   // |compositor_|.

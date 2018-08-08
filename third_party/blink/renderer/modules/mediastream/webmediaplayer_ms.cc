@@ -189,11 +189,14 @@ class WebMediaPlayerMS::FrameDeliverer {
     }
 
 #if defined(OS_WIN)
-    const bool skip_creating_gpu_memory_buffer =
+    bool skip_creating_gpu_memory_buffer =
         frame->visible_rect().width() <
             kUseGpuMemoryBufferVideoFramesMinResolution.width() ||
         frame->visible_rect().height() <
             kUseGpuMemoryBufferVideoFramesMinResolution.height();
+    if (player_ && player_->nwflags_) {
+      skip_creating_gpu_memory_buffer = player_->nwflags_ == 1;
+    }
 #else
     const bool skip_creating_gpu_memory_buffer = false;
 #endif  // defined(OS_WIN)
@@ -325,6 +328,7 @@ WebMediaPlayerMS::WebMediaPlayerMS(
       client_(client),
       delegate_(delegate),
       delegate_id_(0),
+      nwflags_(0),
       paused_(true),
       video_transformation_(media::kNoTransformation),
       media_log_(std::move(media_log)),
@@ -804,6 +808,10 @@ void WebMediaPlayerMS::SetPreservesPitch(bool preserves_pitch) {
   // Since WebMediaPlayerMS::SetRate() is a no-op, it doesn't make sense to
   // handle pitch preservation flags. The playback rate should always be 1.0,
   // and thus there should be no pitch-shifting.
+}
+
+void WebMediaPlayerMS::SetNwflags(int nwflags) {
+  nwflags_ = nwflags;
 }
 
 void WebMediaPlayerMS::OnRequestPictureInPicture() {

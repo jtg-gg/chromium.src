@@ -341,5 +341,6 @@
     "nwdirectorydesc",
     "nwsaveas",
     "nwuseragent",
+    "nwflags",
   ],
 }
