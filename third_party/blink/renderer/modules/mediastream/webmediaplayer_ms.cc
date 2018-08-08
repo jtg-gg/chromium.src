@@ -11,6 +11,8 @@
 
 #include "base/bind.h"
 #include "base/callback.h"
+#include "base/strings/string_number_conversions.h"
+#include "base/strings/string_split.h"
 #include "base/threading/thread_task_runner_handle.h"
 #include "build/build_config.h"
 #include "cc/layers/video_frame_provider_client_impl.h"
@@ -19,6 +21,7 @@
 #include "media/base/media_content_type.h"
 #include "media/base/media_log.h"
 #include "media/base/video_frame.h"
+#include "media/base/media_switches.h"
 #include "media/base/video_transformation.h"
 #include "media/base/video_types.h"
 #include "media/video/gpu_memory_buffer_video_frame_pool.h"
@@ -83,8 +86,7 @@ namespace blink {
 // resolution content which are defined by these thresholds, see
 // https://crbug.com/835752.
 // static
-const gfx::Size WebMediaPlayerMS::kUseGpuMemoryBufferVideoFramesMinResolution =
-    gfx::Size(1920, 1080);
+gfx::Size* WebMediaPlayerMS::pUseGpuMemoryBufferVideoFramesMinResolution = NULL;
 #endif  // defined(OS_WIN)
 
 // FrameDeliverer is responsible for delivering frames received on
@@ -138,11 +140,27 @@ class WebMediaPlayerMS::FrameDeliverer {
     }
 
 #if defined(OS_WIN)
+    if (pUseGpuMemoryBufferVideoFramesMinResolution == NULL) {
+      std::string min_resolution_str(
+        base::CommandLine::ForCurrentProcess()->GetSwitchValueASCII(
+          switches::kGpuMemoryBufferMinResolution));
+      std::vector<std::string> resolutions = base::SplitString(
+        min_resolution_str, "x", base::KEEP_WHITESPACE, base::SPLIT_WANT_ALL);
+      int width, height;
+      if (resolutions.size() != 2 || 
+          !base::StringToInt(resolutions[0], &width) || 
+          !base::StringToInt(resolutions[1], &height)) {
+        width = 1920;
+        height = 1080;
+      }
+      static gfx::Size gpuMemoryBufferVideoFramesMinResolution(width, height);
+      pUseGpuMemoryBufferVideoFramesMinResolution = &gpuMemoryBufferVideoFramesMinResolution;
+    }
     const bool skip_creating_gpu_memory_buffer =
         frame->visible_rect().width() <
-            kUseGpuMemoryBufferVideoFramesMinResolution.width() ||
+            pUseGpuMemoryBufferVideoFramesMinResolution->width() ||
         frame->visible_rect().height() <
-            kUseGpuMemoryBufferVideoFramesMinResolution.height();
+            pUseGpuMemoryBufferVideoFramesMinResolution->height();
 #else
     const bool skip_creating_gpu_memory_buffer = false;
 #endif  // defined(OS_WIN)

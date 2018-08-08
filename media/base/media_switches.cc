@@ -55,6 +55,9 @@ const char kEnableExclusiveAudio[] = "enable-exclusive-audio";
 // Use Windows WaveOut/In audio API even if Core Audio is supported.
 const char kForceWaveAudio[] = "force-wave-audio";
 
+// Minimum resolution for VideoFrame to use GpuMemoryBuffer
+const char kGpuMemoryBufferMinResolution[] = "gpu-memory-buffer-min-resolution";
+
 // Instead of always using the hardware channel layout, check if a driver
 // supports the source channel layout.  Avoids outputting empty channels and
 // permits drivers to enable stereo to multichannel expansion.  Kept behind a
