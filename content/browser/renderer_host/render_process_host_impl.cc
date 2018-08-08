@@ -3119,6 +3119,7 @@ void RenderProcessHostImpl::PropagateBrowserCommandLineToRenderer(
 #if defined(OS_WIN)
     service_manager::switches::kDisableWin32kLockDown,
     switches::kEnableWin7WebRtcHWH264Decoding,
+    switches::kGpuMemoryBufferMinResolution,
     switches::kTrySupportedChannelLayouts,
 #endif
 #if defined(USE_OZONE)
