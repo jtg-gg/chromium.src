@@ -242,7 +242,7 @@ class CONTENT_EXPORT WebMediaPlayerMS
   friend class WebMediaPlayerMSTest;
 
 #if defined(OS_WIN)
-  static const gfx::Size kUseGpuMemoryBufferVideoFramesMinResolution;
+  static gfx::Size* pUseGpuMemoryBufferVideoFramesMinResolution;
 #endif  // defined(OS_WIN)
 
   bool IsInPictureInPicture() const;
