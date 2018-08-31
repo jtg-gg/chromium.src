@@ -71,6 +71,7 @@ static_library("app") {
     "//base",
     "//build:branding_buildflags",
     "//content/public/common:content_descriptors",
+    "//content/nw:commit_id",
   ]
 
   if (is_mac || is_win || is_android || is_linux || is_chromeos) {
