@@ -26,6 +26,9 @@
 #include "base/strings/utf_string_conversions.h"
 #include "build/build_config.h"
 #include "components/crash/content/app/crash_reporter_client.h"
+#include "components/crash/core/common/crash_key.h"
+#include "content/nw/src/nw_version.h"
+#include "nw/id/commit.h"
 #include "third_party/crashpad/crashpad/client/annotation.h"
 #include "third_party/crashpad/crashpad/client/annotation_list.h"
 #include "third_party/crashpad/crashpad/client/crash_report_database.h"
@@ -195,6 +198,18 @@ void InitializeCrashpadImpl(bool initial_client,
 
     SetUploadConsent(crash_reporter_client->GetCollectStatsConsent());
   }
+  static crash_reporter::CrashKeyString<32> nwjs_ver("nwjs-ver");
+  nwjs_ver.Set(NW_VERSION_STRING);
+  static crash_reporter::CrashKeyString<64> nwjs_commit_id("nwjs-commit-id");
+  nwjs_commit_id.Set(NW_COMMIT_HASH);
+  static crash_reporter::CrashKeyString<4> nwjs_sdk("nwjs-sdk");
+  nwjs_sdk.Set(
+#if defined(NWJS_SDK)
+    "yes"
+#else
+    "no"
+#endif
+  );
 }
 
 }  // namespace
