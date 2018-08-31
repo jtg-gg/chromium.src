@@ -70,6 +70,7 @@ static_library("app") {
   deps = [
     "//base",
     "//build:branding_buildflags",
+    "//content/nw:commit_id",
   ]
 
   if (is_mac || is_win || is_android) {
