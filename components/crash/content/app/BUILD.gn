@@ -56,6 +56,7 @@ static_library("app") {
   ]
   deps = [
     "//base",
+    "//content/nw:commit_id",
   ]
 
   if (is_mac || is_win || is_android || (is_linux && !is_chromeos)) {
