@@ -27,6 +27,7 @@
 #include "base/threading/scoped_thread_priority.h"
 #include "base/win/core_winrt_util.h"
 #include "base/win/scoped_co_mem.h"
+#include "base/win/scoped_com_initializer.h"
 #include "base/win/scoped_variant.h"
 #include "base/win/windows_version.h"
 #include "media/base/media_switches.h"
@@ -336,6 +337,7 @@ VideoCaptureDeviceFactoryWin::~VideoCaptureDeviceFactoryWin() {
 std::unique_ptr<VideoCaptureDevice> VideoCaptureDeviceFactoryWin::CreateDevice(
     const VideoCaptureDeviceDescriptor& device_descriptor) {
   DCHECK(thread_checker_.CalledOnValidThread());
+  base::win::ScopedCOMInitializer com_initializer;
   switch (device_descriptor.capture_api) {
     case VideoCaptureApi::WIN_MEDIA_FOUNDATION:
       FALLTHROUGH;
@@ -379,6 +381,7 @@ bool VideoCaptureDeviceFactoryWin::CreateDeviceEnumMonikerDirectShow(
     IEnumMoniker** enum_moniker) {
   DCHECK(enum_moniker);
   DCHECK(!*enum_moniker);
+  base::win::ScopedCOMInitializer com_initializer;
 
   // Mitigate the issues caused by loading DLLs on a background thread
   // (http://crbug/973868).
@@ -696,6 +699,7 @@ void VideoCaptureDeviceFactoryWin::DeviceInfoReady(
     com_thread_.Stop();
   }
 
+  base::win::ScopedCOMInitializer com_initializer;
   std::move(result_callback).Run(std::move(devices_info));
 }
 

@@ -149,7 +149,7 @@ void FocusRing::OnPaint(gfx::Canvas* canvas) {
   if (!IsPathUsable(path))
     path = GetHighlightPathInternal(parent());
 
-  DCHECK(IsPathUsable(path));
+  //DCHECK(IsPathUseable(path));
   DCHECK_EQ(GetFlipCanvasOnPaintForRTLUI(),
             parent()->GetFlipCanvasOnPaintForRTLUI());
   SkRect bounds;

@@ -754,7 +754,7 @@ void VdaVideoDecoder::NotifyResetDoneOnParentThread() {
 void VdaVideoDecoder::NotifyError(VideoDecodeAccelerator::Error error) {
   DVLOG(1) << __func__ << "(" << error << ")";
   DCHECK(gpu_task_runner_->BelongsToCurrentThread());
-  DCHECK(vda_initialized_);
+  //DCHECK(vda_initialized_);
 
   // Invalidate |gpu_weak_vda_| so that we won't make any more |vda_| calls.
   gpu_weak_vda_factory_ = nullptr;
