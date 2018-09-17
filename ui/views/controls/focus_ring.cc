@@ -106,7 +106,7 @@ void FocusRing::OnPaint(gfx::Canvas* canvas) {
   if (path.isEmpty())
     path = GetHighlightPath(parent());
 
-  DCHECK(IsPathUseable(path));
+  //DCHECK(IsPathUseable(path));
   SkRect bounds;
   SkRRect rbounds;
   if (path.isRect(&bounds)) {
