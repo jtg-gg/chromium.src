@@ -66,7 +66,8 @@ LoopbackStream::LoopbackStream(
   //
   // Construct the components of the AudioDataPipe, for delivering the data to
   // the consumer. If successful, create the FlowNetwork too.
-  if (base::TimeTicks::IsHighResolution()) {
+  // || true is added fow workaround where audio loopback fail
+  if (base::TimeTicks::IsHighResolution() || true) {
     base::CancelableSyncSocket foreign_socket;
     std::unique_ptr<InputSyncWriter> writer = InputSyncWriter::Create(
         base::BindRepeating(

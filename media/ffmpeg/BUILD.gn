@@ -14,6 +14,9 @@ source_set("ffmpeg") {
     "//media",
     "//media/filters",
   ]
+  if (is_component_build) {
+    visibility += ["//chrome:chrome_dll"]
+  }
   configs += [
     # TODO(crbug.com/167187): Fix size_t to int truncations.
     "//build/config/compiler:no_size_t_to_int_warning",
