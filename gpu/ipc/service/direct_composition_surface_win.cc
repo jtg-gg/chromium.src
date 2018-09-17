@@ -595,9 +595,9 @@ bool DCLayerTree::InitializeVideoProcessor(const gfx::Size& input_size,
     // This can fail if the D3D device is "Microsoft Basic Display Adapter".
     if (FAILED(d3d11_device_.CopyTo(video_device_.GetAddressOf()))) {
       DLOG(ERROR) << "Failed to retrieve video device from D3D11 device";
-      return false;
+      //return false;
     }
-    DCHECK(video_device_);
+    //DCHECK(video_device_);
 
     Microsoft::WRL::ComPtr<ID3D11DeviceContext> context;
     d3d11_device_->GetImmediateContext(context.GetAddressOf());
