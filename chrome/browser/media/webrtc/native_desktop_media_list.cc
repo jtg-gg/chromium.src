@@ -241,6 +241,9 @@ NativeDesktopMediaList::NativeDesktopMediaList(
 #else
   base::MessageLoop::Type thread_type = base::MessageLoop::TYPE_DEFAULT;
 #endif
+#if defined(OS_WIN)
+  thread_.init_com_with_mta(true);
+#endif
   thread_.StartWithOptions(base::Thread::Options(thread_type, 0));
 
   worker_.reset(new Worker(thread_.task_runner(), weak_factory_.GetWeakPtr(),
