@@ -118,7 +118,7 @@ void FocusRing::OnPaint(gfx::Canvas* canvas) {
   if (path.isEmpty())
     path = GetHighlightPathInternal(parent());
 
-  DCHECK(IsPathUseable(path));
+  //DCHECK(IsPathUseable(path));
   DCHECK_EQ(flip_canvas_on_paint_for_rtl_ui(),
             parent()->flip_canvas_on_paint_for_rtl_ui());
   SkRect bounds;

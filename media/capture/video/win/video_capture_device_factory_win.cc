@@ -23,6 +23,7 @@
 #include "base/strings/sys_string_conversions.h"
 #include "base/win/core_winrt_util.h"
 #include "base/win/scoped_co_mem.h"
+#include "base/win/scoped_com_initializer.h"
 #include "base/win/scoped_variant.h"
 #include "base/win/windows_version.h"
 #include "media/base/media_switches.h"
@@ -268,6 +269,7 @@ void GetDeviceSupportedFormatsMediaFoundation(const Descriptor& descriptor,
                                               VideoCaptureFormats* formats) {
   DVLOG(1) << "GetDeviceSupportedFormatsMediaFoundation for "
            << descriptor.display_name();
+  base::win::ScopedCOMInitializer com_initializer;
   ComPtr<IMFMediaSource> source;
   if (!CreateVideoCaptureDeviceMediaFoundation(descriptor,
                                                source.GetAddressOf())) {
@@ -393,6 +395,7 @@ VideoCaptureDeviceFactoryWin::~VideoCaptureDeviceFactoryWin() {
 std::unique_ptr<VideoCaptureDevice> VideoCaptureDeviceFactoryWin::CreateDevice(
     const Descriptor& device_descriptor) {
   DCHECK(thread_checker_.CalledOnValidThread());
+  base::win::ScopedCOMInitializer com_initializer;
   switch (device_descriptor.capture_api) {
     case VideoCaptureApi::WIN_MEDIA_FOUNDATION:
       FALLTHROUGH;
@@ -429,6 +432,7 @@ std::unique_ptr<VideoCaptureDevice> VideoCaptureDeviceFactoryWin::CreateDevice(
 void VideoCaptureDeviceFactoryWin::GetDeviceDescriptors(
     VideoCaptureDeviceDescriptors* device_descriptors) {
   DCHECK(thread_checker_.CalledOnValidThread());
+  base::win::ScopedCOMInitializer com_initializer;
 
   if (use_media_foundation_) {
     GetDeviceDescriptorsMediaFoundation(device_descriptors);
@@ -607,6 +611,7 @@ void VideoCaptureDeviceFactoryWin::DeviceInfoReady(
     com_thread_.Stop();
   }
 
+  base::win::ScopedCOMInitializer com_initializer;
   std::move(result_callback).Run(std::move(device_descriptors));
 }
 
