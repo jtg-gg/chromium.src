@@ -13,6 +13,10 @@
 #include "extensions/common/extension.h"
 #include "extensions/common/permissions/permissions_data.h"
 
+#ifdef OS_MACOSX
+#include "chrome/browser/media/os_media_access_handler_mac.h"
+#endif
+
 namespace {
 
 // This is a short-term solution to grant camera and/or microphone access to
@@ -85,7 +89,12 @@ void ExtensionMediaAccessHandler::HandleRequest(
           extensions::APIPermission::kVideoCapture) &&
       GetDevicePolicy(profile, extension->url(), prefs::kVideoCaptureAllowed,
                       prefs::kVideoCaptureAllowedUrls) != ALWAYS_DENY;
-
+#ifdef OS_MACOSX
+  OSMediaAccessHandlerMac::CheckDevicesAndRunCallback(
+      web_contents, request, std::move(callback),
+      audio_allowed, video_allowed);
+  return;
+#endif
   CheckDevicesAndRunCallback(web_contents, request, std::move(callback),
                              audio_allowed, video_allowed);
 }
