@@ -25,6 +25,7 @@
 #include "media/audio/mac/audio_auhal_mac.h"
 #include "media/audio/mac/audio_input_mac.h"
 #include "media/audio/mac/audio_low_latency_input_mac.h"
+#include "media/audio/mac/audio_permission_mac.h"
 #include "media/audio/mac/core_audio_util_mac.h"
 #include "media/audio/mac/coreaudio_dispatch_override.h"
 #include "media/audio/mac/scoped_audio_unit.h"
@@ -782,6 +783,10 @@ AudioInputStream* AudioManagerMac::MakeLinearInputStream(
     const LogCallback& log_callback) {
   DCHECK(GetTaskRunner()->BelongsToCurrentThread());
   DCHECK_EQ(AudioParameters::AUDIO_PCM_LINEAR, params.format());
+  if (!GetAudioPermission()) {
+    LOG(WARNING) << "Permission Denied";
+    return nullptr;
+  }
   AudioInputStream* stream = new PCMQueueInAudioInputStream(this, params);
   basic_input_streams_.push_back(stream);
   return stream;
@@ -799,7 +804,10 @@ AudioInputStream* AudioManagerMac::MakeLowLatencyInputStream(
   if (audio_device_id == kAudioObjectUnknown) {
     return nullptr;
   }
-
+  if (!GetAudioPermission()) {
+    LOG(WARNING) << "Permission Denied";
+    return nullptr;
+  }
   VoiceProcessingMode voice_processing_mode =
       (params.effects() & AudioParameters::ECHO_CANCELLER)
           ? VoiceProcessingMode::kEnabled
