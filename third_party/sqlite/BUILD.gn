@@ -82,6 +82,7 @@ config("chromium_sqlite3_compile_options") {
     # execution failing. Review:
     #   patched/src/parse.py
     #   patched/tool/mkkeywordhash.c
+    "SQLITE_HAS_CODEC=1",
 
     # The flags below are recommended in the SQLite documentation, and disable
     # features Chrome doesn't use.
@@ -360,6 +361,7 @@ component("chromium_sqlite3") {
 
   deps = [
     "//third_party/icu",
+    "//third_party/boringssl",
   ]
 }
 
