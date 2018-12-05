@@ -7731,3 +7731,24 @@ int sqlite3PagerWalFramesize(Pager *pPager){
 #endif
 
 #endif /* SQLITE_OMIT_DISKIO */
+
+/* BEGIN SQLCIPHER */
+#ifdef SQLITE_HAS_CODEC
+
+int sqlite3pager_is_mj_pgno(Pager *pPager, Pgno pgno) {
+  return (PAGER_MJ_PGNO(pPager) == pgno) ? 1 : 0;
+}
+
+void sqlite3pager_error(Pager *pPager, int error) {
+  pPager->errCode = error;
+  pPager->eState = PAGER_ERROR;
+  setGetterMethod(pPager);
+}
+
+void sqlite3pager_reset(Pager *pPager){
+  pager_reset(pPager);
+}
+
+#endif
+/* END SQLCIPHER */
+
