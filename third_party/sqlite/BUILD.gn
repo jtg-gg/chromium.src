@@ -86,6 +86,8 @@ config("chromium_sqlite3_compile_options") {
     # execution failing. Review:
     #   src/src/parse.py
     #   src/tool/mkkeywordhash.c
+    "SQLITE_HAS_CODEC=1",
+    "SQLITE_TEMP_STORE=2",
 
     # The flags below are recommended in the SQLite documentation, and disable
     # features Chrome doesn't use.
@@ -319,6 +321,7 @@ component("chromium_sqlite3") {
 
   deps = [
     "//third_party/icu",
+    "//third_party/boringssl",
   ]
 }
 
@@ -340,7 +343,7 @@ group("sqlite") {
   ]
 }
 
-if (is_linux || is_mac) {
+if (is_linux || is_mac || is_win) {
   executable("sqlite_shell") {
     include_dirs = [
       # shell.c contains an '#include "sqlite3.h", which we want to be
