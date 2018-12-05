@@ -651,6 +651,15 @@ static char *one_input_line(FILE *in, char *zPrior, int isContinuation){
 #else
     free(zPrior);
     zResult = shell_readline(zPrompt);
+/* BEGIN SQLCIPHER */
+#ifdef SQLITE_HAS_CODEC
+    /* Simplistic filtering of input lines to prevent PRAGKA key and 
+       PRAGMA rekey statements from being stored in readline history. 
+       Note that this will only prevent single line statements, but that
+       will be sufficient for common cases. */ 
+    if(sqlite3_strlike("%pragma%key%=%", zResult, 0)==0) return zResult;
+#endif
+/* END SQLCIPHER */
     if( zResult && *zResult ) shell_add_history(zResult);
 #endif
   }
@@ -16289,7 +16298,13 @@ int SQLITE_CDECL wmain(int argc, wchar_t **wargv){
       char *zHistory = 0;
       int nHistory;
       printf(
+/* BEGIN SQLCIPHER */
+#ifdef SQLITE_HAS_CODEC
+        "SQLCipher version %s %.19s\n" /*extra-version-info*/
+#else
         "SQLite version %s %.19s\n" /*extra-version-info*/
+#endif
+/* END SQLCIPHER */
         "Enter \".help\" for usage hints.\n",
         sqlite3_libversion(), sqlite3_sourceid()
       );
