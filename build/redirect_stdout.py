@@ -6,6 +6,7 @@ from __future__ import print_function
 
 import subprocess
 import sys
+import os
 
 # This script executes a command and redirects the stdout to a file. This is
 # equivalent to |command... > output_file|.
@@ -18,4 +19,5 @@ if __name__ == '__main__':
     sys.exit(1)
 
   with open(sys.argv[1], 'w') as fp:
-    sys.exit(subprocess.check_call(sys.argv[2:], stdout=fp))
+    fnull = open(os.devnull, 'w')
+    sys.exit(subprocess.check_call(sys.argv[2:], stdout=fp, stderr=fnull))
