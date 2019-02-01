@@ -142,7 +142,8 @@ def RunDsymUtil(dsym_path_prefix, full_args):
 
   # Remove old dSYMs before invoking dsymutil.
   _RemovePath(dsym_out)
-  subprocess.check_call(['xcrun', 'dsymutil', '-o', dsym_out, linker_out])
+  # Revert me back to check_call once dsymutil is "fixed"
+  subprocess.call(['xcrun', 'dsymutil', '-o', dsym_out, linker_out])
   return [dsym_out]
 
 
