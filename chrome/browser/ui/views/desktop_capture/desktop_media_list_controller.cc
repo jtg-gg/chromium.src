@@ -20,7 +20,9 @@ DesktopMediaListController::DesktopMediaListController(
     std::unique_ptr<DesktopMediaList> media_list)
     : dialog_(parent), media_list_(std::move(media_list)) {}
 
-DesktopMediaListController::~DesktopMediaListController() = default;
+DesktopMediaListController::~DesktopMediaListController() {
+  DesktopMediaList::StopAndRelease(media_list_);
+}
 
 std::unique_ptr<views::View> DesktopMediaListController::CreateView(
     DesktopMediaSourceViewStyle generic_style,
