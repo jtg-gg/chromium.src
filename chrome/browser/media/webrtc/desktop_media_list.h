@@ -32,6 +32,10 @@ class DesktopMediaList {
 
   virtual ~DesktopMediaList() {}
 
+  // Set the stop flag to true, so The worker thread can stop at proper time
+  // After that, delete the DesktopMediaList
+  static bool StopAndRelease(std::unique_ptr<DesktopMediaList>& in);
+
   // Sets time interval between updates. By default list of sources and their
   // thumbnail are updated once per second. If called after StartUpdating() then
   // it will take effect only after the next update.
@@ -57,6 +61,10 @@ class DesktopMediaList {
   virtual const Source& GetSource(int index) const = 0;
 
   virtual content::DesktopMediaID::Type GetMediaListType() const = 0;
+
+ protected:
+   // Returns true if the subclass implement "Stop" thread
+  virtual bool Stop();
 };
 
 #endif  // CHROME_BROWSER_MEDIA_WEBRTC_DESKTOP_MEDIA_LIST_H_

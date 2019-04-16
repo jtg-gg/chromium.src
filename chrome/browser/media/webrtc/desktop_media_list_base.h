@@ -44,6 +44,9 @@ class DesktopMediaListBase : public DesktopMediaList {
 
   virtual void Refresh() = 0;
 
+  // DesktopMediaList interface, set observer to null
+  bool Stop() override;
+
   // Update source media list to observer.
   void UpdateSourcesList(const std::vector<SourceDescription>& new_sources);
 
