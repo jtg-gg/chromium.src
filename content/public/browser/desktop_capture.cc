@@ -39,7 +39,7 @@ std::unique_ptr<webrtc::DesktopCapturer> CreateScreenCapturer() {
 }
 
 std::unique_ptr<webrtc::DesktopCapturer> CreateWindowCapturer() {
-  return webrtc::DesktopCapturer::CreateWindowCapturer(
+  return webrtc::CroppingWindowCapturer::CreateCapturer(
       CreateDesktopCaptureOptions());
 }
 

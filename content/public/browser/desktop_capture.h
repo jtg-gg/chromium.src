@@ -6,8 +6,8 @@
 #define CONTENT_PUBLIC_BROWSER_DESKTOP_CAPTURE_H_
 
 #include "content/common/content_export.h"
+#include "third_party/webrtc/modules/desktop_capture/cropping_window_capturer.h"
 #include "third_party/webrtc/modules/desktop_capture/desktop_capture_options.h"
-#include "third_party/webrtc/modules/desktop_capture/desktop_capturer.h"
 
 namespace content {
 namespace desktop_capture {
