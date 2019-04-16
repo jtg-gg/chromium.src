@@ -10,6 +10,7 @@
 #include "base/synchronization/waitable_event.h"
 #include "base/task/post_task.h"
 #include "base/task/task_traits.h"
+#include "base/threading/thread.h"
 #include "build/build_config.h"
 #include "third_party/webrtc/api/task_queue/task_queue_base.h"
 #include "third_party/webrtc/api/task_queue/task_queue_factory.h"
@@ -18,9 +19,21 @@ namespace {
 
 class WebrtcTaskQueue final : public webrtc::TaskQueueBase {
  public:
-  explicit WebrtcTaskQueue(const base::TaskTraits& traits)
-      : task_runner_(base::CreateSequencedTaskRunnerWithTraits(traits)),
-        is_active_(new base::RefCountedData<bool>(true)) {
+  explicit WebrtcTaskQueue(const absl::string_view& name, const base::TaskTraits& traits)
+      : is_active_(new base::RefCountedData<bool>(true)) {
+#if defined(OS_WIN)
+    if (!strcmp(name.data(), "ScreenCapturerWinMagnifierWorker")) {
+      base::MessageLoop::Type thread_type = base::MessageLoop::TYPE_UI;
+      thread_ = std::make_unique<base::Thread>(name.data());
+      thread_->init_com_with_mta(true);
+      thread_->StartWithOptions(base::Thread::Options(thread_type, 0));
+      task_runner_ = thread_->task_runner();
+    }
+    else
+#endif
+    {
+      task_runner_ = base::CreateSequencedTaskRunnerWithTraits(traits);
+    }
     DCHECK(task_runner_);
   }
 
@@ -36,9 +49,10 @@ class WebrtcTaskQueue final : public webrtc::TaskQueueBase {
                       scoped_refptr<base::RefCountedData<bool>> is_active,
                       std::unique_ptr<webrtc::QueuedTask> task);
 
-  const scoped_refptr<base::SequencedTaskRunner> task_runner_;
+  scoped_refptr<base::SequencedTaskRunner> task_runner_;
   // Value of |is_active_| is checked and set on |task_runner_|.
   const scoped_refptr<base::RefCountedData<bool>> is_active_;
+  std::unique_ptr<base::Thread> thread_;
 };
 
 void Deactivate(scoped_refptr<base::RefCountedData<bool>> is_active,
@@ -124,10 +138,10 @@ class WebrtcTaskQueueFactory final : public webrtc::TaskQueueFactory {
   WebrtcTaskQueueFactory() = default;
 
   std::unique_ptr<webrtc::TaskQueueBase, webrtc::TaskQueueDeleter>
-  CreateTaskQueue(absl::string_view /*name*/,
+  CreateTaskQueue(absl::string_view name,
                   Priority priority) const override {
     return std::unique_ptr<webrtc::TaskQueueBase, webrtc::TaskQueueDeleter>(
-        new WebrtcTaskQueue(TaskQueuePriority2Traits(priority)));
+        new WebrtcTaskQueue(name, TaskQueuePriority2Traits(priority)));
   }
 };
 
@@ -140,5 +154,5 @@ std::unique_ptr<webrtc::TaskQueueFactory> CreateWebRtcTaskQueueFactory() {
 std::unique_ptr<webrtc::TaskQueueBase, webrtc::TaskQueueDeleter>
 CreateWebRtcTaskQueue(webrtc::TaskQueueFactory::Priority priority) {
   return std::unique_ptr<webrtc::TaskQueueBase, webrtc::TaskQueueDeleter>(
-      new WebrtcTaskQueue(TaskQueuePriority2Traits(priority)));
+      new WebrtcTaskQueue(absl::string_view(), TaskQueuePriority2Traits(priority)));
 }

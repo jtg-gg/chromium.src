@@ -16,6 +16,18 @@
 using content::BrowserThread;
 using content::DesktopMediaID;
 
+bool DesktopMediaList::StopAndRelease(std::unique_ptr<DesktopMediaList>& in) {
+  if (in->Stop()) {
+    in.release();
+    return true;
+  }
+  return false;
+}
+
+bool DesktopMediaList::Stop() {
+  return false;
+}
+
 DesktopMediaListBase::DesktopMediaListBase(base::TimeDelta update_period)
     : update_period_(update_period), weak_factory_(this) {}
 
@@ -41,6 +53,11 @@ void DesktopMediaListBase::StartUpdating(DesktopMediaListObserver* observer) {
   Refresh();
 }
 
+bool DesktopMediaListBase::Stop() {
+  observer_ = nullptr;
+  return false;
+}
+
 int DesktopMediaListBase::GetSourceCount() const {
   return sources_.size();
 }
@@ -63,6 +80,9 @@ DesktopMediaListBase::SourceDescription::SourceDescription(
 
 void DesktopMediaListBase::UpdateSourcesList(
     const std::vector<SourceDescription>& new_sources) {
+  if (!observer_) {
+    return;
+  }
   typedef std::set<DesktopMediaID> SourceSet;
   SourceSet new_source_set;
   for (size_t i = 0; i < new_sources.size(); ++i) {
@@ -125,6 +145,9 @@ void DesktopMediaListBase::UpdateSourcesList(
 
 void DesktopMediaListBase::UpdateSourceThumbnail(DesktopMediaID id,
                                                  const gfx::ImageSkia& image) {
+  if (!observer_) {
+    return;
+  }
   for (size_t i = 0; i < sources_.size(); ++i) {
     if (sources_[i].id == id) {
       sources_[i].thumbnail = image;

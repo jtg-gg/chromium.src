@@ -232,6 +232,7 @@ NativeDesktopMediaList::NativeDesktopMediaList(
     : DesktopMediaListBase(base::TimeDelta::FromMilliseconds(
           kDefaultNativeDesktopMediaListUpdatePeriod)),
       thread_("DesktopMediaListCaptureThread"),
+      is_stopping_(false),
       weak_factory_(this) {
   type_ = type;
 
@@ -259,6 +260,12 @@ NativeDesktopMediaList::~NativeDesktopMediaList() {
   base::ScopedAllowBaseSyncPrimitivesOutsideBlockingScope allow_thread_join;
   thread_.task_runner()->DeleteSoon(FROM_HERE, worker_.release());
   thread_.Stop();
+}
+
+bool NativeDesktopMediaList::Stop() {
+  is_stopping_ = true;
+  DesktopMediaListBase::Stop();
+  return true;
 }
 
 void NativeDesktopMediaList::Refresh() {
@@ -337,6 +344,10 @@ void NativeDesktopMediaList::RefreshForAuraWindows(
 }
 
 void NativeDesktopMediaList::UpdateNativeThumbnailsFinished() {
+  if (is_stopping_) {
+    delete this;
+    return;
+  }
 #if defined(USE_AURA)
   DCHECK(pending_native_thumbnail_capture_);
   pending_native_thumbnail_capture_ = false;

@@ -34,6 +34,7 @@ class NativeDesktopMediaList : public DesktopMediaListBase {
   // Refresh() posts a task for the |worker_| to update list of windows, get
   // thumbnails and schedule next refresh.
   void Refresh() override;
+  bool Stop() override;
 
   void RefreshForAuraWindows(std::vector<SourceDescription> sources);
   void UpdateNativeThumbnailsFinished();
@@ -46,6 +47,7 @@ class NativeDesktopMediaList : public DesktopMediaListBase {
 
   base::Thread thread_;
   std::unique_ptr<Worker> worker_;
+  bool is_stopping_;
 
 #if defined(USE_AURA)
   // previous_aura_thumbnail_hashes_ holds thumbanil hash values of aura windows

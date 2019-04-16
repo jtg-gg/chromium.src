@@ -25,6 +25,18 @@ webrtc::DesktopCaptureOptions CreateDesktopCaptureOptions() {
   } else {
     options.set_allow_use_magnification_api(true);
   }
+  static constexpr base::Feature kMagnifierApiWindowCapturer{
+      "MagnifierApiWindowCapturer", base::FEATURE_DISABLED_BY_DEFAULT};
+  options.set_allow_magnification_api_for_window_capture(
+      base::FeatureList::IsEnabled(kMagnifierApiWindowCapturer));
+  static constexpr base::Feature kCaptureUWPApp{
+      "CaptureUWPApp", base::FEATURE_ENABLED_BY_DEFAULT};
+  options.set_allow_uwp_window_capture(
+      base::FeatureList::IsEnabled(kCaptureUWPApp));
+  static constexpr base::Feature kWindowsGraphicsCapturer{
+      "WindowsGraphicsCapturer", base::FEATURE_ENABLED_BY_DEFAULT};
+  options.set_allow_windows_graphics_capturer(
+      base::FeatureList::IsEnabled(kWindowsGraphicsCapturer));
 #elif defined(OS_MACOSX)
   if (base::FeatureList::IsEnabled(features::kIOSurfaceCapturer)) {
     options.set_allow_iosurface(true);
@@ -44,8 +56,13 @@ std::unique_ptr<webrtc::DesktopCapturer> CreateScreenCapturer() {
 }
 
 std::unique_ptr<webrtc::DesktopCapturer> CreateWindowCapturer() {
-  return webrtc::DesktopCapturer::CreateWindowCapturer(
-      CreateDesktopCaptureOptions());
+  const webrtc::DesktopCaptureOptions& options = CreateDesktopCaptureOptions();
+#if defined(OS_WIN)
+  if (options.allow_magnification_api_for_window_capture()) {
+    return webrtc::CroppingWindowCapturer::CreateCapturer(options);
+  }
+#endif
+  return webrtc::DesktopCapturer::CreateWindowCapturer(options);
 }
 
 }  // namespace desktop_capture
