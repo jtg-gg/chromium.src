@@ -15,6 +15,7 @@
 #include "base/memory/ref_counted.h"
 #include "base/synchronization/waitable_event.h"
 #include "base/task/post_task.h"
+#include "base/threading/thread.h"
 #include "base/threading/thread_local.h"
 #include "build/build_config.h"
 #include "third_party/webrtc/rtc_base/refcount.h"
@@ -119,8 +120,9 @@ class TaskQueue::Impl : public RefCountInterface {
   };
 
   TaskQueue* const queue_;
-  const ::scoped_refptr<base::SequencedTaskRunner> task_runner_;
+  ::scoped_refptr<base::SequencedTaskRunner> task_runner_;
   bool is_active_ = true;  // Checked and set on |task_runner_|.
+  std::unique_ptr<base::Thread> thread_;
 };
 
 // TaskQueue::Impl.
@@ -128,8 +130,20 @@ class TaskQueue::Impl : public RefCountInterface {
 TaskQueue::Impl::Impl(const char* queue_name,
                       TaskQueue* queue,
                       const base::TaskTraits& traits)
-    : queue_(queue),
-      task_runner_(base::CreateSequencedTaskRunnerWithTraits(traits)) {
+    : queue_(queue) {
+#if defined(OS_WIN)
+  if (!strcmp(queue_name, "ScreenCapturerWinMagnifierWorker")) {
+    base::MessageLoop::Type thread_type = base::MessageLoop::TYPE_UI;
+    thread_ = std::make_unique<base::Thread>(queue_name);
+    thread_->init_com_with_mta(true);
+    thread_->StartWithOptions(base::Thread::Options(thread_type, 0));
+    task_runner_ = thread_->task_runner();
+  } 
+  else 
+#endif
+  {
+    task_runner_ = base::CreateSequencedTaskRunnerWithTraits(traits);
+  }
   DCHECK(task_runner_);
 }
 
