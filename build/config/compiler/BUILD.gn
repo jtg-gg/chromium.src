@@ -561,6 +561,9 @@ config("compiler") {
     defines += [ "_LIBCPP_HAS_NO_ALIGNED_ALLOCATION" ]
     cflags_cc += [ "-stdlib=libc++" ]
     ldflags += [ "-stdlib=libc++" ]
+    if (is_component_build) {
+      ldflags += [ "-lc++abi" ]
+    }
   }
 
   # Add flags for link-time optimization. These flags enable
