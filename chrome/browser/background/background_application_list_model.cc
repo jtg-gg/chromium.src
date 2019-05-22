@@ -365,7 +365,7 @@ void BackgroundApplicationListModel::OnExtensionPermissionsUpdated(
         DissociateApplicationData(extension);
         break;
       default:
-        NOTREACHED();
+        DLOG(WARNING) << "NotReached";
     }
   }
 }

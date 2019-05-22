@@ -11,7 +11,6 @@
 #include <utility>
 #include <vector>
 
-#include "content/nw/src/common/nw_content_common_hooks.h"
 #include "content/nw/src/common/shell_switches.h"
 #include "content/nw/src/nw_content.h"
 #include "content/nw/src/nw_base.h"

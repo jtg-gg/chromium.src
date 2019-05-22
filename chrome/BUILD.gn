@@ -466,7 +466,6 @@ if (is_win || (is_linux && !is_component_build)) {
         "//services/service_manager/embedder",
         "//third_party/wtl",
         "//ui/views",
-        "//v8:v8_initializers",
     ]
     
     ldflags += [
@@ -521,6 +520,7 @@ if (is_win || (is_linux && !is_component_build)) {
     ]
 
     if (!is_component_build) {
+      deps += ["//v8:v8_initializers"]
       # This is a large module that can't do incremental linking in some
       # cases.
       configs -= [ "//build/config/win:default_incremental_linking" ]
