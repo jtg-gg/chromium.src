@@ -323,7 +323,7 @@ void FeatureList::FinalizeInitialization() {
 bool FeatureList::IsFeatureEnabled(const Feature& feature) {
   DCHECK(initialized_);
   DCHECK(IsValidFeatureOrFieldTrialName(feature.name)) << feature.name;
-  DCHECK(CheckFeatureIdentity(feature)) << feature.name;
+  //DCHECK(CheckFeatureIdentity(feature)) << feature.name;
 
   auto it = overrides_.find(feature.name);
   if (it != overrides_.end()) {
