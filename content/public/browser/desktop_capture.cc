@@ -33,6 +33,10 @@ webrtc::DesktopCaptureOptions CreateDesktopCaptureOptions() {
       "CaptureUWPApp", base::FEATURE_ENABLED_BY_DEFAULT};
   options.set_allow_uwp_window_capture(
       base::FeatureList::IsEnabled(kCaptureUWPApp));
+  static constexpr base::Feature kWindowsGraphicsCapturer{
+      "WindowsGraphicsCapturer", base::FEATURE_ENABLED_BY_DEFAULT};
+  options.set_allow_windows_graphics_capturer(
+      base::FeatureList::IsEnabled(kWindowsGraphicsCapturer));
 #elif defined(OS_MACOSX)
   if (base::FeatureList::IsEnabled(features::kIOSurfaceCapturer)) {
     options.set_allow_iosurface(true);
