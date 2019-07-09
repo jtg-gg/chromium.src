@@ -26,9 +26,13 @@ webrtc::DesktopCaptureOptions CreateDesktopCaptureOptions() {
     options.set_allow_use_magnification_api(true);
   }
   static constexpr base::Feature kMagnifierApiWindowCapturer{
-      "MagnifierApiWindowCapturer", base::FEATURE_ENABLED_BY_DEFAULT};
+      "MagnifierApiWindowCapturer", base::FEATURE_DISABLED_BY_DEFAULT};
   options.set_allow_magnification_api_for_window_capture(
       base::FeatureList::IsEnabled(kMagnifierApiWindowCapturer));
+  static constexpr base::Feature kCaptureUWPApp{
+      "CaptureUWPApp", base::FEATURE_ENABLED_BY_DEFAULT};
+  options.set_allow_uwp_window_capture(
+      base::FeatureList::IsEnabled(kCaptureUWPApp));
 #elif defined(OS_MACOSX)
   if (base::FeatureList::IsEnabled(features::kIOSurfaceCapturer)) {
     options.set_allow_iosurface(true);
