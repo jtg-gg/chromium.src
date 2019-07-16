@@ -26,6 +26,7 @@
 #include "util/file/directory_reader.h"
 #include "util/file/filesystem.h"
 #include "util/misc/initialization_state_dcheck.h"
+#include "util/misc/memory_sanitizer.h"
 
 namespace crashpad {
 
@@ -41,14 +42,6 @@ UUID UUIDFromReportPath(const base::FilePath& path) {
   UUID uuid;
   uuid.InitializeFromString(path.RemoveFinalExtension().BaseName().value());
   return uuid;
-}
-
-bool AttachmentNameIsOK(const std::string& name) {
-  for (const char c : name) {
-    if (c != '_' && c != '-' && c != '.' && !isalnum(c))
-      return false;
-  }
-  return true;
 }
 
 using OperationStatus = CrashReportDatabase::OperationStatus;
@@ -1003,6 +996,11 @@ bool CrashReportDatabaseGeneric::WriteNewMetadata(const base::FilePath& path) {
   }
 
   ReportMetadata metadata;
+#if defined(MEMORY_SANITIZER)
+  // memset() + re-initialization is required to zero padding bytes for MSan.
+  memset(&metadata, 0, sizeof(metadata));
+#endif  // defined(MEMORY_SANITIZER)
+  metadata = {};
   metadata.creation_time = time(nullptr);
 
   return LoggingWriteFile(handle.get(), &metadata, sizeof(metadata));
@@ -1023,6 +1021,11 @@ bool CrashReportDatabaseGeneric::WriteMetadata(const base::FilePath& path,
   }
 
   ReportMetadata metadata;
+#if defined(MEMORY_SANITIZER)
+  // memset() + re-initialization is required to zero padding bytes for MSan.
+  memset(&metadata, 0, sizeof(metadata));
+#endif  // defined(MEMORY_SANITIZER)
+  metadata = {};
   metadata.creation_time = report.creation_time;
   metadata.last_upload_attempt_time = report.last_upload_attempt_time;
   metadata.upload_attempts = report.upload_attempts;

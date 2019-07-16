@@ -155,12 +155,12 @@ void ProcessSnapshotLinux::GetCrashpadOptions(
   *options = local_options;
 }
 
-pid_t ProcessSnapshotLinux::ProcessID() const {
+crashpad::ProcessID ProcessSnapshotLinux::ProcessID() const {
   INITIALIZATION_STATE_DCHECK_VALID(initialized_);
   return process_reader_.ProcessID();
 }
 
-pid_t ProcessSnapshotLinux::ParentProcessID() const {
+crashpad::ProcessID ProcessSnapshotLinux::ParentProcessID() const {
   INITIALIZATION_STATE_DCHECK_VALID(initialized_);
   return process_reader_.ParentProcessID();
 }
@@ -273,7 +273,8 @@ void ProcessSnapshotLinux::InitializeModules() {
         std::make_unique<internal::ModuleSnapshotElf>(reader_module.name,
                                                       reader_module.elf_reader,
                                                       reader_module.type,
-                                                      &memory_range_);
+                                                      &memory_range_,
+                                                      process_reader_.Memory());
     if (module->Initialize()) {
       modules_.push_back(std::move(module));
     }
