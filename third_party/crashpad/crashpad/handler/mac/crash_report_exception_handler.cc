@@ -23,10 +23,12 @@
 #include "base/strings/stringprintf.h"
 #include "client/settings.h"
 #include "handler/mac/file_limit_annotation.h"
+#include "handler/minidump_to_upload_parameters.h"
 #include "minidump/minidump_file_writer.h"
 #include "minidump/minidump_user_extension_stream_data_source.h"
 #include "snapshot/crashpad_info_client_options.h"
 #include "snapshot/mac/process_snapshot_mac.h"
+#include "util/file/file_helper.h"
 #include "util/file/file_writer.h"
 #include "util/mach/bootstrap.h"
 #include "util/mach/exc_client_variants.h"
@@ -177,6 +179,26 @@ kern_return_t CrashReportExceptionHandler::CatchMachException(
       Metrics::ExceptionCaptureResult(
           Metrics::CaptureResult::kMinidumpWriteFailed);
       return KERN_FAILURE;
+    }
+
+    const std::map<std::string, std::string> parameters = BreakpadHTTPFormParametersFromMinidump(&process_snapshot);
+    const auto nwjs_log = parameters.find("nwjs.log");
+    if (nwjs_log != parameters.end()) {
+      const base::FilePath attachment(base::FilePath::StringType(nwjs_log->second.begin(), nwjs_log->second.end()));
+      FileReader file_reader;
+      if (file_reader.Open(attachment)) {
+        FileWriter* file_writer =
+            new_report->AddAttachment("nwjs.log");
+        if (file_writer != nullptr) {
+          CopyFileContent(&file_reader, file_writer);
+        } else {
+          LOG(ERROR) << "attachment nwjs.log"
+                     << " couldn't be created, skipping";          
+        }
+      } else {
+        LOG(ERROR) << "attachment " << attachment.value().c_str()
+                   << " couldn't be opened, skipping";        
+      }
     }
 
     UUID uuid;

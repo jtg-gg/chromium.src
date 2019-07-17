@@ -21,6 +21,7 @@
 #include "client/crash_report_database.h"
 #include "client/settings.h"
 #include "handler/crash_report_upload_thread.h"
+#include "handler/minidump_to_upload_parameters.h"
 #include "minidump/minidump_file_writer.h"
 #include "minidump/minidump_user_extension_stream_data_source.h"
 #include "snapshot/win/process_snapshot_win.h"
@@ -114,6 +115,26 @@ unsigned int CrashReportExceptionHandler::ExceptionHandlerServerException(
       Metrics::ExceptionCaptureResult(
           Metrics::CaptureResult::kMinidumpWriteFailed);
       return termination_code;
+    }
+    
+    const std::map<std::string, std::string> parameters = BreakpadHTTPFormParametersFromMinidump(&process_snapshot);
+    const auto nwjs_log = parameters.find("nwjs.log");
+    if (nwjs_log != parameters.end()) {
+      const base::FilePath attachment(base::FilePath::StringType(nwjs_log->second.begin(), nwjs_log->second.end()));
+      FileReader file_reader;
+      if (file_reader.Open(attachment)) {
+        FileWriter* file_writer =
+            new_report->AddAttachment("nwjs.log");
+        if (file_writer != nullptr) {
+          CopyFileContent(&file_reader, file_writer);
+        } else {
+          LOG(ERROR) << "attachment nwjs.log"
+                     << " couldn't be created, skipping";          
+        }
+      } else {
+        LOG(ERROR) << "attachment " << attachment.value().c_str()
+                   << " couldn't be opened, skipping";        
+      }
     }
 
     for (const auto& attachment : (*attachments_)) {
