@@ -53,6 +53,7 @@
 #include "chrome/common/chrome_switches.h"
 #include "chrome/common/env_vars.h"
 #include "content/public/common/content_switches.h"
+#include "components/crash/core/common/crash_key.h"
 #include "ipc/ipc_logging.h"
 
 #if defined(OS_CHROMEOS)
@@ -322,6 +323,10 @@ void InitChromeLogging(const base::CommandLine& command_line,
     return;
   }
 #endif  // defined(OS_CHROMEOS)
+  if ((logging_dest & LOG_TO_FILE) != 0) {
+    static crash_reporter::CrashKeyString<255> attachment_nwjs_log("attachment_nwjs.log");
+    attachment_nwjs_log.Set(log_path.MaybeAsASCII());
+  }
 
   // We call running in unattended mode "headless", and allow headless mode to
   // be configured either by the Environment Variable or by the Command Line
