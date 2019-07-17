@@ -77,7 +77,7 @@ void SetExceptionInformation(siginfo_t* siginfo,
 
 void SetClientInformation(ExceptionInformation* exception,
                           SanitizationInformation* sanitization,
-                          ClientInformation* info) {
+                          ExceptionHandlerProtocol::ClientInformation* info) {
   info->exception_information_address =
       FromPointerCast<decltype(info->exception_information_address)>(exception);
 
@@ -128,12 +128,12 @@ class SandboxedHandler {
       SetExceptionInformation(siginfo, static_cast<ucontext_t*>(context),
                               &exception_information);
 
-      ClientInformation info;
+      ExceptionHandlerProtocol::ClientInformation info;
       SetClientInformation(&exception_information, &sanitization_, &info);
 
       ScopedPrSetDumpable set_dumpable(/* may_log= */ false);
 
-      ExceptionHandlerClient handler_client(connection.get());
+      ExceptionHandlerClient handler_client(connection.get(), false);
       handler_client.SetCanSetPtracer(false);
       handler_client.RequestCrashDump(info);
     }
@@ -664,12 +664,12 @@ bool DumpWithoutCrashingForClient(CrashReporterClient* client) {
   crashpad::ExceptionInformation exception;
   crashpad::SetExceptionInformation(&siginfo, &context, &exception);
 
-  crashpad::ClientInformation info;
+  crashpad::ExceptionHandlerProtocol::ClientInformation info;
   crashpad::SetClientInformation(&exception, &sanitization, &info);
 
   crashpad::ScopedPrSetDumpable set_dumpable(/* may_log= */ false);
 
-  crashpad::ExceptionHandlerClient handler_client(connection.get());
+  crashpad::ExceptionHandlerClient handler_client(connection.get(), false);
   return handler_client.RequestCrashDump(info) == 0;
 }
 

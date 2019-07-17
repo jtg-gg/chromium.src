@@ -20,6 +20,7 @@
 #include "client/crash_report_database.h"
 #include "client/settings.h"
 #include "handler/crash_report_upload_thread.h"
+#include "handler/minidump_to_upload_parameters.h"
 #include "minidump/minidump_file_writer.h"
 #include "minidump/minidump_user_extension_stream_data_source.h"
 #include "snapshot/win/process_snapshot_win.h"
@@ -117,6 +118,7 @@ unsigned int CrashReportExceptionHandler::ExceptionHandlerServerException(
     }
 
     if (process_attachments_) {
+      const std::map<std::string, std::string> parameters = BreakpadHTTPFormParametersFromMinidump(&process_snapshot);
       // Note that attachments are read at this point each time rather than once
       // so that if the contents of the file has changed it will be re-read for
       // each upload (e.g. in the case of a log file).
@@ -124,7 +126,12 @@ unsigned int CrashReportExceptionHandler::ExceptionHandlerServerException(
         FileWriter* writer = new_report->AddAttachment(it.first);
         if (writer) {
           std::string contents;
-          if (!LoggingReadEntireFile(it.second, &contents)) {
+          auto file_override = parameters.find(it.first);
+          base::FilePath log_path = it.second;
+          if (file_override != parameters.end()) {
+            log_path = base::FilePath(base::FilePath::StringType(file_override->second.begin(), file_override->second.end()));
+          }
+          if (!LoggingReadEntireFile(log_path, &contents)) {
             // Not being able to read the file isn't considered fatal, and
             // should not prevent the report from being processed.
             continue;
