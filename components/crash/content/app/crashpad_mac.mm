@@ -169,7 +169,10 @@ base::FilePath PlatformCrashpadInitialization(
             "--reset-own-crash-exception-port-to-system-default");
       }
 
-      
+      std::string attachment = "--attachment=attachment_nwjs.log=debug.log";
+      LOG(INFO) << "crashpad attachment: " << attachment;
+      arguments.push_back(attachment);
+
       bool result = GetCrashpadClient().StartHandler(
           handler_path, database_path, metrics_path, url,
           process_annotations, arguments, true, false);
