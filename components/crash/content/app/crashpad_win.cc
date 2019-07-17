@@ -145,6 +145,14 @@ base::FilePath PlatformCrashpadInitialization(
     arguments.push_back(std::string("--monitor-self-annotation=ptype=") +
                         switches::kCrashpadHandler);
 
+    base::FilePath log_path(logging::GetLogFileFullPath());
+    log_path = log_path.DirName();
+    log_path = log_path.Append(FILE_PATH_LITERAL("chrome_debug.log"));
+    std::string attachment = "--attachment=attachment_chrome_debug.log=";
+    attachment += log_path.MaybeAsASCII();
+    LOG(INFO) << "crashpad attachment: " << attachment;
+    arguments.push_back(attachment);
+
     GetCrashpadClient().StartHandler(exe_file, database_path, metrics_path, url,
                                      process_annotations, arguments, false,
                                      false);
