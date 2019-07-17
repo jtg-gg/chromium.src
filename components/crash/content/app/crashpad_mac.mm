@@ -169,7 +169,13 @@ base::FilePath PlatformCrashpadInitialization(
             "--reset-own-crash-exception-port-to-system-default");
       }
 
-      
+      base::FilePath log_path = database_path.DirName();
+      log_path = log_path.Append("chrome_debug.log");
+      std::string attachment = "--attachment=attachment_chrome_debug.log=";
+      attachment += log_path.MaybeAsASCII();
+      LOG(INFO) << "crashpad attachment: " << attachment;
+      arguments.push_back(attachment);
+
       bool result = GetCrashpadClient().StartHandler(
           handler_path, database_path, metrics_path, url,
           process_annotations, arguments, true, false);
