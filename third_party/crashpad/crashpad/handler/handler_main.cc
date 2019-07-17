@@ -162,7 +162,7 @@ void Usage(const base::FilePath& me) {
 #endif  // OS_LINUX || OS_ANDROID
 "      --url=URL               send crash reports to this Breakpad server URL,\n"
 "                              only if uploads are enabled for the database\n"
-#if defined(OS_WIN) || defined(OS_FUCHSIA) || defined(OS_LINUX)
+#if defined(OS_WIN) || defined(OS_FUCHSIA) || defined(OS_LINUX) || defined(OS_MACOSX)
 "      --attachment=NAME=PATH  attach a copy of a file, along with a crash dump\n"
 #endif // OS_WIN || OS_FUCHSIA || OS_LINUX
 #if defined(OS_CHROMEOS)
@@ -227,7 +227,7 @@ bool AddKeyValueToMap(std::map<std::string, std::string>* map,
   }
   return true;
 }
-#if defined(OS_WIN) || defined(OS_FUCHSIA) || defined(OS_LINUX)
+#if defined(OS_WIN) || defined(OS_FUCHSIA) || defined(OS_LINUX) || defined(OS_MACOSX)
 // Overloaded version, to accept base::FilePath as a VALUE.
 bool AddKeyValueToMap(std::map<std::string, base::FilePath>* map,
                       const std::string& key_value,
@@ -600,7 +600,7 @@ int HandlerMain(int argc,
     kOptionTraceParentWithException,
 #endif
     kOptionURL,
-#if defined(OS_WIN) || defined(OS_FUCHSIA) || defined (OS_LINUX)
+#if defined(OS_WIN) || defined(OS_FUCHSIA) || defined (OS_LINUX) || defined(OS_MACOSX)
     kOptionAttachment,
 #endif // OS_WIN || OS_FUCHSIA || OS_LINUX
 #if defined(OS_CHROMEOS)
@@ -671,7 +671,7 @@ int HandlerMain(int argc,
      kOptionTraceParentWithException},
 #endif  // OS_LINUX || OS_ANDROID
     {"url", required_argument, nullptr, kOptionURL},
-#if defined(OS_WIN) || defined(OS_FUCHSIA) || defined (OS_LINUX)
+#if defined(OS_WIN) || defined(OS_FUCHSIA) || defined (OS_LINUX) || defined(OS_MACOSX)
     {"attachment", required_argument, nullptr, kOptionAttachment},
 #endif // OS_WIN || OS_FUCHSIA || OS_LINUX
 #if defined(OS_CHROEMOS)
@@ -821,7 +821,7 @@ int HandlerMain(int argc,
         options.url = optarg;
         break;
       }
-#if defined(OS_WIN) || defined(OS_FUCHSIA) || defined(OS_LINUX)
+#if defined(OS_WIN) || defined(OS_FUCHSIA) || defined(OS_LINUX) || defined(OS_MACOSX)
       case kOptionAttachment: {
         if (!AddKeyValueToMap(&options.attachments, optarg, "--attachment")) {
           return ExitFailure();
