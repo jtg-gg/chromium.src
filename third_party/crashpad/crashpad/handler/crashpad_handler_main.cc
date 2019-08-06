@@ -1,4 +1,4 @@
-// Copyright 2018 The Crashpad Authors. All rights reserved.
+// Copyright 2019 The Crashpad Authors. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,17 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "util/linux/exception_handler_protocol.h"
+#include "handler/handler_main.h"
 
 namespace crashpad {
 
-ExceptionHandlerProtocol::ClientInformation::ClientInformation()
-    : exception_information_address(0), sanitization_information_address(0) {}
+extern "C" {
 
-ExceptionHandlerProtocol::ClientToServerMessage::ClientToServerMessage()
-    : version(kVersion),
-      type(kTypeCrashDumpRequest),
-      requesting_thread_stack_address(0),
-      client_info() {}
+__attribute__((visibility("default"), used)) int CrashpadHandlerMain(
+    int argc,
+    char* argv[]) {
+  return HandlerMain(argc, argv, nullptr);
+}
+
+}  // extern "C"
 
 }  // namespace crashpad
