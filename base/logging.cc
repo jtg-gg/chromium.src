@@ -335,6 +335,10 @@ bool InitializeLogFileHandle() {
                             FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
                             OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
     if (g_log_file == INVALID_HANDLE_VALUE || g_log_file == nullptr) {
+#if defined(NDEBUG)
+      g_log_file = nullptr;
+      return false;
+#endif
       // We are intentionally not using FilePath or FileUtil here to reduce the
       // dependencies of the logging implementation. For e.g. FilePath and
       // FileUtil depend on shell32 and user32.dll. This is not acceptable for
