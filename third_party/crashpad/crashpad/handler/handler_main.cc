@@ -45,6 +45,7 @@
 #include "client/simple_string_dictionary.h"
 #include "handler/crash_report_upload_thread.h"
 #include "handler/prune_crash_reports_thread.h"
+#include "base/strings/utf_string_conversions.h"
 #include "tools/tool_support.h"
 #include "util/file/file_io.h"
 #include "util/misc/address_types.h"
@@ -161,6 +162,9 @@ void Usage(const base::FilePath& me) {
 #endif  // OS_LINUX || OS_ANDROID
 "      --url=URL               send crash reports to this Breakpad server URL,\n"
 "                              only if uploads are enabled for the database\n"
+#if defined(OS_WIN) || defined(OS_FUCHSIA) || defined(OS_LINUX)
+"      --attachment=NAME=PATH  attach a copy of a file, along with a crash dump\n"
+#endif // OS_WIN || OS_FUCHSIA || OS_LINUX
 #if defined(OS_CHROMEOS)
 "      --use-cros-crash-reporter\n"
 #endif  // OS_CHROMEOS
@@ -173,6 +177,7 @@ void Usage(const base::FilePath& me) {
 struct Options {
   std::map<std::string, std::string> annotations;
   std::map<std::string, std::string> monitor_self_annotations;
+  std::map<std::string, base::FilePath> attachments;
   std::string url;
   base::FilePath database;
   base::FilePath metrics_dir;
@@ -222,6 +227,32 @@ bool AddKeyValueToMap(std::map<std::string, std::string>* map,
   }
   return true;
 }
+#if defined(OS_WIN) || defined(OS_FUCHSIA) || defined(OS_LINUX)
+// Overloaded version, to accept base::FilePath as a VALUE.
+bool AddKeyValueToMap(std::map<std::string, base::FilePath>* map,
+                      const std::string& key_value,
+                      const char* argument) {
+  std::string key;
+  std::string raw_value;
+  if (!SplitStringFirst(key_value, '=', &key, &raw_value)) {
+    LOG(ERROR) << argument << " requires NAME=PATH";
+    return false;
+  }
+
+#ifdef OS_WIN
+  base::FilePath value(base::UTF8ToUTF16(raw_value));
+#else
+  base::FilePath value(raw_value);
+#endif
+
+  base::FilePath old_value;
+  if (!MapInsertOrReplace(map, key, value, &old_value)) {
+    LOG(WARNING) << argument << " has duplicate name " << key
+                 << ", discarding value " << old_value.value().c_str();
+  }
+  return true;
+}
+#endif // OS_WIN || OS_FUCHSIA || OS_LINUX
 
 // Calls Metrics::HandlerLifetimeMilestone, but only on the first call. This is
 // to prevent multiple exit events from inadvertently being recorded, which
@@ -569,6 +600,9 @@ int HandlerMain(int argc,
     kOptionTraceParentWithException,
 #endif
     kOptionURL,
+#if defined(OS_WIN) || defined(OS_FUCHSIA) || defined (OS_LINUX)
+    kOptionAttachment,
+#endif // OS_WIN || OS_FUCHSIA || OS_LINUX
 #if defined(OS_CHROMEOS)
     kOptionUseCrosCrashReporter,
 #endif  // OS_CHROMEOS
@@ -637,6 +671,9 @@ int HandlerMain(int argc,
      kOptionTraceParentWithException},
 #endif  // OS_LINUX || OS_ANDROID
     {"url", required_argument, nullptr, kOptionURL},
+#if defined(OS_WIN) || defined(OS_FUCHSIA) || defined (OS_LINUX)
+    {"attachment", required_argument, nullptr, kOptionAttachment},
+#endif // OS_WIN || OS_FUCHSIA || OS_LINUX
 #if defined(OS_CHROEMOS)
     {"use-cros-crash-reporter",
       no_argument,
@@ -784,6 +821,14 @@ int HandlerMain(int argc,
         options.url = optarg;
         break;
       }
+#if defined(OS_WIN) || defined(OS_FUCHSIA) || defined(OS_LINUX)
+      case kOptionAttachment: {
+        if (!AddKeyValueToMap(&options.attachments, optarg, "--attachment")) {
+          return ExitFailure();
+        }
+        break;
+      }
+#endif // OS_WIN || OS_FUCHSIA || OS_LINUX
 #if defined(OS_CHROMEOS)
       case kOptionUseCrosCrashReporter: {
         options.use_cros_crash_reporter = true;
@@ -939,10 +984,10 @@ int HandlerMain(int argc,
       database.get(),
       static_cast<CrashReportUploadThread*>(upload_thread.Get()),
       &options.annotations,
-#if defined(OS_FUCHSIA)
-      // TODO(scottmg): Process level file attachments, and for all platforms.
-      nullptr,
-#endif
+#if defined(OS_WIN) || defined(OS_FUCHSIA) || defined(OS_LINUX) || defined(OS_MACOSX)
+      // TODO(scottmg): for all platforms.
+      &options.attachments,
+#endif // OS_WIN || OS_FUCHSIA || OS_LINUX || OS_MACOSX
       user_stream_sources);
 #endif  // OS_CHROMEOS
 
