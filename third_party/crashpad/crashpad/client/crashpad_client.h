@@ -46,6 +46,18 @@ class CrashpadClient {
   CrashpadClient();
   ~CrashpadClient();
 
+#if defined(OS_WIN)
+  bool StartHandlerForBacktrace(const base::FilePath& handler,
+                                const base::FilePath& database,
+                                const base::FilePath& metrics_dir,
+                                const std::string& url,
+                                const std::map<std::string, std::string>& annotations,
+                                const std::vector<std::string>& arguments,
+                                const std::map<std::string, std::string>& fileAttachments,
+                                bool restartable,
+                                bool asynchronous_start);
+#endif
+
   //! \brief Starts a Crashpad handler process, performing any necessary
   //!     handshake to configure it.
   //!
@@ -413,6 +425,15 @@ class CrashpadClient {
   //! \param[in] handler The custom crash signal handler to install.
   static void SetFirstChanceExceptionHandler(FirstChanceHandler handler);
 
+  static bool StartHandlerAtCrashForBacktrace(
+      const base::FilePath& handler,
+      const base::FilePath& database,
+      const base::FilePath& metrics_dir,
+      const std::string& url,
+      const std::map<std::string, std::string>& annotations,
+      const std::vector<std::string>& arguments,
+      const std::map<std::string, std::string>& fileAttachments
+      );
 #endif  // OS_LINUX || OS_ANDROID || DOXYGEN
 
 #if defined(OS_MACOSX) || DOXYGEN
@@ -512,6 +533,12 @@ class CrashpadClient {
   //!     error message will have been logged.
   bool WaitForHandlerStart(unsigned int timeout_ms);
 
+   //! \brief Requests that the handler capture a dump even though there hasn't
+  //!     been a crash.
+  //!
+  //! \param[in] pointer A `EXCEPTION_POINTERS`to current exception received in application 
+  static void DumpWithoutCrashWithException(EXCEPTION_POINTERS* pointer);
+  
   //! \brief Requests that the handler capture a dump even though there hasn't
   //!     been a crash.
   //!
