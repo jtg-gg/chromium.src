@@ -333,7 +333,8 @@ void VideoTrackAdapter::VideoFrameResolutionAdapter::DeliverFrame(
     // |desired_size| that fits entirely inside of |frame->visible_rect()|.
     // This will be the rect we need to crop the original frame to.
     // From this rect, the original frame can be scaled down to |desired_size|.
-    const gfx::Rect region_in_frame =
+    const gfx::Rect region_in_frame = (frame->format() == media::PIXEL_FORMAT_I420) ?
+        media::ComputeLetterboxRegionForI420(frame->visible_rect(), desired_size) :
         media::ComputeLetterboxRegion(frame->visible_rect(), desired_size);
 
     video_frame = media::VideoFrame::WrapVideoFrame(
