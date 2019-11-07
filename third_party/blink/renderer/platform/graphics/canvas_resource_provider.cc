@@ -1185,6 +1185,10 @@ std::unique_ptr<CanvasResourceProvider> CanvasResourceProvider::Create(
             resource_dispatcher);
         break;
       case CanvasResourceType::kSharedImage: {
+#if defined(OS_WIN)
+        // quickfix, shared image is causing image corruption on windows
+        continue;
+#endif
         DCHECK_NE(usage, ResourceUsage::kSoftwareResourceUsage);
 
         if (!context_provider_wrapper)
