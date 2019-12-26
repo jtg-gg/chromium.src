@@ -120,15 +120,16 @@ const gfx::Image GetMaskedSmallImage(const gfx::ImageSkia& small_image) {
   int height = small_image.height();
 
   // Background color grey
-  const gfx::ImageSkia background = CreateSolidColorImage(
-      width, height, message_center::kSmallImageMaskBackgroundColor);
+  //const gfx::ImageSkia background = CreateSolidColorImage(
+  //    width, height, message_center::kSmallImageMaskBackgroundColor);
   // Foreground color white
   const gfx::ImageSkia foreground = CreateSolidColorImage(
       width, height, message_center::kSmallImageMaskForegroundColor);
   const gfx::ImageSkia masked_small_image =
       gfx::ImageSkiaOperations::CreateMaskedImage(foreground, small_image);
-  return gfx::Image(gfx::ImageSkiaOperations::CreateSuperimposedImage(
-      background, masked_small_image));
+  return gfx::Image(masked_small_image);
+  //return gfx::Image(gfx::ImageSkiaOperations::CreateSuperimposedImage(
+  //    background, masked_small_image));
 }
 
 // Converts the |notification_bitmap| (in RGBA format) to the |*return_image|
