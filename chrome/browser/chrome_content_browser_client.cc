@@ -2128,6 +2128,9 @@ void ChromeContentBrowserClient::AppendExtraCommandLineSwitches(
   if (process_type == switches::kRendererProcess) {
     command_line->AppendSwitch(switches::kNWJS);
 
+    if (browser_command_line.HasSwitch(switches::kDisablePinch)) {
+      command_line->AppendSwitch(switches::kDisablePinch);
+    }
     content::RenderProcessHost* process =
         content::RenderProcessHost::FromID(child_process_id);
     Profile* profile =
