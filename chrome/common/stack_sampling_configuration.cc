@@ -37,7 +37,7 @@ bool IsProfilerSupported() {
   return channel == version_info::Channel::CANARY ||
          channel == version_info::Channel::DEV;
 #else
-  return true;
+  return false;
 #endif
 #else
   return false;
