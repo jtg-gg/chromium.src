@@ -114,6 +114,7 @@ if (use_v8_context_snapshot) {
     sources = [ "v8_context_snapshot_generator.cc" ]
 
     deps = [
+      "//content/public/common:static_switches",
       "//gin:gin",
       "//mojo/core/embedder",
       "//services/service_manager/public/cpp",

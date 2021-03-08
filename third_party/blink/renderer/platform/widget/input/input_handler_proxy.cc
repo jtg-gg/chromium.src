@@ -23,6 +23,7 @@
 #include "base/time/default_tick_clock.h"
 #include "base/trace_event/trace_event.h"
 #include "build/build_config.h"
+#include "content/public/common/content_switches.h"
 #include "cc/base/features.h"
 #include "cc/input/main_thread_scrolling_reason.h"
 #include "cc/metrics/event_metrics.h"
@@ -606,6 +607,12 @@ bool HasScrollbarJumpKeyModifier(const WebInputEvent& event) {
 #endif
 }
 
+static bool IsPinchToZoomEnabled() {
+  const base::CommandLine& command_line =
+      *base::CommandLine::ForCurrentProcess();
+  return !command_line.HasSwitch(switches::kDisablePinch);
+}
+
 InputHandlerProxy::EventDisposition
 InputHandlerProxy::RouteToTypeSpecificHandler(
     EventWithCallback* event_with_callback,
@@ -653,6 +660,8 @@ InputHandlerProxy::RouteToTypeSpecificHandler(
       return HandleGestureScrollEnd(static_cast<const WebGestureEvent&>(event));
 
     case WebInputEvent::Type::kGesturePinchBegin: {
+      if (!IsPinchToZoomEnabled())
+        return DID_NOT_HANDLE;      
       DCHECK(!gesture_pinch_in_progress_);
       input_handler_->PinchGestureBegin();
       gesture_pinch_in_progress_ = true;
@@ -660,6 +669,8 @@ InputHandlerProxy::RouteToTypeSpecificHandler(
     }
 
     case WebInputEvent::Type::kGesturePinchEnd: {
+      if (!IsPinchToZoomEnabled())
+        return DID_NOT_HANDLE;      
       DCHECK(gesture_pinch_in_progress_);
       gesture_pinch_in_progress_ = false;
       const WebGestureEvent& gesture_event =
@@ -671,6 +682,8 @@ InputHandlerProxy::RouteToTypeSpecificHandler(
     }
 
     case WebInputEvent::Type::kGesturePinchUpdate: {
+      if (!IsPinchToZoomEnabled())
+        return DID_NOT_HANDLE;      
       DCHECK(gesture_pinch_in_progress_);
       const WebGestureEvent& gesture_event =
           static_cast<const WebGestureEvent&>(event);
